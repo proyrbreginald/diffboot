@@ -3,7 +3,7 @@
   * @warning 请使用GCC进行预处理后生成的版本。
   */
 
-#include "partition.h"
+#include <partition.h>
 
 /* MCU内存分区 */
 MEMORY
