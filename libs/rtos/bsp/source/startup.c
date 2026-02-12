@@ -21,24 +21,28 @@
  */
 static int rti_start(void)
 {
+    LOG_N("start to auto init");
     return 0;
 }
 INIT_EXPORT(rti_start, "0");
 
 static int rti_board_start(void)
 {
+    LOG_N("auto init board");
     return 0;
 }
 INIT_EXPORT(rti_board_start, "0.end");
 
 static int rti_board_end(void)
 {
+    LOG_N("start to auto init components");
     return 0;
 }
 INIT_EXPORT(rti_board_end, "1.end");
 
 static int rti_end(void)
 {
+    LOG_N("auto init finish");
     return 0;
 }
 INIT_EXPORT(rti_end, "6.end");
@@ -46,43 +50,23 @@ INIT_EXPORT(rti_end, "6.end");
 // 初始化系统板
 void rt_hw_board_init(void)
 {
-#if RT_DEBUG_INIT
-    const struct rt_init_desc *desc;
-    LOG_N("start to initialize board");
-    for (desc = &__rt_init_desc_rti_board_start;
-         desc < &__rt_init_desc_rti_board_end; desc++)
-    {
-        LOG_D("initialize %s : %d done", desc->fn_name, desc->fn());
-    }
-#else
     volatile const init_fn_t *fn_ptr;
-    for (fn_ptr = &__rt_init_rti_board_start; fn_ptr < &__rt_init_rti_board_end;
+    for (fn_ptr = &__rt_init_rti_start; fn_ptr < &__rt_init_rti_board_end;
          fn_ptr++)
     {
         (*fn_ptr)();
     }
-#endif /* RT_DEBUG_INIT */
 }
 
 // 初始化rtos组件
 void rt_components_init(void)
 {
-#if RT_DEBUG_INIT
-    const struct rt_init_desc *desc;
-    LOG_N("start to initialize components");
-    for (desc = &__rt_init_desc_rti_board_end; desc < &__rt_init_desc_rti_end;
-         desc++)
-    {
-        LOG_D("initialize %s : %d done", desc->fn_name, desc->fn());
-    }
-#else
     volatile const init_fn_t *fn_ptr;
-    for (fn_ptr = &__rt_init_rti_board_end; fn_ptr < &__rt_init_rti_end;
+    for (fn_ptr = &__rt_init_rti_board_end; fn_ptr <= &__rt_init_rti_end;
          fn_ptr++)
     {
         (*fn_ptr)();
     }
-#endif /* RT_DEBUG_INIT */
 }
 
 // 创建业务层任务

@@ -34,7 +34,6 @@
 #define RT_DEBUG_COLOR               // 开启颜色日志
 #define RT_DEBUG_IRQ               0 // 中断日志
 #define RT_DEBUG_MEM               0 // 内存日志
-#define RT_DEBUG_INIT              1 // 初始化日志
 #define RT_DEBUG_MEMHEAP           0 // 堆内存日志
 #define RT_DEBUG_SLAB              0 // SLAB使用日志
 #define RT_DEBUG_DEVICE            0 // 设备日志

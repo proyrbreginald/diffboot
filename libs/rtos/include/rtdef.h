@@ -227,46 +227,19 @@ typedef __gnuc_va_list              va_list;
 typedef int (*init_fn_t)(void);
 #ifdef _MSC_VER
 #pragma section("rti_fn$f",read)
-    #if RT_DEBUG_INIT
-        struct rt_init_desc
-        {
-            const char* level;
-            const init_fn_t fn;
-            const char* fn_name;
-        };
-        #define INIT_EXPORT(fn, level)                                  \
-                                const char __rti_level_##fn[] = ".rti_fn." level;       \
-                                const char __rti_##fn##_name[] = #fn;                   \
-                                __declspec(allocate("rti_fn$f"))                        \
-                                RT_USED const struct rt_init_desc __rt_init_msc_##fn =  \
-                                {__rti_level_##fn, fn, __rti_##fn##_name};
-    #else
-        struct rt_init_desc
-        {
-            const char* level;
-            const init_fn_t fn;
-        };
-        #define INIT_EXPORT(fn, level)                                  \
-                                const char __rti_level_##fn[] = ".rti_fn." level;       \
-                                __declspec(allocate("rti_fn$f"))                        \
-                                RT_USED const struct rt_init_desc __rt_init_msc_##fn =  \
-                                {__rti_level_##fn, fn };
-    #endif
+    struct rt_init_desc
+    {
+        const char* level;
+        const init_fn_t fn;
+    };
+    #define INIT_EXPORT(fn, level)                                  \
+                            const char __rti_level_##fn[] = ".rti_fn." level;       \
+                            __declspec(allocate("rti_fn$f"))                        \
+                            RT_USED const struct rt_init_desc __rt_init_msc_##fn =  \
+                            {__rti_level_##fn, fn };
 #else
-    #if RT_DEBUG_INIT
-        struct rt_init_desc
-        {
-            const char* fn_name;
-            const init_fn_t fn;
-        };
-        #define INIT_EXPORT(fn, level)                                                       \
-            const char __rti_##fn##_name[] = #fn;                                            \
-            RT_USED const struct rt_init_desc __rt_init_desc_##fn RT_SECTION(".rti_fn." level) = \
-            { __rti_##fn##_name, fn};
-    #else
-        #define INIT_EXPORT(fn, level)                                                       \
-            RT_USED const init_fn_t __rt_init_##fn RT_SECTION(".rti_fn." level) = fn
-    #endif
+    #define INIT_EXPORT(fn, level)                                                       \
+        RT_USED const init_fn_t __rt_init_##fn RT_SECTION(".rti_fn." level) = fn
 #endif
 #else
 #define INIT_EXPORT(fn, level)
