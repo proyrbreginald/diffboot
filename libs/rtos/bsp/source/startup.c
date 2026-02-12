@@ -58,6 +58,7 @@ void rt_hw_board_init(void)
     }
 }
 
+#ifdef RT_USING_COMPONENTS_INIT
 // 初始化rtos组件
 void rt_components_init(void)
 {
@@ -68,6 +69,7 @@ void rt_components_init(void)
         (*fn_ptr)();
     }
 }
+#endif
 
 // 创建业务层任务
 RT_WEAK void rt_app_init(void)
@@ -87,8 +89,10 @@ void rtthread_startup(void)
     // 初始化系统板
     rt_hw_board_init();
 
+#ifdef RT_USING_COMPONENTS_INIT
     // 初始化rtos组件
     rt_components_init();
+#endif
 
     // 打印rtos版本到控制台
     rt_show_version();

@@ -44,6 +44,8 @@ targets:
       - libs/libstm32h743/hal/source/stm32h7xx_hal_timebase_rtc_alarm_template.c
       - libs/libstm32h743/hal/source/stm32h7xx_hal_timebase_rtc_wakeup_template.c
       - libs/libstm32h743/hal/source/stm32h7xx_hal_timebase_tim_template.c
+      - libs/cubemx/Core/Src/sysmem.c
+      - libs/cubemx/Core/Src/syscalls.c
     toolchain: GCC
     toolchainConfigMap:
       GCC:
@@ -62,7 +64,7 @@ targets:
               disable: false
               stopBuildAfterFailed: true
           c/cpp-compiler:
-            C_FLAGS: -ffreestanding -fno-common
+            C_FLAGS: -ffreestanding -fno-common -fno-builtin
             language-c: gnu23
             language-cpp: gnu++23
             no-exceptions: true
@@ -72,7 +74,6 @@ targets:
             one-elf-section-per-data: true
             one-elf-section-per-function: true
             optimization: level-debug
-            optimization-lto: true
             warnings: all-warnings
           global:
             $float-abi-type: hard
@@ -83,7 +84,7 @@ targets:
             $outputTaskExcludes:
               - .bin
             $toolName: gcc
-            LD_FLAGS: -nodefaultlibs
+            LD_FLAGS: -nostdlib
             LIB_FLAGS: -lgcc
             output-format: elf
             remove-unused-input-sections: true

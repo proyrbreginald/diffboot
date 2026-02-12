@@ -47,7 +47,7 @@ SECTIONS
     .fast : ALIGN(4)
     {
         _fast_ram_start = .;    /* 起始地址 */
-        *(.fast*)               /* 快速代码 */
+        KEEP(*(.fast*))         /* 快速代码 */
         _fast_ram_end = .;      /* 结束地址 */
     } > ITCM AT > LOADER
     _fast_section_addr = LOADADDR(.fast);

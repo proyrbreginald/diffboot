@@ -1268,29 +1268,6 @@ RT_WEAK void rt_hw_console_output(const char *str)
 RTM_EXPORT(rt_hw_console_output);
 
 /**
- * This function will put string to the console.
- *
- * @param str is the string output to the console.
- */
-void rt_kputs(const char *str)
-{
-    if (!str) return;
-
-#ifdef RT_USING_DEVICE
-    if (_console_device == RT_NULL)
-    {
-        rt_hw_console_output(str);
-    }
-    else
-    {
-        rt_device_write(_console_device, 0, str, rt_strlen(str));
-    }
-#else
-    rt_hw_console_output(str);
-#endif /* RT_USING_DEVICE */
-}
-
-/**
  * This function will print a formatted string on system console.
  *
  * @param fmt is the format parameters.
