@@ -45,6 +45,7 @@ void rt_object_put_sethook(void (*hook)(struct rt_object *object));
 
 /**@{*/
 
+void rt_hw_us_delay(rt_uint32_t us);
 rt_tick_t rt_tick_get(void);
 void rt_tick_set(rt_tick_t tick);
 void rt_tick_increase(void);
