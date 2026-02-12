@@ -8,12 +8,12 @@
 
 /* 复位后RAM数据初始化 */
 .word _fast_section_addr      /* 快速代码段在Flash中的起始地址 */
-.word _fast_ram_addr          /* 快速代码段在RAM中的起始地址 */
+.word _fast_ram_start         /* 快速代码段在RAM中的起始地址 */
 .word _fast_ram_end           /* 快速代码段在RAM中的结束地址 */
 .word _assigned_section_addr  /* 已初始化数据段在Flash中的起始地址 */
-.word _assigned_ram_addr      /* 已初始化数据段在RAM中的起始地址 */
+.word _assigned_ram_start     /* 已初始化数据段在RAM中的起始地址 */
 .word _assigned_ram_end       /* 已初始化数据段在RAM中的结束地址 */
-.word _unassigned_ram_addr    /* 未初始化数据段在RAM中的起始地址 */
+.word _unassigned_ram_start   /* 未初始化数据段在RAM中的起始地址 */
 .word _unassigned_ram_end     /* 未初始化数据段在RAM中的结束地址 */
 
 /* 复位处理函数 */
@@ -22,7 +22,7 @@
 
 reset_handler:
   /* 设置初始堆栈指针 */
-  ldr sp, =stack_addr
+  ldr sp, =stack_start
 
   /* 退出可能的低功耗模式，切换到正常模式并配置电源供应 */
   bl ExitRun0Mode 
@@ -31,7 +31,7 @@ reset_handler:
   bl SystemInit 
  
   /* 初始化fast段数据 */
-  ldr r0, =_fast_ram_addr         /* 源地址：快速代码段的起始地址 */
+  ldr r0, =_fast_ram_start        /* 源地址：快速代码段的起始地址 */
   ldr r1, =_fast_ram_end          /* 目标地址：快速代码段的结束地址 */
   ldr r2, =_fast_section_addr     /* Flash中存储的快速代码段地址 */
   movs r3, #0                     /* 偏移量初始化为0 */
@@ -48,7 +48,7 @@ loop_copy_fast:
   bcc copy_fast                   /* 如果未达到结束位置则继续复制 */
 
   /* 初始化assigned段数据 */
-  ldr r0, =_assigned_ram_addr     /* 源地址：数据段的起始地址 */
+  ldr r0, =_assigned_ram_start    /* 源地址：数据段的起始地址 */
   ldr r1, =_assigned_ram_end      /* 目标地址：数据段的结束地址 */
   ldr r2, =_assigned_section_addr /* Flash中存储的初始化数据地址 */
   movs r3, #0                     /* 偏移量初始化为0 */
@@ -65,7 +65,7 @@ loop_copy_data:
   bcc copy_data                   /* 如果未达到结束位置则继续复制 */
 
   /* 初始化unassigned段数据 */
-  ldr r2, =_unassigned_ram_addr   /* 获取未初始化数据段起始地址 */
+  ldr r2, =_unassigned_ram_start  /* 获取未初始化数据段起始地址 */
   ldr r4, =_unassigned_ram_end    /* 获取未初始化数据段结束地址 */
   movs r3, #0                     /* 偏移量初始化为0 */
   b loop_fill_bss_zero
@@ -98,7 +98,7 @@ loop:
 .type isr_table, %object
 
 isr_table:
-.word stack_addr                            /* 初始堆栈指针值 */
+.word stack_start                           /* 初始堆栈指针值 */
 .word reset_handler                         /* 复位处理程序 */
 
 /* Cortex-M内核中断 */

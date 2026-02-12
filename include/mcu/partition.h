@@ -12,11 +12,11 @@
 #include "specification.h"
 
 // 内存各分区占用扇区数量
-#define LOADER_SECTOR_COUNT 2u // 引导程序占用扇区数量
-#define CONFIG_SECTOR_COUNT 1u // 配置参数占用扇区数量
-#define USER_SECTOR_COUNT   5u // 用户程序占用扇区数量
-#define PATCH_SECTOR_COUNT  3u // 差分数据占用扇区数量
-#define OEM_SECTOR_COUNT    5u // 厂商程序占用扇区数量
+#define LOADER_SECTOR_COUNT 2 // 引导程序占用扇区数量
+#define CONFIG_SECTOR_COUNT 1 // 配置参数占用扇区数量
+#define USER_SECTOR_COUNT   5 // 用户程序占用扇区数量
+#define PATCH_SECTOR_COUNT  3 // 差分数据占用扇区数量
+#define OEM_SECTOR_COUNT    5 // 厂商程序占用扇区数量
 
 // 内存各分区占用大小
 #define LOADER_SIZE                                                            \

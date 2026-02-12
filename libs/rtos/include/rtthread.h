@@ -552,7 +552,6 @@ void rt_interrupt_leave_sethook(void (*hook)(void));
 
 #ifdef RT_USING_COMPONENTS_INIT
 void rt_components_init(void);
-void rt_components_board_init(void);
 #endif
 
 /**
@@ -565,7 +564,8 @@ void rt_components_board_init(void);
  * general kernel service
  */
 #ifndef RT_USING_CONSOLE
-#define rt_kprintf(...)
+#include <printf.h>
+#define rt_kprintf printf
 #define rt_kputs(str)
 #else
 int rt_kprintf(const char *fmt, ...);

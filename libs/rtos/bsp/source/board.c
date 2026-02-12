@@ -1,79 +1,67 @@
-/*
- * Copyright (c) 2006-2019, RT-Thread Development Team
- *
- * SPDX-License-Identifier: Apache-2.0
- *
- * Change Logs:
- * Date           Author       Notes
- * 2021-05-24                  the first version
- */
-
+#include <board.h>
+#include <boot/ld.h>
+#include <boot/section.h>
+#include <main.h>
 #include <rthw.h>
-#include <rtthread.h>
 
-#if defined(RT_USING_USER_MAIN) && defined(RT_USING_HEAP)
-/*
- * Please modify RT_HEAP_SIZE if you enable RT_USING_HEAP
- * the RT_HEAP_SIZE max value = (sram size - ZI size), 1024 means 1024 bytes
- */
-#define RT_HEAP_SIZE (15*1024)
-static rt_uint8_t rt_heap[RT_HEAP_SIZE];
+// 配置调试日志
+#define DBG_TAG __FILE_NAME__
+#define DBG_LVL DBG_LOG
+#include <rtdbg.h>
 
-RT_WEAK void *rt_heap_begin_get(void)
+// 执行内核启动前的配置
+void rt_hw_mcu_init(void)
 {
-    return rt_heap;
-}
+    // 更新MCU内核时钟
+    SystemCoreClockUpdate();
+    LOG_N("mcu reset");
 
-RT_WEAK void *rt_heap_end_get(void)
-{
-    return rt_heap + RT_HEAP_SIZE;
-}
-#endif
+    // 配置systick中断频率
+    const uint32_t cpu_clock_frequency = HAL_RCC_GetSysClockFreq();
+    HAL_SYSTICK_Config(cpu_clock_frequency / RT_TICK_PER_SECOND);
+    LOG_I("cpu clock frequency: %u Hz", cpu_clock_frequency);
+    LOG_I("systick frequency: %u Hz", RT_TICK_PER_SECOND);
 
-void rt_os_tick_callback(void)
-{
-    rt_interrupt_enter();
-    
-    rt_tick_increase();
-
-    rt_interrupt_leave();
-}
-
-/**
- * This function will initial your board.
- */
-void rt_hw_board_init(void)
-{
-#error "TODO 1: OS Tick Configuration."
-    /* 
-     * TODO 1: OS Tick Configuration
-     * Enable the hardware timer and call the rt_os_tick_callback function
-     * periodically with the frequency RT_TICK_PER_SECOND. 
-     */
-
-    /* Call components board initial (use INIT_BOARD_EXPORT()) */
-#ifdef RT_USING_COMPONENTS_INIT
-    rt_components_board_init();
-#endif
-
-#if defined(RT_USING_USER_MAIN) && defined(RT_USING_HEAP)
-    rt_system_heap_init(rt_heap_begin_get(), rt_heap_end_get());
+#if defined(RT_USING_HEAP)
+    // 初始化rtos堆内存
+    rt_system_heap_init((void *)&_heap_start, (void *)&heap_end);
+    LOG_I("heap: [0x%p, 0x%p]", &_heap_start, &heap_end);
 #endif
 }
 
-#ifdef RT_USING_CONSOLE
-
-static int uart_init(void)
+// 差分启动的主任务
+void diffboot_thread_entry(void *parameter)
 {
-#error "TODO 2: Enable the hardware uart and config baudrate."
-    return 0;
-}
-INIT_BOARD_EXPORT(uart_init);
-
-void rt_hw_console_output(const char *str)
-{
-#error "TODO 3: Output the string 'str' through the uart."
+    LOG_I("diffboot task start");
+    while (1)
+    {
+        HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+        rt_thread_mdelay(1000);
+    }
 }
 
-#endif
+// 创建业务层任务
+void rt_app_init(void)
+{
+    LOG_N("start to initialize app");
+    rt_thread_t tid =
+        rt_thread_create("diffboot", diffboot_thread_entry, RT_NULL, 512, 1, 0);
 
+    if (tid != RT_NULL)
+    {
+        LOG_N("diffboot task create success");
+        rt_err_t result = rt_thread_startup(tid);
+        if (result == RT_EOK)
+        {
+            LOG_N("diffboot task startup success");
+        }
+        else
+        {
+            LOG_W("diffboot task startup fail with %d", result);
+        }
+    }
+    else
+    {
+        LOG_W("diffboot task create fail");
+    }
+}

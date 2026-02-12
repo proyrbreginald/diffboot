@@ -1,144 +1,64 @@
-/* RT-Thread config file */
+#ifndef _RTCONFIG_H_
+#define _RTCONFIG_H_
 
-#ifndef __RTTHREAD_CFG_H__
-#define __RTTHREAD_CFG_H__
+#define RT_USING_LIBC                 // 使用libc
+#define RT_ALIGN_SIZE              4  // 内存对齐
+#define RT_NAME_MAX                16 // object字符串名称长度
 
-// <<< Use Configuration Wizard in Context Menu >>>
+#define RT_USING_HEAP              // 使用堆内存
+#define RT_USING_SMALL_MEM         // 开启小内存算法
+#define RT_USING_SMALL_MEM_AS_HEAP // 用小内存算法实现堆
+// #define RT_USING_SLAB              // 开启SLAB算法
+// #define RT_USING_SLAB_AS_HEAP      // 用SLAB算法实现堆
+#define RT_USING_MEMPOOL           // 使用内存池
 
-// <h>Basic Configuration
-// <o>Maximal level of thread priority <8-256>
-//  <i>Default: 32
-#define RT_THREAD_PRIORITY_MAX  32
-// <o>OS tick per second
-//  <i>Default: 1000   (1ms)
-#define RT_TICK_PER_SECOND  1000
-// <o>Alignment size for CPU architecture data access
-//  <i>Default: 4
-#define RT_ALIGN_SIZE   4
-// <o>the max length of object name<2-16>
-//  <i>Default: 8
-#define RT_NAME_MAX    8
-// <c1>Using RT-Thread components initialization
-//  <i>Using RT-Thread components initialization
-#define RT_USING_COMPONENTS_INIT
-// </c>
+#define RT_TICK_PER_SECOND         1000 // systick每秒触发频率
+#define RT_THREAD_PRIORITY_MAX     8    // 优先级数量
 
-#define RT_USING_USER_MAIN
+#define RT_USING_COMPONENTS_INIT   // 使用组件形式自动初始化
+#define RT_USING_HOOK              // 使用钩子
+#define RT_USING_IDLE_HOOK         // 使用空闲任务钩子
 
-// <o>the stack size of main thread<1-4086>
-//  <i>Default: 512
-#define RT_MAIN_THREAD_STACK_SIZE     256
+#define RT_USING_SEMAPHORE         // 使用信号量
+#define RT_USING_MUTEX             // 使用互斥锁
+#define RT_USING_EVENT             // 使用事件集
+#define RT_USING_SIGNALS           // 使用异步信号
+#define RT_USING_MAILBOX           // 使用邮箱
+#define RT_USING_MESSAGEQUEUE      // 使用消息队列
 
-// </h>
+#define RT_USING_TIMER_SOFT        1   // 使用软件定时器
+#define RT_TIMER_THREAD_PRIO       0   // 软件定时器线程优先级
+#define RT_TIMER_THREAD_STACK_SIZE 512 // 软件定时器线程栈大小
 
-// <h>Debug Configuration
-// <c1>enable kernel debug configuration
-//  <i>Default: enable kernel debug configuration
-//#define RT_DEBUG
-// </c>
-// <o>enable components initialization debug configuration<0-1>
-//  <i>Default: 0
-#define RT_DEBUG_INIT 0
-// <c1>thread stack over flow detect
-//  <i> Diable Thread stack over flow detect
-//#define RT_USING_OVERFLOW_CHECK
-// </c>
-// </h>
+#define RT_DEBUG                     // 开启调试日志
+#define RT_DEBUG_COLOR               // 开启颜色日志
+#define RT_DEBUG_IRQ               0 // 中断日志
+#define RT_DEBUG_MEM               0 // 内存日志
+#define RT_DEBUG_INIT              1 // 初始化日志
+#define RT_DEBUG_MEMHEAP           0 // 堆内存日志
+#define RT_DEBUG_SLAB              0 // SLAB使用日志
+#define RT_DEBUG_DEVICE            0 // 设备日志
+#define RT_DEBUG_SCHEDULER         0 // 调度器日志
+#define RT_DEBUG_CONTEXT_CHECK     0 // 上下文日志
+#define RT_DEBUG_MODULE            0 // 模块日志
+#define RT_DEBUG_THREAD            0 // 线程日志
+#define RT_DEBUG_IPC               0 // 线程间通信日志
+#define RT_DEBUG_TIMER             0 // 定时器日志
+#define RT_USING_OVERFLOW_CHECK      // 栈溢出检查
 
-// <h>Hook Configuration
-// <c1>using hook
-//  <i>using hook
-//#define RT_USING_HOOK
-// </c>
-// <c1>using idle hook
-//  <i>using idle hook
-//#define RT_USING_IDLE_HOOK
-// </c>
-// </h>
+#define RT_USING_DEVICE            // 使用设备驱动框架
+#define RT_USING_DEVICE_OPS        // 使用设备驱动标准接口
 
-// <e>Software timers Configuration
-// <i> Enables user timers
-#define RT_USING_TIMER_SOFT         0
-#if RT_USING_TIMER_SOFT == 0
-    #undef RT_USING_TIMER_SOFT
-#endif
-// <o>The priority level of timer thread <0-31>
-//  <i>Default: 4
-#define RT_TIMER_THREAD_PRIO        4
-// <o>The stack size of timer thread <0-8192>
-//  <i>Default: 512
-#define RT_TIMER_THREAD_STACK_SIZE  512
-// </e>
+// #define RT_USING_FINSH
+// #define FINSH_USING_SYMTAB
+// #define FINSH_USING_DESCRIPTION
+// #define RT_CONSOLEBUF_SIZE      256
+// #define FINSH_THREAD_PRIORITY   (RT_THREAD_PRIORITY_MAX - 2)
+// #define FINSH_THREAD_STACK_SIZE 2048
+// #define FINSH_CMD_SIZE          64
+// #define FINSH_USING_HISTORY
+// #define FINSH_HISTORY_LINES 8
 
-// <h>IPC(Inter-process communication) Configuration
-// <c1>Using Semaphore
-//  <i>Using Semaphore
-#define RT_USING_SEMAPHORE
-// </c>
-// <c1>Using Mutex
-//  <i>Using Mutex
-//#define RT_USING_MUTEX
-// </c>
-// <c1>Using Event
-//  <i>Using Event
-//#define RT_USING_EVENT
-// </c>
-// <c1>Using MailBox
-//  <i>Using MailBox
-//#define RT_USING_SIGNALS
-// </c>
-// <c1>Using Signals
-//  <i>Using Signals
-#define RT_USING_MAILBOX
-// </c>
-// <c1>Using Message Queue
-//  <i>Using Message Queue
-//#define RT_USING_MESSAGEQUEUE
-// </c>
-// </h>
-
-// <h>Memory Management Configuration
-// <c1>Memory Pool Management
-//  <i>Memory Pool Management
-//#define RT_USING_MEMPOOL
-// </c>
-// <c1>Dynamic Heap Management(Algorithm: small memory )
-//  <i>Dynamic Heap Management
-#define RT_USING_HEAP
-#define RT_USING_SMALL_MEM
-#define RT_USING_SMALL_MEM_AS_HEAP
-// </c>
-// <c1>using tiny size of memory
-//  <i>using tiny size of memory
-//#define RT_USING_TINY_SIZE
-// </c>
-// </h>
-
-// <h>Console Configuration
-// <c1>Using console
-//  <i>Using console
-//#define RT_USING_CONSOLE
-// </c>
-// <o>the buffer size of console <1-1024>
-//  <i>the buffer size of console
-//  <i>Default: 128  (128Byte)
-#define RT_CONSOLEBUF_SIZE          256
-// </h>
-
-// <h>FinSH Configuration
-// <c1>include finsh config
-//  <i>Select this choice if you using FinSH 
-//#include "finsh_config.h"
-// </c>
-// </h>
-
-// <h>Device Configuration
-// <c1>using device framework
-//  <i>using device framework
-//#define RT_USING_DEVICE
-// </c>
-// </h>
-
-// <<< end of configuration section >>>
+#include <printf.h>
 
 #endif

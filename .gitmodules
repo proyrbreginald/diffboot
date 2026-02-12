@@ -1,0 +1,3 @@
+[submodule "libs/libstm32h743"]
+	path = libs/libstm32h743
+	url = git@github.com:proyrbreginald/libstm32h743.git

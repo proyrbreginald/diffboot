@@ -1,70 +1,43 @@
-/*
- * Copyright (c) 2006-2021, RT-Thread Development Team
- *
- * SPDX-License-Identifier: Apache-2.0
- *
- * Change Logs:
- * Date           Author       Notes
- * 2016-11-12     Bernard      The first version
- * 2018-05-25     armink       Add simple API, such as LOG_D, LOG_E
- */
+#ifndef _RT_DBG_H_
+#define _RT_DBG_H_
 
-/*
- * The macro definitions for debug
- *
- * These macros are defined in static. If you want to use debug macro, you can
- * use as following code:
- *
- * In your C/C++ file, enable/disable DEBUG_ENABLE macro, and then include this
- * header file.
- *
- * #define DBG_TAG           "MOD_TAG"
- * #define DBG_LVL           DBG_INFO
- * #include <rtdbg.h>          // must after of DBG_LVL, DBG_TAG or other options
- *
- * Then in your C/C++ file, you can use LOG_X macro to print out logs:
- * LOG_D("this is a debug log!");
- * LOG_E("this is a error log!");
- */
+#include <rtconfig.h>
 
-#ifndef RT_DBG_H__
-#define RT_DBG_H__
-
-#include "rtconfig.h"
-
-/* the debug log will force enable when RT_DEBUG macro is defined */
+// 定义RT_DEBUG宏来开启日志调试功能
 #if defined(RT_DEBUG) && !defined(DBG_ENABLE)
 #define DBG_ENABLE
 #endif
 
-/* it will force output color log when RT_DEBUG_COLOR macro is defined */
+// 定义RT_DEBUG_COLOR宏来开启附带颜色的日志
 #if defined(RT_DEBUG_COLOR) && !defined(DBG_COLOR)
 #define DBG_COLOR
 #endif
 
-#if defined(RT_USING_ULOG)
-/* using ulog compatible with rtdbg  */
-#include <ulog.h>
-#else
+// 定义日志级别
+#define DBG_ERROR 0
+#define DBG_WARN  1
+#define DBG_NEWS  2
+#define DBG_INFO  3
+#define DBG_LOG   4
 
-/* DEBUG level */
-#define DBG_ERROR           0
-#define DBG_WARNING         1
-#define DBG_INFO            2
-#define DBG_LOG             3
-
+// 定义日志标签
 #ifndef DBG_TAG
-#define DBG_TAG    "DBG"
+#define DBG_TAG "DBG"
 #endif
 
+// 定义DBG_ENABLE宏来开启日志输出宏
 #ifdef DBG_ENABLE
 
+// 默认日志级别
 #ifndef DBG_LVL
-#define DBG_LVL         DBG_WARNING
+#define DBG_LVL DBG_WARN
 #endif
 
+// 定义DBG_COLOR宏来开启日志颜色输出宏
+#ifdef DBG_COLOR
+
 /*
- * The color for terminal (foreground)
+ * 前景色（符号颜色）
  * BLACK    30
  * RED      31
  * GREEN    32
@@ -74,94 +47,106 @@
  * CYAN     36
  * WHITE    37
  */
-#ifdef DBG_COLOR
-#define _DBG_COLOR(n)        rt_kprintf("\033["#n"m")
-#define _DBG_LOG_HDR(lvl_name, color_n)                    \
-    rt_kprintf("\033["#color_n"m[" lvl_name "/" DBG_TAG "] ")
-#define _DBG_LOG_X_END                                     \
-    rt_kprintf("\033[0m\n")
+#define _DBG_COLOR(n) rt_kprintf("\033[" #n "m")
+#define _DBG_LOG_HDR(lvl_name, color_n)                                        \
+    rt_kprintf("\033[" #color_n "m[" lvl_name "/" DBG_TAG "] ")
+#define _DBG_LOG_X_END rt_kprintf("\033[0m\n")
+
 #else
+
 #define _DBG_COLOR(n)
-#define _DBG_LOG_HDR(lvl_name, color_n)                    \
+#define _DBG_LOG_HDR(lvl_name, color_n)                                        \
     rt_kprintf("[" lvl_name "/" DBG_TAG "] ")
-#define _DBG_LOG_X_END                                     \
-    rt_kprintf("\n")
-#endif /* DBG_COLOR */
+#define _DBG_LOG_X_END rt_kprintf("\n")
 
-/*
- * static debug routine
- * NOTE: This is a NOT RECOMMENDED API. Please using LOG_X API.
- *       It will be DISCARDED later. Because it will take up more resources.
- */
-#define dbg_log(level, fmt, ...)                            \
-    if ((level) <= DBG_LVL)                               \
-    {                                                       \
-        switch(level)                                       \
-        {                                                   \
-            case DBG_ERROR:   _DBG_LOG_HDR("E", 31); break; \
-            case DBG_WARNING: _DBG_LOG_HDR("W", 33); break; \
-            case DBG_INFO:    _DBG_LOG_HDR("I", 32); break; \
-            case DBG_LOG:     _DBG_LOG_HDR("D", 0); break;  \
-            default: break;                                 \
-        }                                                   \
-        rt_kprintf(fmt, ##__VA_ARGS__);                     \
-        _DBG_COLOR(0);                                      \
+#endif
+
+// 定义普通日志输出宏
+#define dbg_log(level, fmt, ...)                                               \
+    if ((level) <= DBG_LVL) {                                                  \
+        switch (level) {                                                       \
+            case DBG_ERROR:                                                    \
+                _DBG_LOG_HDR("E", 31);                                         \
+                break;                                                         \
+            case DBG_WARN:                                                     \
+                _DBG_LOG_HDR("W", 33);                                         \
+                break;                                                         \
+            case DBG_NEWS:                                                     \
+                _DBG_LOG_HDR("N", 34);                                         \
+                break;                                                         \
+            case DBG_INFO:                                                     \
+                _DBG_LOG_HDR("I", 32);                                         \
+                break;                                                         \
+            case DBG_LOG:                                                      \
+                _DBG_LOG_HDR("D", 0);                                          \
+                break;                                                         \
+            default:                                                           \
+                break;                                                         \
+        }                                                                      \
+        rt_kprintf(fmt, ##__VA_ARGS__);                                        \
+        _DBG_COLOR(0);                                                         \
     }
 
-#define dbg_here                                            \
-    if ((DBG_LVL) <= DBG_LOG){                            \
-        rt_kprintf(DBG_TAG " Here %s:%d\n",        \
-            __FUNCTION__, __LINE__);                        \
+// 定义定位日志输出宏
+#define dbg_here                                                               \
+    if ((DBG_LVL) <= DBG_LOG) {                                                \
+        rt_kprintf(DBG_TAG " Here %s:%d\n", __FUNCTION__, __LINE__);           \
     }
 
-#define dbg_log_line(lvl, color_n, fmt, ...)                \
-    do                                                      \
-    {                                                       \
-        _DBG_LOG_HDR(lvl, color_n);                         \
-        rt_kprintf(fmt, ##__VA_ARGS__);                     \
-        _DBG_LOG_X_END;                                     \
-    }                                                       \
-    while (0)
+// 定义单行日志输出宏
+#define dbg_log_line(lvl, color_n, fmt, ...)                                   \
+    do {                                                                       \
+        _DBG_LOG_HDR(lvl, color_n);                                            \
+        rt_kprintf(fmt, ##__VA_ARGS__);                                        \
+        _DBG_LOG_X_END;                                                        \
+    } while (0)
 
-#define dbg_raw(...)         rt_kprintf(__VA_ARGS__);
+// 定义源日志输出宏
+#define dbg_raw(...) rt_kprintf(__VA_ARGS__);
 
 #else
+
 #define dbg_log(level, fmt, ...)
 #define dbg_here
 #define dbg_enter
 #define dbg_exit
 #define dbg_log_line(lvl, color_n, fmt, ...)
 #define dbg_raw(...)
-#endif /* DBG_ENABLE */
+
+#endif
 
 #if (DBG_LVL >= DBG_LOG)
-#define LOG_D(fmt, ...)      dbg_log_line("D", 0, fmt, ##__VA_ARGS__)
+#define LOG_D(fmt, ...) dbg_log_line("D", 0, fmt, ##__VA_ARGS__)
 #else
 #define LOG_D(...)
 #endif
 
 #if (DBG_LVL >= DBG_INFO)
-#define LOG_I(fmt, ...)      dbg_log_line("I", 32, fmt, ##__VA_ARGS__)
+#define LOG_I(fmt, ...) dbg_log_line("I", 32, fmt, ##__VA_ARGS__)
 #else
 #define LOG_I(...)
 #endif
 
-#if (DBG_LVL >= DBG_WARNING)
-#define LOG_W(fmt, ...)      dbg_log_line("W", 33, fmt, ##__VA_ARGS__)
+#if (DBG_LVL >= DBG_NEWS)
+#define LOG_N(fmt, ...) dbg_log_line("N", 34, fmt, ##__VA_ARGS__)
+#else
+#define LOG_N(...)
+#endif
+
+#if (DBG_LVL >= DBG_WARN)
+#define LOG_W(fmt, ...) dbg_log_line("W", 33, fmt, ##__VA_ARGS__)
 #else
 #define LOG_W(...)
 #endif
 
 #if (DBG_LVL >= DBG_ERROR)
-#define LOG_E(fmt, ...)      dbg_log_line("E", 31, fmt, ##__VA_ARGS__)
+#define LOG_E(fmt, ...) dbg_log_line("E", 31, fmt, ##__VA_ARGS__)
 #else
 #define LOG_E(...)
 #endif
 
-#define LOG_RAW(...)         dbg_raw(__VA_ARGS__)
+#define LOG_RAW(...) dbg_raw(__VA_ARGS__)
 
 #define LOG_HEX(name, width, buf, size)
 
-#endif /* defined(RT_USING_ULOG) && define(DBG_ENABLE) */
-
-#endif /* RT_DBG_H__ */
+#endif

@@ -23,7 +23,7 @@
 #endif /* RT_SIG_INFO_MAX */
 
 #define DBG_TAG     "SIGN"
-#define DBG_LVL     DBG_WARNING
+#define DBG_LVL     DBG_WARN
 #include <rtdbg.h>
 
 #define sig_mask(sig_no)    (1u << sig_no)

@@ -274,9 +274,7 @@ typedef int (*init_fn_t)(void);
 
 /* board init routines will be called in board_init() function */
 #define INIT_BOARD_EXPORT(fn)           INIT_EXPORT(fn, "1")
-
-/* pre/device/component/env/app init routines will be called in init_thread */
-/* components pre-initialization (pure software initialization) */
+/* pre-initialization (pure software initialization) */
 #define INIT_PREV_EXPORT(fn)            INIT_EXPORT(fn, "2")
 /* device initialization */
 #define INIT_DEVICE_EXPORT(fn)          INIT_EXPORT(fn, "3")

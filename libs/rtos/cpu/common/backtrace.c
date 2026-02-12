@@ -7,7 +7,6 @@
  * Date           Author       Notes
  * 2008-07-29     Bernard      first version from QiuYi implementation
  */
-
 #include <rtthread.h>
 
 #ifdef __GNUC__

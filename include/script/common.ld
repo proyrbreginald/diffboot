@@ -3,7 +3,7 @@
   * @warning 请使用GCC进行预处理后生成的版本。
   */
 
-#include <partition.h>
+#include <mcu/partition.h>
 
 /* MCU内存分区 */
 MEMORY
@@ -40,16 +40,15 @@ SECTIONS
         KEEP(*(.isr_vector))    /* 中断向量表 */
         *(.text*)               /* 普通代码 */
         *(.glue_7*)             /* ARM/Thumb胶水代码 */
-        KEEP(*(.retain))        /* 强制保留 */
         KEEP(*(SORT(.rti_fn*))) /* RTOS启动时自动执行 */
     } > LOADER
 
     /* 快速代码段 */
     .fast : ALIGN(4)
     {
-        _fast_ram_addr = .; /* 起始地址 */
-        *(.fast*)           /* 快速代码 */
-        _fast_ram_end = .;  /* 结束地址 */
+        _fast_ram_start = .;    /* 起始地址 */
+        *(.fast*)               /* 快速代码 */
+        _fast_ram_end = .;      /* 结束地址 */
     } > ITCM AT > LOADER
     _fast_section_addr = LOADADDR(.fast);
 
@@ -62,16 +61,16 @@ SECTIONS
     /* 已初始化数据段 */
     .assigned : ALIGN(4)
     {
-        _assigned_ram_addr = .; /* 起始地址 */
-        *(.data*)               /* 已初始化数据 */
-        _assigned_ram_end = .;  /* 结束地址 */
+        _assigned_ram_start = .;    /* 起始地址 */
+        *(.data*)                   /* 已初始化数据 */
+        _assigned_ram_end = .;      /* 结束地址 */
     } > DTCM AT > LOADER
     _assigned_section_addr = LOADADDR(.assigned);
 
     /* 未初始化数据段 */
     .unassigned : ALIGN(4)
     {
-        _unassigned_ram_addr = .;   /* RAM中的起始地址 */
+        _unassigned_ram_start = .;   /* RAM中的起始地址 */
         *(.bss*)                    /* 未初始化数据 */
         _unassigned_ram_end = .;    /* RAM中的结束地址 */
     } > DTCM
@@ -79,7 +78,7 @@ SECTIONS
     /* 堆空间段 */
     .heap : ALIGN(8)
     {
-        _heap_addr = .;
+        _heap_start = .;
     } > DTCM
 
     /* 栈空间段 */

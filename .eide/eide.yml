@@ -1,0 +1,110 @@
+version: "4.1"
+name: diffboot
+type: ARM
+deviceName: null
+packDir: null
+srcDirs:
+  - libs/cubemx/Core/Src
+  - source
+  - libs/libstm32h743/hal/source
+  - libs/rtos/source
+  - libs/rtos/cpu
+  - libs/rtos/bsp/source
+  - libs/libc/source
+  - libs/libc/bsp/source
+virtualFolder:
+  name: <virtual_root>
+  files: []
+  folders: []
+dependenceList: []
+outDir: build
+miscInfo:
+  uid: 007456c3da493e6d561de6f771797624
+targets:
+  Debug:
+    cppPreprocessAttrs:
+      defineList:
+        - STM32H743xx
+        - USE_FULL_LL_DRIVER
+        - USE_HAL_DRIVER
+        - USE_PWR_LDO_SUPPLY
+      incList:
+        - include
+        - libs/cubemx/Core/Inc
+        - libs/libstm32h743/hal/include
+        - libs/libstm32h743/cmsis/include
+        - libs/libstm32h743/cmsis/device/st/stm32h7/include
+        - libs/rtos/include
+        - libs/rtos/bsp/include
+        - libs/libc/include
+        - libs/libc/bsp/include
+      libList: []
+    excludeList:
+      - libs/libstm32h743/hal/source/stm32h7xx_hal_msp_template.c
+      - libs/libstm32h743/hal/source/stm32h7xx_hal_timebase_rtc_alarm_template.c
+      - libs/libstm32h743/hal/source/stm32h7xx_hal_timebase_rtc_wakeup_template.c
+      - libs/libstm32h743/hal/source/stm32h7xx_hal_timebase_tim_template.c
+    toolchain: GCC
+    toolchainConfigMap:
+      GCC:
+        archExtensions: ""
+        cpuType: Cortex-M7
+        floatingPointHardware: single
+        options:
+          version: 5
+          afterBuildTasks: []
+          asm-compiler:
+            ASM_FLAGS: -ffreestanding -fno-common
+          beforeBuildTasks:
+            - name: build link script
+              abortAfterFailed: false
+              command: ${CompilerPrefix}gcc.exe -E -P -x c -I include -DBUILD_LOADER ${workspaceFolder}\include\script\common.ld -o ${OutDir}\diffboot.ld
+              disable: false
+              stopBuildAfterFailed: true
+          c/cpp-compiler:
+            C_FLAGS: -ffreestanding -fno-common
+            language-c: gnu23
+            language-cpp: gnu++23
+            no-exceptions: true
+            no-rtti: true
+            no-threadsafe-statics: true
+            no-use-cxa-atexit: true
+            one-elf-section-per-data: true
+            one-elf-section-per-function: true
+            optimization: level-debug
+            optimization-lto: true
+            warnings: all-warnings
+          global:
+            $float-abi-type: hard
+            arm-thumb-mode: thumb
+            not-use-syscalls: true
+            output-debug-info: enable
+          linker:
+            $outputTaskExcludes:
+              - .bin
+            $toolName: gcc
+            LD_FLAGS: -nodefaultlibs
+            LIB_FLAGS: -lgcc
+            output-format: elf
+            remove-unused-input-sections: true
+        scatterFilePath: ${OutDir}\diffboot.ld
+        storageLayout:
+          RAM: []
+          ROM: []
+        useCustomScatterFile: true
+    uploadConfigMap:
+      JLink:
+        baseAddr: ""
+        bin: ""
+        cpuInfo:
+          cpuName: "null"
+          vendor: "null"
+        otherCmds: ""
+        proType: 1
+        speed: 8000
+      OpenOCD:
+        baseAddr: "0x08000000"
+        bin: ""
+        interface: cmsis-dap-v1
+        target: stm32h7x_dual_bank
+    uploader: OpenOCD
