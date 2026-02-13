@@ -1,5 +1,6 @@
 #include <board.h>
 #include <rthw.h>
+#include <boot/boot.h>
 
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__
@@ -21,28 +22,28 @@
  */
 static int rti_start(void)
 {
-    LOG_N("start to auto init");
+    LOG_I("start to auto init");
     return 0;
 }
 INIT_EXPORT(rti_start, "0");
 
 static int rti_board_start(void)
 {
-    LOG_N("auto init board");
+    LOG_I("auto init board");
     return 0;
 }
 INIT_EXPORT(rti_board_start, "0.end");
 
 static int rti_board_end(void)
 {
-    LOG_N("start to auto init components");
+    LOG_I("start to auto init components");
     return 0;
 }
 INIT_EXPORT(rti_board_end, "1.end");
 
 static int rti_end(void)
 {
-    LOG_N("auto init finish");
+    LOG_I("auto init finish");
     return 0;
 }
 INIT_EXPORT(rti_end, "6.end");
@@ -70,12 +71,6 @@ void rt_components_init(void)
     }
 }
 #endif
-
-// 创建业务层任务
-RT_WEAK void rt_app_init(void)
-{
-    return;
-}
 
 // rtos启动流程
 void rtthread_startup(void)
@@ -121,5 +116,5 @@ void rtthread_startup(void)
     rt_system_scheduler_start();
 
     // 一般永远不会执行到这
-    LOG_W("return from scheduler");
+    LOG_F("return from scheduler");
 }

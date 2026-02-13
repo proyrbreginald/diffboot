@@ -4,10 +4,9 @@
 
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__
-#define DBG_LVL DBG_LOG
+#define DBG_LVL DBG_VERBOSE
 #include <rtdbg.h>
 
-static uint32_t cpu_clock_frequency;
 static rt_uint32_t ticks_per_us;
 
 static bool rt_hw_dwt_init(void)
@@ -54,17 +53,11 @@ void rt_hw_us_delay(rt_uint32_t us)
 // 执行内核启动前的配置
 void rt_hw_mcu_init(void)
 {
+    // MCU复位启动完成
+    LOG_F("mcu reset finish");
+
     // 更新MCU内核时钟
     SystemCoreClockUpdate();
-    LOG_N("mcu reset finish");
-
-    // 配置systick中断频率
-    cpu_clock_frequency = HAL_RCC_GetSysClockFreq();
-    ticks_per_us = cpu_clock_frequency / 1000000; // 计算1us对应的时钟周期数
-    HAL_SYSTICK_Config(cpu_clock_frequency / RT_TICK_PER_SECOND);
-    LOG_I("cpu clock per second: %u", cpu_clock_frequency);
-    LOG_I("tick per us: %u", ticks_per_us);
-    LOG_I("systick per second: %u", RT_TICK_PER_SECOND);
 
     // 初始化内核计数器
     bool result = rt_hw_dwt_init();
@@ -74,12 +67,22 @@ void rt_hw_mcu_init(void)
     }
     else
     {
-        LOG_N("DWT init success");
+        LOG_I("DWT init success");
     }
+    
+    LOG_V("cpu clock per s: %u", HAL_RCC_GetSysClockFreq());
+
+    // 计算1us对应的时钟周期数
+    ticks_per_us = HAL_RCC_GetSysClockFreq() / 1000000; 
+    LOG_V("tick per us: %u", ticks_per_us);
+
+    // 配置systick中断频率
+    HAL_SYSTICK_Config(HAL_RCC_GetSysClockFreq() / RT_TICK_PER_SECOND);
+    LOG_V("systick per s: %u", RT_TICK_PER_SECOND);
 
 #if defined(RT_USING_HEAP)
     // 初始化rtos堆内存
     rt_system_heap_init((void *)&_heap_start, (void *)&heap_end);
-    LOG_I("heap: [0x%p, 0x%p]", &_heap_start, &heap_end);
+    LOG_V("heap: [0x%p, 0x%p]", &_heap_start, &heap_end);
 #endif
 }
