@@ -262,23 +262,20 @@ static void rt_thread_idle_entry(void *parameter)
 
     while (1)
     {
-#ifdef RT_USING_IDLE_HOOK
-        rt_size_t i;
-        void (*idle_hook)(void);
+#ifndef RT_USING_SMP
+        rt_defunct_execute();
+#endif /* RT_USING_SMP */
 
-        for (i = 0; i < RT_IDLE_HOOK_LIST_SIZE; i++)
+#ifdef RT_USING_IDLE_HOOK
+        for (rt_size_t  i = 0; i < RT_IDLE_HOOK_LIST_SIZE; i++)
         {
-            idle_hook = idle_hook_list[i];
+            void (*idle_hook)(void) = idle_hook_list[i];
             if (idle_hook != RT_NULL)
             {
                 idle_hook();
             }
         }
 #endif /* RT_USING_IDLE_HOOK */
-
-#ifndef RT_USING_SMP
-        rt_defunct_execute();
-#endif /* RT_USING_SMP */
 
 #ifdef RT_USING_PM
         void rt_system_power_manager(void);

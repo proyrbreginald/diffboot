@@ -840,6 +840,7 @@ void rt_system_timer_init(void)
     }
 }
 
+#ifdef RT_USING_TIMER_SOFT
 /**
  * @ingroup SystemInit
  *
@@ -847,7 +848,6 @@ void rt_system_timer_init(void)
  */
 void rt_system_timer_thread_init(void)
 {
-#ifdef RT_USING_TIMER_SOFT
     int i;
 
     for (i = 0;
@@ -869,7 +869,7 @@ void rt_system_timer_thread_init(void)
 
     /* startup */
     rt_thread_startup(&_timer_thread);
-#endif /* RT_USING_TIMER_SOFT */
 }
+#endif
 
 /**@}*/

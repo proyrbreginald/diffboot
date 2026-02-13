@@ -84,11 +84,6 @@ void rtthread_startup(void)
     // 初始化系统板
     rt_hw_board_init();
 
-#ifdef RT_USING_COMPONENTS_INIT
-    // 初始化rtos组件
-    rt_components_init();
-#endif
-
     // 打印rtos版本到控制台
     rt_show_version();
 
@@ -103,11 +98,18 @@ void rtthread_startup(void)
     rt_system_signal_init();
 #endif
 
-    // 初始化系统定时器任务
-    rt_system_timer_thread_init();
-
     // 初始化空闲任务
     rt_thread_idle_init();
+
+#ifdef RT_USING_TIMER_SOFT
+    // 初始化系统定时器任务
+    rt_system_timer_thread_init();
+#endif
+
+#ifdef RT_USING_COMPONENTS_INIT
+    // 初始化rtos组件
+    rt_components_init();
+#endif
 
     // 初始化业务层
     rt_app_init();

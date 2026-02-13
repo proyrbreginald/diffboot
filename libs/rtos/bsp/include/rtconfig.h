@@ -11,10 +11,12 @@
 #define RT_TICK_PER_SECOND              1000 // systick每秒触发频率
 #define RT_THREAD_PRIORITY_MAX          8    // 优先级数量
 
-#define RT_USING_COMPONENTS_INIT        // 使用组件形式自动初始化
-#define RT_USING_SIGNALS                // 使用异步信号
-#define RT_USING_HOOK                   // 使用钩子
-#define RT_USING_IDLE_HOOK              // 使用空闲任务钩子
+#define RT_USING_COMPONENTS_INIT            // 使用组件形式自动初始化
+#define RT_USING_SIGNALS                    // 使用异步信号
+#define RT_USING_HOOK                       // 使用钩子
+#define RT_USING_IDLE_HOOK                  // 使用空闲下线程钩子
+#define RT_IDLE_HOOK_LIST_SIZE          1   // 空闲线程的钩子数量
+#define IDLE_THREAD_STACK_SIZE          512 // 定义空闲钩子栈大小
 
 #define RT_USING_MEMPOOL                // 使用内存池
 #define RT_USING_HEAP                   // 使用堆内存
@@ -30,7 +32,7 @@
 #define RT_USING_MAILBOX           // 使用邮箱
 #define RT_USING_MESSAGEQUEUE      // 使用消息队列
 
-#define RT_USING_TIMER_SOFT        1   // 使用软件定时器
+// #define RT_USING_TIMER_SOFT            // 使用软件定时器
 #define RT_TIMER_THREAD_PRIO       0   // 软件定时器线程优先级
 #define RT_TIMER_THREAD_STACK_SIZE 512 // 软件定时器线程栈大小
 
