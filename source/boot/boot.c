@@ -4,7 +4,7 @@
 
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__
-#define DBG_LVL DBG_LOG
+#define DBG_LVL DBG_VERBOSE
 #include <rtdbg.h>
 
 // cpu使用率统计线程
@@ -38,8 +38,8 @@ static void count_thread_entry(void *parameter)
         }
 
         /* 占用率 = 100 - (睡眠占比) */
-        float usage = 100.0f - ((float)sleep_cnt / (1000000)) * 100.0f;
-        LOG_I("cpu usage: %.2f%%, ticks: %u", usage, sleep_cnt);
+        float usage = 100.0f - ((float)sleep_cnt / 1000000) * 100.0f;
+        LOG_V("cpu usage per s: %.2f%%, ticks: %u", usage, sleep_cnt);
     }
 }
 
@@ -79,8 +79,7 @@ static void boot_thread_entry(void *parameter)
     while (1)
     {
         HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-        rt_hw_us_delay(100 * 1000);
-        rt_thread_mdelay(900);
+        rt_thread_mdelay(1000);
     }
 }
 
@@ -112,7 +111,7 @@ static int boot_thread_init(void)
     return result;
 #undef THREAD_NAME
 }
-// INIT_APP_EXPORT(boot_thread_init);
+INIT_APP_EXPORT(boot_thread_init);
 
 // 创建业务层任务
 void rt_app_init(void)

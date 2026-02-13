@@ -1,5 +1,6 @@
 #include <board.h>
 #include <boot/ld.h>
+#include <boot/section.h>
 #include <lptim.h>
 #include <rthw.h>
 
@@ -13,18 +14,18 @@ static rt_uint32_t ticks_per_us;
 /* 累加睡眠的Tick数(虽然LPTIM是16位，但累加变量我们要用64位防止总数溢出) */
 static volatile uint64_t total_sleep_ticks = 0;
 
-uint64_t total_sleep_get(void)
+FAST uint64_t total_sleep_get(void)
 {
     return total_sleep_ticks;
 }
 
-void total_sleep_clear(void)
+FAST void total_sleep_clear(void)
 {
     total_sleep_ticks = 0;
 }
 
 // 空闲钩子进行低功耗处理
-static void idle_hook_wfi(void)
+FAST static void idle_hook_wfi(void)
 {
     uint16_t start, end;
     rt_base_t level;
@@ -85,7 +86,7 @@ static bool rt_hw_dwt_init(void)
  * @brief 精确微秒延时实现
  * @param us 延时长度(微秒)
  */
-void rt_hw_us_delay(rt_uint32_t us)
+FAST void rt_hw_us_delay(rt_uint32_t us)
 {
     rt_uint32_t ticks = us * ticks_per_us;
     rt_uint32_t start = DWT->CYCCNT;
@@ -138,4 +139,12 @@ void rt_hw_mcu_init(void)
     // 设置空闲钩子
     rt_thread_idle_sethook(idle_hook_wfi);
     LOG_I("add idle hook: idle_hook_wfi");
+}
+
+FAST void SysTick_Handler(void)
+{
+    rt_interrupt_enter();
+    HAL_IncTick();
+    rt_tick_increase();
+    rt_interrupt_leave();
 }
