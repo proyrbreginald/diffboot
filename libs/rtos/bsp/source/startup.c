@@ -115,6 +115,7 @@ void rtthread_startup(void)
     rt_app_init();
 
     // 开始执行调度
+    LOG_I("scheduler start");
     rt_system_scheduler_start();
 
     // 一般永远不会执行到这

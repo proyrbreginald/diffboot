@@ -121,6 +121,8 @@ rt_thread_t rt_thread_idle_gethandler(void);
 rt_err_t rt_thread_idle_sethook(void (*hook)(void));
 rt_err_t rt_thread_idle_delhook(void (*hook)(void));
 #endif
+uint64_t rt_total_sleep_get(void);
+void rt_total_sleep_clear(void);
 
 void rt_system_scheduler_init(void);
 void rt_system_scheduler_start(void);

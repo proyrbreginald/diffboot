@@ -14,12 +14,12 @@ static rt_uint32_t ticks_per_us;
 /* 累加睡眠的Tick数(虽然LPTIM是16位，但累加变量我们要用64位防止总数溢出) */
 static volatile uint64_t total_sleep_ticks = 0;
 
-FAST uint64_t total_sleep_get(void)
+FAST uint64_t rt_total_sleep_get(void)
 {
     return total_sleep_ticks;
 }
 
-FAST void total_sleep_clear(void)
+FAST void rt_total_sleep_clear(void)
 {
     total_sleep_ticks = 0;
 }
@@ -105,6 +105,11 @@ void rt_hw_mcu_init(void)
 
     // 更新MCU内核时钟
     SystemCoreClockUpdate();
+    LOG_V("cpu clock per s: %u", HAL_RCC_GetSysClockFreq());
+
+    // 计算1us对应的时钟周期数
+    ticks_per_us = HAL_RCC_GetSysClockFreq() / 1000000;
+    LOG_V("tick per us: %u", ticks_per_us);
 
     // 初始化内核计数器
     bool result = rt_hw_dwt_init();
@@ -117,14 +122,10 @@ void rt_hw_mcu_init(void)
         LOG_I("DWT init success");
     }
 
-    HAL_LPTIM_Counter_Start(&hlptim1, 0xffff);
+    LL_LPTIM_Enable(LPTIM1);
+    LL_LPTIM_SetAutoReload(LPTIM1, 0xFFFF); // 设置最大计数值
+    LL_LPTIM_StartCounter(LPTIM1, LL_LPTIM_OPERATING_MODE_CONTINUOUS);
     LOG_I("start lptim counter");
-
-    LOG_V("cpu clock per s: %u", HAL_RCC_GetSysClockFreq());
-
-    // 计算1us对应的时钟周期数
-    ticks_per_us = HAL_RCC_GetSysClockFreq() / 1000000;
-    LOG_V("tick per us: %u", ticks_per_us);
 
     // 配置systick中断频率
     HAL_SYSTICK_Config(HAL_RCC_GetSysClockFreq() / RT_TICK_PER_SECOND);

@@ -51,7 +51,7 @@ targets:
       GCC:
         archExtensions: ""
         cpuType: Cortex-M7
-        floatingPointHardware: single
+        floatingPointHardware: double
         options:
           version: 5
           afterBuildTasks: []

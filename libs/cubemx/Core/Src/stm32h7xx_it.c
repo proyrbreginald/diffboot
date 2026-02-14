@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <rtthread.h>
+#include <rtdbg.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,8 +57,7 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern UART_HandleTypeDef huart4;
-extern UART_HandleTypeDef huart1;
+
 /* USER CODE BEGIN EV */
 
 /* USER CODE END EV */
@@ -73,10 +73,12 @@ void NMI_Handler(void)
   /* USER CODE BEGIN NonMaskableInt_IRQn 0 */
   rt_interrupt_enter(); /* RT-Thread中断进入 */
   /* USER CODE END NonMaskableInt_IRQn 0 */
-  HAL_RCC_NMI_IRQHandler();
   /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
+  LOG_F("NMI_Handler");
   while (1)
   {
+    HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+    rt_hw_us_delay(250);
   }
   /* USER CODE END NonMaskableInt_IRQn 1 */
 }
@@ -88,10 +90,13 @@ void MemManage_Handler(void)
 {
   /* USER CODE BEGIN MemoryManagement_IRQn 0 */
   rt_interrupt_enter(); /* RT-Thread中断进入 */
+  LOG_F("MemManage_Handler");
   /* USER CODE END MemoryManagement_IRQn 0 */
   while (1)
   {
     /* USER CODE BEGIN W1_MemoryManagement_IRQn 0 */
+    HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+    rt_hw_us_delay(250);
     /* USER CODE END W1_MemoryManagement_IRQn 0 */
   }
 }
@@ -103,10 +108,13 @@ void BusFault_Handler(void)
 {
   /* USER CODE BEGIN BusFault_IRQn 0 */
   rt_interrupt_enter(); /* RT-Thread中断进入 */
+  LOG_F("BusFault_Handler");
   /* USER CODE END BusFault_IRQn 0 */
   while (1)
   {
     /* USER CODE BEGIN W1_BusFault_IRQn 0 */
+    HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+    rt_hw_us_delay(250);
     /* USER CODE END W1_BusFault_IRQn 0 */
   }
 }
@@ -118,10 +126,13 @@ void UsageFault_Handler(void)
 {
   /* USER CODE BEGIN UsageFault_IRQn 0 */
   rt_interrupt_enter(); /* RT-Thread中断进入 */
+  LOG_F("UsageFault_Handler");
   /* USER CODE END UsageFault_IRQn 0 */
   while (1)
   {
     /* USER CODE BEGIN W1_UsageFault_IRQn 0 */
+    HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
+    rt_hw_us_delay(250);
     /* USER CODE END W1_UsageFault_IRQn 0 */
   }
 }
@@ -184,7 +195,6 @@ void USART1_IRQHandler(void)
   // }
 
   /* USER CODE END USART1_IRQn 0 */
-  HAL_UART_IRQHandler(&huart1);
   /* USER CODE BEGIN USART1_IRQn 1 */
   rt_interrupt_leave(); /* RT-Thread中断退出 */
   /* USER CODE END USART1_IRQn 1 */
@@ -198,7 +208,6 @@ void UART4_IRQHandler(void)
   /* USER CODE BEGIN UART4_IRQn 0 */
   rt_interrupt_enter(); /* RT-Thread中断进入 */
   /* USER CODE END UART4_IRQn 0 */
-  HAL_UART_IRQHandler(&huart4);
   /* USER CODE BEGIN UART4_IRQn 1 */
   rt_interrupt_leave(); /* RT-Thread中断退出 */
   /* USER CODE END UART4_IRQn 1 */

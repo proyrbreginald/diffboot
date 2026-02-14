@@ -26,11 +26,11 @@
 // #define RT_USING_SLAB_AS_HEAP           // 用SLAB算法实现堆
 // #define RT_USING_MEMHEAP                // 使用不连续内存堆
 
-#define RT_USING_SEMAPHORE         // 使用信号量
-#define RT_USING_MUTEX             // 使用互斥锁
-#define RT_USING_EVENT             // 使用事件集
-#define RT_USING_MAILBOX           // 使用邮箱
-#define RT_USING_MESSAGEQUEUE      // 使用消息队列
+#define RT_USING_SEMAPHORE    // 使用信号量
+#define RT_USING_MUTEX        // 使用互斥锁
+#define RT_USING_EVENT        // 使用事件集
+#define RT_USING_MAILBOX      // 使用邮箱
+#define RT_USING_MESSAGEQUEUE // 使用消息队列
 
 // #define RT_USING_TIMER_SOFT            // 使用软件定时器
 #define RT_TIMER_THREAD_PRIO       0   // 软件定时器线程优先级
@@ -57,13 +57,10 @@
 // #define RT_USING_FINSH
 // #define FINSH_USING_SYMTAB
 // #define FINSH_USING_DESCRIPTION
-// #define RT_CONSOLEBUF_SIZE      256
 // #define FINSH_THREAD_PRIORITY   (RT_THREAD_PRIORITY_MAX - 2)
 // #define FINSH_THREAD_STACK_SIZE 2048
 // #define FINSH_CMD_SIZE          64
 // #define FINSH_USING_HISTORY
 // #define FINSH_HISTORY_LINES 8
-
-#include <printf.h>
 
 #endif
