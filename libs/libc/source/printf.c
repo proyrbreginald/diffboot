@@ -180,8 +180,8 @@ FAST static void print_float(out_ctx_t *ctx, double value, int width, int precis
     uint32_t int_part = (uint32_t)value;
     double remainder = value - (double)int_part;
 
-    // 打印整数部分 (复用 print_int，宽度和精度置0处理)
-    print_int(ctx, int_part, 10, is_negative, 0, 0, flags & ~FLAG_ZERO, false);
+    // 打印整数部分 (复用 print_int，宽度和精度置1处理)
+    print_int(ctx, int_part, 10, is_negative, 0, 1, flags & ~FLAG_ZERO, false);
 
     // 打印小数部分
     if (precision > 0 || (flags & FLAG_HASH))

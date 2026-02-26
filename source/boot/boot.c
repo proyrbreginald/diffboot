@@ -87,7 +87,7 @@ static void boot_thread_entry(void *parameter)
     {
         LOG_I(THREAD_NAME " thread running");
         HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-        rt_thread_mdelay(250);
+        rt_thread_mdelay(500);
     }
 }
 
