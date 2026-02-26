@@ -400,17 +400,8 @@ void rt_components_init(void);
 
 /**@{*/
 
-#ifndef RT_USING_CONSOLE
 #include <printf.h>
-#define rt_kprintf   printf
-#define rt_vsnprintf vsnprintf
-#else
 int rt_kprintf(const char *fmt, ...);
-#endif
-int rt_vsnprintf(char *buf, rt_size_t size, const char *fmt, va_list args);
-int rt_vsprintf(char *dest, const char *format, va_list arg_ptr);
-int rt_sprintf(char *buf, const char *format, ...);
-int rt_snprintf(char *buf, rt_size_t size, const char *format, ...);
 #if defined(RT_USING_DEVICE) && defined(RT_USING_CONSOLE)
 rt_device_t rt_console_set_device(const char *name);
 rt_device_t rt_console_get_device(void);
@@ -428,11 +419,6 @@ const char *rt_strerror(rt_err_t error);
 
 int __rt_ffs(int value);
 
-#ifndef RT_KSERVICE_USING_STDLIB_MEMORY
-#endif
-
-char *rt_strdup(const char *s);
-rt_size_t rt_strnlen(const char *s, rt_ubase_t maxlen);
 #ifndef RT_KSERVICE_USING_STDLIB
 char *rt_strstr(const char *str1, const char *str2);
 rt_int32_t rt_strcasecmp(const char *a, const char *b);

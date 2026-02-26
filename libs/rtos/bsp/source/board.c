@@ -97,6 +97,21 @@ FAST void rt_hw_us_delay(rt_uint32_t us)
         ;
 }
 
+void rt_hw_console_output(const char *str)
+{
+    while (*str != '\0')
+    {
+        /* 等待发送数据寄存器为空 (TXE) */
+        while (!LL_USART_IsActiveFlag_TXE_TXFNF(USART1))
+            ;
+
+        /* 写入字符到发送数据寄存器 */
+        LL_USART_TransmitData8(USART1, *str);
+
+        ++str;
+    }
+}
+
 // 执行内核启动前的配置
 void rt_hw_mcu_init(void)
 {

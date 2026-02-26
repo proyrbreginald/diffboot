@@ -307,7 +307,7 @@ void rt_thread_idle_init(void)
 
     for (i = 0; i < _CPUS_NR; i++)
     {
-        rt_sprintf(tidle_name, "tidle%d", i);
+        sprintf(tidle_name, "tidle%d", i);
         rt_thread_init(&idle[i],
                 tidle_name,
                 rt_thread_idle_entry,

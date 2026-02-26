@@ -51,9 +51,11 @@
 #define RT_DEBUG_TIMER             0 // 定时器日志
 #define RT_USING_OVERFLOW_CHECK      // 栈溢出检查
 
-#define RT_USING_DEVICE            // 使用设备驱动框架
-#define RT_USING_DEVICE_OPS        // 使用设备驱动标准接口
+#define RT_USING_DEVICE                // 使用设备驱动框架
+#define RT_USING_DEVICE_OPS            // 使用设备驱动标准接口
+#define RT_CONSOLEBUF_SIZE         128 // 控制台输出栈缓存大小
 
+#define RT_USING_CONSOLE           // 使用控制台
 // #define RT_USING_FINSH
 // #define FINSH_USING_SYMTAB
 // #define FINSH_USING_DESCRIPTION
@@ -62,5 +64,12 @@
 // #define FINSH_CMD_SIZE          64
 // #define FINSH_USING_HISTORY
 // #define FINSH_HISTORY_LINES 8
+
+#define ASYNC_LOG_BUF_SIZE    RT_CONSOLEBUF_SIZE           // 单条日志大小
+#define ASYNC_LOG_MSG_COUNT   16                           // 队列深度
+#define ASYNC_LOG_THREAD_STK  512                          // 消费线程栈
+#define ASYNC_LOG_THREAD_PRIO (RT_THREAD_PRIORITY_MAX - 2) // 极低优先级
+
+#include <boot/section.h>
 
 #endif

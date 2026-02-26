@@ -6,6 +6,7 @@
 #define DBG_LVL DBG_VERBOSE
 #include <rtdbg.h>
 
+
 #define THREAD_NAME "count"
 // cpu使用率统计线程
 static void count_thread_entry(void *parameter)
