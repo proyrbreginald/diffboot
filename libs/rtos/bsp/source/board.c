@@ -11,20 +11,13 @@
 
 static rt_uint32_t ticks_per_us;
 
-/* 累加睡眠的Tick数(虽然LPTIM是16位，但累加变量我们要用64位防止总数溢出) */
+// 累加睡眠的Tick数(虽然LPTIM是16位，但累加变量我们要用64位防止总数溢出)
 static volatile uint64_t total_sleep_ticks = 0;
 
-FAST uint64_t rt_total_sleep_get(void)
-{
-    return total_sleep_ticks;
-}
-
-FAST void rt_total_sleep_clear(void)
-{
-    total_sleep_ticks = 0;
-}
-
-// 空闲钩子进行低功耗处理
+/**
+ * @brief 空闲任务运行时的钩子函数。
+ *
+ */
 FAST static void idle_hook_wfi(void)
 {
     uint16_t start, end;
@@ -56,6 +49,12 @@ FAST static void idle_hook_wfi(void)
     }
 }
 
+/**
+ * @brief 初始化并启动CPU计数器。
+ *
+ * @return true 启动成功。
+ * @return false 启动失败。
+ */
 static bool rt_hw_dwt_init(void)
 {
     /* 禁用DWT计数器（先停止，方便配置） */
@@ -77,14 +76,46 @@ static bool rt_hw_dwt_init(void)
     __DSB(); // 数据同步屏障
     if (DWT->CYCCNT == 0)
     {
-        return 1;
+        return false;
     }
-    return 0;
+    return true;
 }
 
 /**
- * @brief 精确微秒延时实现
- * @param us 延时长度(微秒)
+ * @brief 返回空闲任务睡眠了多少tick。
+ *
+ * @return uint64_t 空闲任务睡眠了多少tick。
+ */
+FAST uint64_t rt_idle_total_sleep_get(void)
+{
+    return total_sleep_ticks;
+}
+
+/**
+ * @brief 清除空闲任务睡眠的tick数。
+ *
+ */
+FAST void rt_idle_total_sleep_clear(void)
+{
+    total_sleep_ticks = 0;
+}
+
+/**
+ * @brief 系统滴答定时器中断处理。
+ *
+ */
+FAST void SysTick_Handler(void)
+{
+    rt_interrupt_enter();
+    HAL_IncTick();
+    rt_tick_increase();
+    rt_interrupt_leave();
+}
+
+/**
+ * @brief 精确微秒延时实现。
+ *
+ * @param us 延时长度(微秒)。
  */
 FAST void rt_hw_us_delay(rt_uint32_t us)
 {
@@ -97,7 +128,12 @@ FAST void rt_hw_us_delay(rt_uint32_t us)
         ;
 }
 
-void rt_hw_console_output(const char *str)
+/**
+ * @brief 控制台内容输出。
+ * 
+ * @param str 输出内容指针。
+ */
+FAST void rt_hw_console_output(const char *str)
 {
     while (*str != '\0')
     {
@@ -107,12 +143,14 @@ void rt_hw_console_output(const char *str)
 
         /* 写入字符到发送数据寄存器 */
         LL_USART_TransmitData8(USART1, *str);
-
         ++str;
     }
 }
 
-// 执行内核启动前的配置
+/**
+ * @brief 执行操作系统启动前的配置。
+ * 
+ */
 void rt_hw_mcu_init(void)
 {
     // MCU复位启动完成
@@ -128,7 +166,7 @@ void rt_hw_mcu_init(void)
 
     // 初始化内核计数器
     bool result = rt_hw_dwt_init();
-    if (result)
+    if (!result)
     {
         LOG_E("DWT init fail");
     }
@@ -137,6 +175,7 @@ void rt_hw_mcu_init(void)
         LOG_I("DWT init success");
     }
 
+    // 配置微秒级延时
     LL_LPTIM_Enable(LPTIM1);
     LL_LPTIM_SetAutoReload(LPTIM1, 0xFFFF); // 设置最大计数值
     LL_LPTIM_StartCounter(LPTIM1, LL_LPTIM_OPERATING_MODE_CONTINUOUS);
@@ -155,12 +194,4 @@ void rt_hw_mcu_init(void)
     // 设置空闲钩子
     rt_thread_idle_sethook(idle_hook_wfi);
     LOG_I("add idle hook: idle_hook_wfi");
-}
-
-FAST void SysTick_Handler(void)
-{
-    rt_interrupt_enter();
-    HAL_IncTick();
-    rt_tick_increase();
-    rt_interrupt_leave();
 }

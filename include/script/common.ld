@@ -58,21 +58,21 @@ SECTIONS
         *(.rodata*) /* 常量数据 */
     } > LOADER
 
-    /* 已初始化数据段 */
-    .assigned : ALIGN(4)
+    /* DTCM已初始化数据段 */
+    .dtcm_init : ALIGN(4)
     {
-        _assigned_ram_start = .;    /* 起始地址 */
-        *(.data*)                   /* 已初始化数据 */
-        _assigned_ram_end = .;      /* 结束地址 */
+        _dtcm_init_start = .;   /* 起始地址 */
+        *(.data*)               /* 已初始化数据 */
+        _dtcm_init_end = .;     /* 结束地址 */
     } > DTCM AT > LOADER
-    _assigned_section_addr = LOADADDR(.assigned);
+    _assigned_section_addr = LOADADDR(.dtcm_init);
 
-    /* 未初始化数据段 */
-    .unassigned : ALIGN(4)
+    /* DTCM未初始化数据段 */
+    .dtcm_uninit : ALIGN(4)
     {
-        _unassigned_ram_start = .;   /* RAM中的起始地址 */
-        *(.bss*)                    /* 未初始化数据 */
-        _unassigned_ram_end = .;    /* RAM中的结束地址 */
+        _dtcm_uninit_start = .; /* 起始地址 */
+        *(.bss*)                /* 未初始化数据 */
+        _dtcm_uninit_end = .;   /* 结束地址 */
     } > DTCM
 
     /* 堆空间段 */
@@ -86,6 +86,23 @@ SECTIONS
     {
         . = . + stack_size; /* 如果RAM不足会报错 */
     } > DTCM
+
+    /* RAM0已初始化数据段 */
+    .ram0_init : ALIGN(4)
+    {
+        _ram0_init_start = .;   /* 起始地址 */
+        *(.share*)              /* 已初始化数据 */
+        _ram0_init_end = .;     /* 结束地址 */
+    } > RAM0 AT > LOADER
+    _ram0_section_addr = LOADADDR(.ram0_init);
+
+    /* RAM0未初始化数据段 */
+    .ram0_uninit : ALIGN(4)
+    {
+        _ram0_uninit_start = .; /* 起始地址 */
+        *(.bss*)                /* 未初始化数据 */
+        _ram0_uninit_end = .;   /* RAM中的结束地址 */
+    } > RAM0
 
     /* 显式丢弃的内容 */
     /DISCARD/ :

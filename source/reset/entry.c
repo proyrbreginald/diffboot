@@ -3,7 +3,7 @@
 
 void entry(void)
 {
-    // 初始化HAL库并配置MCU
+    // 调用CubeMX的HAL初始化代码
     main();
 
     // 启动rtthread

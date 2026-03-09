@@ -3,5 +3,6 @@
 
 #define FAST   __attribute__((section(".fast"), noinline))
 #define RETAIN __attribute__((section(".retain"), noinline))
+#define SHARE __attribute__((section(".share")))
 
 #endif // __SECTION_H__

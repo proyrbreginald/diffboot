@@ -3,10 +3,10 @@
 
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__
-#define DBG_LVL DBG_VERBOSE
+#define DBG_LVL DBG_WARN
 #include <rtdbg.h>
 
-
+#undef THREAD_NAME
 #define THREAD_NAME "count"
 // cpu使用率统计线程
 static void count_thread_entry(void *parameter)
@@ -21,8 +21,8 @@ static void count_thread_entry(void *parameter)
     {
         /* 取出数据并清零 */
         rt_enter_critical();
-        uint64_t sleep_cnt = rt_total_sleep_get();
-        rt_total_sleep_clear();
+        uint64_t sleep_cnt = rt_idle_total_sleep_get();
+        rt_idle_total_sleep_clear();
         rt_exit_critical();
 
         /* 理论上1秒钟LPTIM应该走1000000个Tick */
@@ -31,13 +31,11 @@ static void count_thread_entry(void *parameter)
             sleep_cnt = 1000000; // 修正误差，防止出现负数
         }
 
-        /* 占用率 = 100 - (睡眠占比) */
-        float usage = 100.0f - ((float)sleep_cnt / 1000000) * 100.0f;
-
         static uint8_t cnt = 0;
         if (++cnt % 1 == 0)
         {
-            LOG_V("cpu usage per s: %.2f%%", usage);
+            /* 占用率 = 100 - (睡眠占比) */
+            LOG_V("cpu usage per s: %.2f%%", 100.0f - ((float)sleep_cnt / 1000000) * 100.0f);
             cnt = 0;
         }
 
@@ -76,9 +74,9 @@ static int count_thread_init(void)
     }
     return result;
 }
-#undef THREAD_NAME
 INIT_APP_EXPORT(count_thread_init);
 
+#undef THREAD_NAME
 #define THREAD_NAME "boot"
 // 差分启动线程
 static void boot_thread_entry(void *parameter)
@@ -117,7 +115,6 @@ static int boot_thread_init(void)
     }
     return result;
 }
-#undef THREAD_NAME
 INIT_APP_EXPORT(boot_thread_init);
 
 // 创建业务层任务

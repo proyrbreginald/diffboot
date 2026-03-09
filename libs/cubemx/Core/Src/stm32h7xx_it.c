@@ -23,7 +23,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <rtthread.h>
-#include <rtdbg.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -33,7 +32,10 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+// 配置调试日志
+#define DBG_TAG __FILE_NAME__
+#define DBG_LVL DBG_WARN
+#include <rtdbg.h>
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -74,7 +76,7 @@ void NMI_Handler(void)
   rt_interrupt_enter(); /* RT-Thread中断进入 */
   /* USER CODE END NonMaskableInt_IRQn 0 */
   /* USER CODE BEGIN NonMaskableInt_IRQn 1 */
-  LOG_F("NMI_Handler");
+  LOG_F("enter %s", __FUNCTION__);
   while (1)
   {
     HAL_GPIO_TogglePin(LED_RED_GPIO_Port, LED_RED_Pin);
@@ -90,7 +92,7 @@ void MemManage_Handler(void)
 {
   /* USER CODE BEGIN MemoryManagement_IRQn 0 */
   rt_interrupt_enter(); /* RT-Thread中断进入 */
-  LOG_F("MemManage_Handler");
+  LOG_F("enter %s", __FUNCTION__);
   /* USER CODE END MemoryManagement_IRQn 0 */
   while (1)
   {
@@ -108,7 +110,7 @@ void BusFault_Handler(void)
 {
   /* USER CODE BEGIN BusFault_IRQn 0 */
   rt_interrupt_enter(); /* RT-Thread中断进入 */
-  LOG_F("BusFault_Handler");
+  LOG_F("enter %s", __FUNCTION__);
   /* USER CODE END BusFault_IRQn 0 */
   while (1)
   {
@@ -126,7 +128,7 @@ void UsageFault_Handler(void)
 {
   /* USER CODE BEGIN UsageFault_IRQn 0 */
   rt_interrupt_enter(); /* RT-Thread中断进入 */
-  LOG_F("UsageFault_Handler");
+  LOG_F("enter %s", __FUNCTION__);
   /* USER CODE END UsageFault_IRQn 0 */
   while (1)
   {
@@ -177,23 +179,6 @@ void USART1_IRQHandler(void)
 {
   /* USER CODE BEGIN USART1_IRQn 0 */
   rt_interrupt_enter(); /* RT-Thread中断进入 */
-
-  // /* 检查RXNE标志 (Read Data Register Not Empty) */
-  // if (LL_USART_IsActiveFlag_RXNE(USART1) && LL_USART_IsEnabledIT_RXNE(USART1))
-  // {
-  //   /* 读取数据 (LL库读取函数，读取后硬件会自动清除RXNE标志) */
-  //   uint8_t ch = LL_USART_ReceiveData8(USART1);
-
-  //   /* 将数据存入FIFO模块 */
-  //   uart_fifo_input_irq(get_console_fifo_instance(), ch);
-  // }
-  
-  // /* 处理Overrun错误，防止中断卡死 */
-  // if (LL_USART_IsActiveFlag_ORE(USART1))
-  // {
-  //     LL_USART_ClearFlag_ORE(USART1);
-  // }
-
   /* USER CODE END USART1_IRQn 0 */
   /* USER CODE BEGIN USART1_IRQn 1 */
   rt_interrupt_leave(); /* RT-Thread中断退出 */
@@ -201,16 +186,18 @@ void USART1_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles UART4 global interrupt.
+  * @brief This function handles DMAMUX1 overrun interrupt.
   */
-void UART4_IRQHandler(void)
+void DMAMUX1_OVR_IRQHandler(void)
 {
-  /* USER CODE BEGIN UART4_IRQn 0 */
+  /* USER CODE BEGIN DMAMUX1_OVR_IRQn 0 */
   rt_interrupt_enter(); /* RT-Thread中断进入 */
-  /* USER CODE END UART4_IRQn 0 */
-  /* USER CODE BEGIN UART4_IRQn 1 */
+  LOG_E("enter %s", __FUNCTION__);
+  /* USER CODE END DMAMUX1_OVR_IRQn 0 */
+  /* USER CODE BEGIN DMAMUX1_OVR_IRQn 1 */
+  LOG_E("exit %s", __FUNCTION__);
   rt_interrupt_leave(); /* RT-Thread中断退出 */
-  /* USER CODE END UART4_IRQn 1 */
+  /* USER CODE END DMAMUX1_OVR_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

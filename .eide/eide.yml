@@ -11,6 +11,7 @@ srcDirs:
   - libs/rtos/cpu
   - libs/rtos/bsp/source
   - libs/libc/source
+  - libs/ymodem/source
 virtualFolder:
   name: <virtual_root>
   files: []
@@ -37,6 +38,7 @@ targets:
         - libs/rtos/bsp/include
         - libs/libc/include
         - libs/libc/bsp/include
+        - libs/ymodem/include
       libList: []
     excludeList:
       - libs/libstm32h743/hal/source/stm32h7xx_hal_msp_template.c

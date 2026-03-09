@@ -4,7 +4,7 @@
 
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__
-#define DBG_LVL DBG_LOG
+#define DBG_LVL DBG_DEBUG
 #include <rtdbg.h>
 
 /*

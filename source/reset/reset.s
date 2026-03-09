@@ -11,10 +11,10 @@
 .word _fast_ram_start         /* 快速代码段在RAM中的起始地址 */
 .word _fast_ram_end           /* 快速代码段在RAM中的结束地址 */
 .word _assigned_section_addr  /* 已初始化数据段在Flash中的起始地址 */
-.word _assigned_ram_start     /* 已初始化数据段在RAM中的起始地址 */
-.word _assigned_ram_end       /* 已初始化数据段在RAM中的结束地址 */
-.word _unassigned_ram_start   /* 未初始化数据段在RAM中的起始地址 */
-.word _unassigned_ram_end     /* 未初始化数据段在RAM中的结束地址 */
+.word _dtcm_init_start     /* 已初始化数据段在RAM中的起始地址 */
+.word _dtcm_init_end       /* 已初始化数据段在RAM中的结束地址 */
+.word _dtcm_uninit_start   /* 未初始化数据段在RAM中的起始地址 */
+.word _dtcm_uninit_end     /* 未初始化数据段在RAM中的结束地址 */
 
 /* 复位处理函数 */
 .section .text.reset_handler
@@ -48,8 +48,8 @@ loop_copy_fast:
   bcc copy_fast                   /* 如果未达到结束位置则继续复制 */
 
   /* 初始化assigned段数据 */
-  ldr r0, =_assigned_ram_start    /* 源地址：数据段的起始地址 */
-  ldr r1, =_assigned_ram_end      /* 目标地址：数据段的结束地址 */
+  ldr r0, =_dtcm_init_start    /* 源地址：数据段的起始地址 */
+  ldr r1, =_dtcm_init_end      /* 目标地址：数据段的结束地址 */
   ldr r2, =_assigned_section_addr /* Flash中存储的初始化数据地址 */
   movs r3, #0                     /* 偏移量初始化为0 */
   b loop_copy_data
@@ -65,8 +65,8 @@ loop_copy_data:
   bcc copy_data                   /* 如果未达到结束位置则继续复制 */
 
   /* 初始化unassigned段数据 */
-  ldr r2, =_unassigned_ram_start  /* 获取未初始化数据段起始地址 */
-  ldr r4, =_unassigned_ram_end    /* 获取未初始化数据段结束地址 */
+  ldr r2, =_dtcm_uninit_start  /* 获取未初始化数据段起始地址 */
+  ldr r4, =_dtcm_uninit_end    /* 获取未初始化数据段结束地址 */
   movs r3, #0                     /* 偏移量初始化为0 */
   b loop_fill_bss_zero
 

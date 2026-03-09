@@ -18,7 +18,7 @@
 #define DBG_ERROR   1
 #define DBG_WARN    2
 #define DBG_INFO    3
-#define DBG_LOG     4
+#define DBG_DEBUG   4
 #define DBG_VERBOSE 5
 
 // 定义日志标签
@@ -79,7 +79,7 @@
 
 // 定义定位日志输出宏
 #define dbg_here                                                               \
-    if ((DBG_LVL) <= DBG_LOG) {                                                \
+    if ((DBG_LVL) <= DBG_DEBUG) {                                              \
         rt_kprintf(DBG_TAG " Here %s:%d\n", __FUNCTION__, __LINE__);           \
     }
 
@@ -112,7 +112,7 @@
 #define LOG_V(...)
 #endif
 
-#if (DBG_LVL >= DBG_LOG)
+#if (DBG_LVL >= DBG_DEBUG)
 #define LOG_D(fmt, ...)                                                        \
     dbg_log_line("D", DBG_FG_BLUE, DBG_BG_BLACK, fmt, ##__VA_ARGS__)
 #else
