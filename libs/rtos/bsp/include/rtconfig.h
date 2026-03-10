@@ -53,7 +53,7 @@
 
 #define RT_USING_DEVICE                // 使用设备驱动框架
 #define RT_USING_DEVICE_OPS            // 使用设备驱动标准接口
-#define RT_CONSOLEBUF_SIZE         128 // 控制台输出栈缓存大小
+#define RT_CONSOLEBUF_SIZE         256 // 控制台输出栈缓存大小
 
 #define RT_USING_CONSOLE           // 使用控制台
 // #define RT_USING_FINSH

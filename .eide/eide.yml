@@ -4,14 +4,8 @@ type: ARM
 deviceName: null
 packDir: null
 srcDirs:
-  - libs/cubemx/Core/Src
   - source
-  - libs/libstm32h743/hal/source
-  - libs/rtos/source
-  - libs/rtos/cpu
-  - libs/rtos/bsp/source
-  - libs/libc/source
-  - libs/ymodem/source
+  - libs
 virtualFolder:
   name: <virtual_root>
   files: []
@@ -39,6 +33,7 @@ targets:
         - libs/libc/include
         - libs/libc/bsp/include
         - libs/ymodem/include
+        - libs/ringbuffer/include
       libList: []
     excludeList:
       - libs/libstm32h743/hal/source/stm32h7xx_hal_msp_template.c
@@ -47,6 +42,7 @@ targets:
       - libs/libstm32h743/hal/source/stm32h7xx_hal_timebase_tim_template.c
       - libs/cubemx/Core/Src/sysmem.c
       - libs/cubemx/Core/Src/syscalls.c
+      - libs/cubemx/startup_stm32h743xx.s
     toolchain: GCC
     toolchainConfigMap:
       GCC:
