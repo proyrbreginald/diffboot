@@ -5,7 +5,7 @@
 #include <ymodem.h>
 
 #define DBG_TAG __FILE_NAME__
-#define DBG_LVL DBG_DEBUG
+#define DBG_LVL DBG_INFO
 #include <rtdbg.h>
 
 #define UART_RX_BUF_SIZE (1024 * 2)
@@ -16,6 +16,12 @@ static uint32_t last_read_end_pos = 0;
 static struct rt_semaphore uart_rx_sem;
 static struct rt_ringbuffer ymodem_rb;
 static uint8_t rb_mem[YMODEM_RB_SIZE];
+static ymodem_ops_t *ymodem_cb = RT_NULL;
+
+void ymodem_set_ops(ymodem_ops_t *const ops)
+{
+    ymodem_cb = ops;
+}
 
 /**
  * @brief CRC16-CCITT软件实现。
@@ -119,6 +125,7 @@ static void ymodem_receive_loop(void)
         return;
 
     uint8_t head;
+    int error_occurred = 0;
     LOG_I("wait for sender");
 
     // 会话层循环
@@ -155,16 +162,32 @@ static void ymodem_receive_loop(void)
             uint32_t f_size = atoi((char *)&pkt[3] + strlen(f_name) + 1);
             LOG_I("receiving file: %s, size: %u", f_name, f_size);
 
+            // 开始接收
+            if (ymodem_cb && ymodem_cb->on_begin)
+            {
+                if (ymodem_cb->on_begin(f_name, f_size) != 0)
+                {
+                    // 拒绝接收(例如磁盘空间不足)
+                    ymodem_putchar(CAN);
+                    ymodem_putchar(CAN);
+                    goto exit_session;
+                }
+            }
+
             ymodem_putchar(ACK);
             ymodem_putchar(CRC_C); // 准备接收正式数据
 
             // 进入数据接收循环
             uint32_t curr = 0;
             uint8_t seq = 1;
+
             while (1)
             {
                 if (rb_read_wait(&head, 1, 5000) != 1)
-                    break; // 超时退出
+                {
+                    error_occurred = -1;
+                    break;
+                }
 
                 // 只有收到EOT才说明数据传完了
                 if (head == EOT)
@@ -203,8 +226,20 @@ static void ymodem_receive_loop(void)
                                         (f_size - curr < block_len)
                                             ? (f_size - curr)
                                             : block_len;
-                                    LOG_D("data(%u):\n%s", write_sz, &pkt[3]);
-                                    rt_kprintf("\n");
+
+                                    // 处理数据块
+                                    if (ymodem_cb && ymodem_cb->on_data)
+                                    {
+                                        if (ymodem_cb->on_data(
+                                                &pkt[3], write_sz, curr) != 0)
+                                        {
+                                            ymodem_putchar(CAN);
+                                            ymodem_putchar(CAN);
+                                            error_occurred = -2;
+                                            goto exit_session;
+                                        }
+                                    }
+
                                     curr += write_sz;
                                     seq++;
                                 }
@@ -217,7 +252,10 @@ static void ymodem_receive_loop(void)
                 }
 
                 if (head == CAN)
+                {
+                    error_occurred = -3;
                     goto exit_session;
+                }
             }
         }
         else if (head == CAN)
@@ -225,6 +263,10 @@ static void ymodem_receive_loop(void)
     }
 
 exit_session:
+    // 数据传输循环结束，传递可能的错误信息通知上层
+    if (ymodem_cb && ymodem_cb->on_end)
+        ymodem_cb->on_end(error_occurred);
+
     rt_free(pkt);
 }
 /**
@@ -260,7 +302,6 @@ static void ymodem_thread_entry(void *parameter)
     {
         // 实际应用中，可在此处判断是否进入下载模式
         ymodem_receive_loop();
-        rt_thread_mdelay(1000);
     }
 }
 
@@ -274,7 +315,7 @@ static int ymodem_thread_init(void)
 {
     rt_err_t result = RT_EOK;
     rt_thread_t tid =
-        rt_thread_create(THREAD_NAME, ymodem_thread_entry, RT_NULL, 2048, 2, 0);
+        rt_thread_create(THREAD_NAME, ymodem_thread_entry, RT_NULL, 1024, 2, 0);
     if (tid != RT_NULL)
     {
         LOG_I(THREAD_NAME " thread create success");
