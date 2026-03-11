@@ -104,4 +104,6 @@ void rt_hw_secondary_cpu_idle_exec(void);
 #define rt_hw_spin_unlock(lock) rt_hw_interrupt_enable(*(lock))
 #endif
 
+void rt_hw_console_output(const char *str);
+
 #endif

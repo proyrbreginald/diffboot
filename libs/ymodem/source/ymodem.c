@@ -170,6 +170,7 @@ static void ymodem_receive_loop(void)
                     // 拒绝接收(例如磁盘空间不足)
                     ymodem_putchar(CAN);
                     ymodem_putchar(CAN);
+                    error_occurred = -1;
                     goto exit_session;
                 }
             }
@@ -185,7 +186,7 @@ static void ymodem_receive_loop(void)
             {
                 if (rb_read_wait(&head, 1, 5000) != 1)
                 {
-                    error_occurred = -1;
+                    error_occurred = -2;
                     break;
                 }
 
@@ -235,7 +236,7 @@ static void ymodem_receive_loop(void)
                                         {
                                             ymodem_putchar(CAN);
                                             ymodem_putchar(CAN);
-                                            error_occurred = -2;
+                                            error_occurred = -3;
                                             goto exit_session;
                                         }
                                     }
@@ -253,7 +254,7 @@ static void ymodem_receive_loop(void)
 
                 if (head == CAN)
                 {
-                    error_occurred = -3;
+                    error_occurred = -4;
                     goto exit_session;
                 }
             }
@@ -314,8 +315,8 @@ static void ymodem_thread_entry(void *parameter)
 static int ymodem_thread_init(void)
 {
     rt_err_t result = RT_EOK;
-    rt_thread_t tid =
-        rt_thread_create(THREAD_NAME, ymodem_thread_entry, RT_NULL, 1024, 2, 0);
+    rt_thread_t tid = rt_thread_create(THREAD_NAME, ymodem_thread_entry,
+                                       RT_NULL, 1024 * 2, 2, 0);
     if (tid != RT_NULL)
     {
         LOG_I(THREAD_NAME " thread create success");

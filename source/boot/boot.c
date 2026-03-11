@@ -1,4 +1,6 @@
 #include <main.h>
+#include <mcu/partition.h>
+#include <rthw.h>
 #include <rtthread.h>
 #include <ymodem.h>
 
@@ -78,6 +80,14 @@ static int count_thread_init(void)
 }
 INIT_APP_EXPORT(count_thread_init);
 
+typedef enum
+{
+    IAP_USER,
+    IAP_OEM,
+} iap_zone_t;
+
+static iap_zone_t iap_zone = IAP_USER;
+
 /**
  * @brief ymodem接收到文件头时执行的回调。
  *
@@ -85,10 +95,76 @@ INIT_APP_EXPORT(count_thread_init);
  * @param size 文件内容的字节大小。
  * @return int 返回0表示继续接收此文件，否则拒绝接收。
  */
-static int ymodem_on_begin(const char *name, uint32_t size)
+FAST static int ymodem_on_begin(const char *name, uint32_t size)
 {
+    int result = 0;
+    FLASH_EraseInitTypeDef flash_erase_configuration = {
+        .TypeErase = FLASH_TYPEERASE_SECTORS,
+        .NbSectors = (1 + size / MCU_FLASH_SECTOR_SIZE),
+        .VoltageRange = FLASH_VOLTAGE_RANGE_3,
+    };
+    if (strcmp(name, "user.txt") == 0)
+    {
+        flash_erase_configuration.Banks = FLASH_BANK_1;
+        flash_erase_configuration.Sector =
+            (USER_START - MCU_FLASH0_START) / MCU_FLASH_SECTOR_SIZE;
+        iap_zone = IAP_USER;
+    }
+    else if (strcmp(name, "oem") == 0)
+    {
+        flash_erase_configuration.Banks = FLASH_BANK_2;
+        flash_erase_configuration.Sector =
+            (OEM_START - MCU_FLASH1_START) / MCU_FLASH_SECTOR_SIZE;
+        iap_zone = IAP_OEM;
+    }
+    else
+    {
+        LOG_E("unsupport file: %s (%d bytes)", name, size);
+        goto exit;
+    }
+    LOG_D("flash erase sector index: %u, number: %u",
+          flash_erase_configuration.Sector,
+          flash_erase_configuration.NbSectors);
+
+    // 在擦写前关闭全局中断
+    __disable_irq();
+
+    // 解锁Flash控制寄存器
+    result = HAL_FLASH_Unlock();
+    if (0 != result)
+    {
+        LOG_E("flash unlock fail");
+        goto exit;
+    }
+
+    // 清除ECC标志
+    __HAL_FLASH_CLEAR_FLAG_BANK1(
+        (flash_erase_configuration.Banks == FLASH_BANK_1)
+            ? FLASH_FLAG_ALL_ERRORS_BANK1
+            : FLASH_FLAG_ALL_ERRORS_BANK2);
+
+    // 执行擦除
+    uint32_t sector_error;
+    result = HAL_FLASHEx_Erase(&flash_erase_configuration, &sector_error);
+    if (0 != result)
+    {
+        LOG_E("flash erase fail with %u", sector_error);
+        goto exit;
+    }
+
     LOG_I("start download: %s (%d bytes)", name, size);
-    // 这里可以执行Flash擦除操作
+
+exit:
+    // 上锁Flash控制寄存器
+    result = HAL_FLASH_Lock();
+    if (0 != result)
+    {
+        LOG_E("flash lock fail");
+    }
+
+    // 使能全局中断
+    __enable_irq();
+
     return 0;
 }
 
@@ -100,11 +176,93 @@ static int ymodem_on_begin(const char *name, uint32_t size)
  * @param offset 当前文件偏移量。
  * @return int 0: 处理成功; 非0: 错误 (例如写入失败)，将终止传输。
  */
-static int ymodem_on_data(const uint8_t *data, uint32_t len, uint32_t offset)
+FAST static int ymodem_on_data(const uint8_t *data, uint32_t len,
+                               uint32_t offset)
 {
-    LOG_I("offset: %u len: %u", offset, len); // 打印进度条
-    // 这里将数据块写入 Flash
-    // flash_write(PARTITION_ADDR + offset, data, len);
+    int result = 0;
+
+    const uint32_t addr =
+        ((iap_zone == IAP_USER) ? USER_START : OEM_START) + offset;
+    // 检查地址是否32字节对齐
+    if ((addr & 31) != 0)
+    {
+        LOG_E("flash address 0x%08X not 32-byte aligned", addr);
+        goto exit;
+    }
+    LOG_D("flash program from 0x%08X", addr);
+
+    // 在写前关闭全局中断
+    __disable_irq();
+
+    // 解锁Flash控制寄存器
+    result = HAL_FLASH_Unlock();
+    if (0 != result)
+    {
+        LOG_E("flash unlock fail");
+        goto exit;
+    }
+
+    // 清除ECC标志
+    __HAL_FLASH_CLEAR_FLAG_BANK1((iap_zone == IAP_USER)
+                                     ? FLASH_FLAG_ALL_ERRORS_BANK1
+                                     : FLASH_FLAG_ALL_ERRORS_BANK2);
+
+    uint32_t bytes_processed = 0;
+    static uint8_t buffer[32] __attribute__((aligned(32)));
+
+    while (bytes_processed < len)
+    {
+        uint32_t remaining = len - bytes_processed;
+        uint32_t write_addr = addr + bytes_processed;
+        uint8_t *src_ptr = (uint8_t *)(data + bytes_processed);
+
+        if (remaining >= 32)
+        {
+            // 情况1:剩余数据足够写一个完整的32字节块
+            // 注意：如果源数据地址本身就是32位对齐的，可以直接传src_ptr
+            // 否则为了安全，如果src_ptr不对齐，建议先copy到align_buffer
+            if (((uint32_t)src_ptr & 31) == 0)
+            {
+                result = HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD,
+                                           write_addr, (uint32_t)src_ptr);
+            }
+            else
+            {
+                memcpy(buffer, src_ptr, 32);
+                result = HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD,
+                                           write_addr, (uint32_t)buffer);
+            }
+            bytes_processed += 32;
+        }
+        else
+        {
+            // 情况2: 剩余数据不足32字节，进行填充
+            memset(buffer, 0xFF, 32);           // 先全部填0xFF
+            memcpy(buffer, src_ptr, remaining); // 拷入剩余数据
+
+            result = HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD, write_addr,
+                                       (uint32_t)buffer);
+            bytes_processed += remaining; // 处理完成
+        }
+
+        if (result != HAL_OK)
+        {
+            LOG_E("flash program fail at 0x%08X with %u", write_addr, result);
+            goto exit;
+        }
+    }
+
+exit:
+    // 上锁Flash控制寄存器
+    result = HAL_FLASH_Lock();
+    if (0 != result)
+    {
+        LOG_E("flash lock fail");
+    }
+
+    // 使能全局中断
+    __enable_irq();
+
     return 0;
 }
 
@@ -113,15 +271,21 @@ static int ymodem_on_data(const uint8_t *data, uint32_t len, uint32_t offset)
  *
  * @param status 0: 成功; 非0: 异常终止 (超时、校验失败、被取消等)
  */
-static void ymodem_on_end(int status)
+FAST static void ymodem_on_end(int status)
 {
     if (status == 0)
     {
         LOG_I("download success!");
+
+        char buffer[64] = {0};
+        const uint32_t addr =
+            ((iap_zone == IAP_USER) ? USER_START : OEM_START);
+        memcpy(buffer, (void *)addr, sizeof(buffer) - 1);
+        LOG_I("read data: %s", buffer);
     }
     else
     {
-        LOG_I("download failed, error code: %d", status);
+        LOG_E("download failed, error code: %d", status);
     }
 }
 
