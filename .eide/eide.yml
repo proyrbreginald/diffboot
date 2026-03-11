@@ -51,13 +51,17 @@ targets:
         floatingPointHardware: double
         options:
           version: 5
-          afterBuildTasks: []
+          afterBuildTasks:
+            - name: build bin
+              abortAfterFailed: false
+              command: ${CompilerPrefix}objcopy.exe -I ihex -O binary ${outDir}\${projectName}.hex ${outDir}\${projectName}.bin
+              disable: false
           asm-compiler:
             ASM_FLAGS: -ffreestanding -fno-common
           beforeBuildTasks:
             - name: build link script
               abortAfterFailed: false
-              command: ${CompilerPrefix}gcc.exe -E -P -x c -I include -DBUILD_LOADER ${workspaceFolder}\include\script\common.ld -o ${OutDir}\diffboot.ld
+              command: ${CompilerPrefix}gcc.exe -E -P -x c -I include -DBUILD_LOADER ${workspaceFolder}\include\script\common.ld -o ${OutDir}\${projectName}.ld
               disable: false
               stopBuildAfterFailed: true
           c/cpp-compiler:
