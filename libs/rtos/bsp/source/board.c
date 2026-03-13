@@ -168,11 +168,11 @@ void rt_hw_mcu_init(void)
     bool result = rt_hw_dwt_init();
     if (!result)
     {
-        LOG_E("DWT init fail");
+        LOG_E("dwt init fail");
     }
     else
     {
-        LOG_I("DWT init success");
+        LOG_I("dwt init success");
     }
 
     // 配置微秒级延时

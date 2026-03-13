@@ -103,14 +103,14 @@ FAST static int ymodem_on_begin(const char *name, uint32_t size)
         .NbSectors = (1 + size / MCU_FLASH_SECTOR_SIZE),
         .VoltageRange = FLASH_VOLTAGE_RANGE_3,
     };
-    if (strcmp(name, "user.txt") == 0)
+    if (strcmp(name, "user.bin") == 0)
     {
         flash_erase_configuration.Banks = FLASH_BANK_1;
         flash_erase_configuration.Sector =
             (USER_START - MCU_FLASH0_START) / MCU_FLASH_SECTOR_SIZE;
         iap_zone = IAP_USER;
     }
-    else if (strcmp(name, "oem") == 0)
+    else if (strcmp(name, "oem.bin") == 0)
     {
         flash_erase_configuration.Banks = FLASH_BANK_2;
         flash_erase_configuration.Sector =
@@ -277,11 +277,21 @@ FAST static void ymodem_on_end(int status)
     {
         LOG_I("download success!");
 
-        char buffer[64] = {0};
-        const uint32_t addr =
-            ((iap_zone == IAP_USER) ? USER_START : OEM_START);
-        memcpy(buffer, (void *)addr, sizeof(buffer) - 1);
-        LOG_I("read data: %s", buffer);
+        uint8_t buffer[8] = {0};
+        const uint32_t addr = ((iap_zone == IAP_USER) ? USER_START : OEM_START);
+        memcpy(buffer, (void *)addr, sizeof(buffer));
+
+        uint32_t stack = (uint32_t)buffer[3] << (3 * 8);
+        stack |= (uint32_t)buffer[2] << (2 * 8);
+        stack |= (uint32_t)buffer[1] << (1 * 8);
+        stack |= (uint32_t)buffer[0] << (0 * 8);
+
+        uint32_t reset = (uint32_t)buffer[7] << (3 * 8);
+        reset |= (uint32_t)buffer[6] << (2 * 8);
+        reset |= (uint32_t)buffer[5] << (1 * 8);
+        reset |= (uint32_t)buffer[4] << (0 * 8);
+
+        LOG_I("stack: 0x%08x, reset: 0x%08x", stack, reset);
     }
     else
     {

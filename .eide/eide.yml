@@ -54,7 +54,7 @@ targets:
           afterBuildTasks:
             - name: build bin
               abortAfterFailed: false
-              command: ${CompilerPrefix}objcopy.exe -I ihex -O binary ${outDir}\${projectName}.hex ${outDir}\${projectName}.bin
+              command: ${CompilerPrefix}objcopy.exe -O binary ${outDir}\${projectName}.elf ${outDir}\${projectName}.bin
               disable: false
           asm-compiler:
             ASM_FLAGS: -ffreestanding -fno-common
