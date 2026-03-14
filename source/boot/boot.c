@@ -1,5 +1,7 @@
+#include <boot/ld.h>
 #include <main.h>
 #include <mcu/partition.h>
+#include <reset/start.h>
 #include <rthw.h>
 #include <rtthread.h>
 #include <ymodem.h>
@@ -291,7 +293,12 @@ FAST static void ymodem_on_end(int status)
         reset |= (uint32_t)buffer[5] << (1 * 8);
         reset |= (uint32_t)buffer[4] << (0 * 8);
 
-        LOG_I("stack: 0x%08x, reset: 0x%08x", stack, reset);
+        // 设置加载app标志位
+        *(volatile uint32_t *)MCU_BKPRAM_START =
+            ((iap_zone == IAP_USER) ? LOAD_USER_CHECKSUM : LOAD_OEM_CHECKSUM);
+
+        LOG_I("stack: 0x%08x, reset: 0x%08x, checksum: 0x%08x", stack, reset,
+              *(volatile uint32_t *)MCU_BKPRAM_START);
     }
     else
     {
@@ -306,6 +313,42 @@ static ymodem_ops_t ymodem_ops = {
     .on_end = ymodem_on_end,
 };
 
+void detect_app(void)
+{
+    // 待加载的app程序地址
+    uint32_t app_bin_addr;
+
+    // 校验跳转标志位
+    switch (*(volatile uint32_t *)MCU_BKPRAM_START)
+    {
+    case LOAD_USER_CHECKSUM:
+        // 赋值user程序分区的地址作为app程序地址
+        app_bin_addr = USER_START;
+        LOG_I("LOAD_USER_CHECKSUM");
+        break;
+    case LOAD_OEM_CHECKSUM:
+        // 赋值oem程序分区的地址作为app程序地址
+        app_bin_addr = OEM_START;
+        LOG_I("LOAD_OEM_CHECKSUM");
+        break;
+    default:
+        // 无效参数时不加载app程序
+        LOG_I("checksum invalid");
+        return;
+    }
+
+    // 获取app的栈指针和复位处理函数
+    // app程序的第一个4字节是栈地址，第二个是复位处理函数地址
+    const uint32_t new_msp = *(volatile uint32_t *)app_bin_addr;
+    const void_fn_void_t new_reset_handler =
+        (void_fn_void_t)(*(volatile uint32_t *)(app_bin_addr + 4));
+    LOG_I("VTOR: 0x%08x, new_msp: 0x%08x, new_reset_handler: 0x%08x",
+          app_bin_addr, new_msp, new_reset_handler);
+
+    // 执行mcu软件复位
+    NVIC_SystemReset();
+}
+
 #undef THREAD_NAME
 #define THREAD_NAME "boot"
 // 差分启动线程
@@ -319,6 +362,7 @@ static void boot_thread_entry(void *parameter)
     {
         LOG_D(THREAD_NAME " thread running");
         HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+        detect_app();
         rt_thread_mdelay(500);
     }
 }

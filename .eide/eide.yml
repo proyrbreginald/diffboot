@@ -48,7 +48,7 @@ targets:
       GCC:
         archExtensions: ""
         cpuType: Cortex-M7
-        floatingPointHardware: double
+        floatingPointHardware: single
         options:
           version: 5
           afterBuildTasks:
@@ -89,7 +89,7 @@ targets:
             LIB_FLAGS: -lgcc
             output-format: elf
             remove-unused-input-sections: true
-        scatterFilePath: ${OutDir}\diffboot.ld
+        scatterFilePath: ${OutDir}\${projectName}.ld
         storageLayout:
           RAM: []
           ROM: []

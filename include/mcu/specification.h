@@ -60,4 +60,11 @@
 #define MCU_RAM2_SIZE  (64 * 1024) // RAM2大小
 #endif
 
+/* BKPRAM规格参数 */
+#define MCU_BKPRAM_EXIST 1
+#if MCU_BKPRAM_EXIST
+#define MCU_BKPRAM_START 0x38800000 // BKPRAM起始地址
+#define MCU_BKPRAM_SIZE  (4 * 1024) // BKPRAM大小
+#endif
+
 #endif

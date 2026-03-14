@@ -157,7 +157,6 @@ void rt_hw_mcu_init(void)
     LOG_F("mcu reset finish");
 
     // 更新MCU内核时钟
-    SystemCoreClockUpdate();
     LOG_V("cpu clock per s: %u", HAL_RCC_GetSysClockFreq());
 
     // 计算1us对应的时钟周期数

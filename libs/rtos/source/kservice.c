@@ -326,7 +326,7 @@ FAST int rt_kprintf(const char *fmt, ...)
     va_list args;
     rt_size_t length;
     
-    /* 1. 使用局部变量替代 static，确保线程安全 */
+    /* 使用局部变量替代static，确保线程安全 */
     char local_buf[ASYNC_LOG_BUF_SIZE]; 
 
     va_start(args, fmt);
@@ -336,8 +336,8 @@ FAST int rt_kprintf(const char *fmt, ...)
     local_buf[length] = '\0'; // 确保字符串结束
     va_end(args);
 
-    /* 2. 判断当前环境是否支持异步 */
-    /* 如果 OS 已启动、不在中断中、且队列已初始化 */
+    /* 判断当前环境是否支持异步 */
+    /* 如果OS已启动、不在中断中、且队列已初始化 */
     if (is_async_ready && rt_thread_self() != RT_NULL && rt_interrupt_get_nest() == 0) {
         rt_log_msg_t msg;
         memcpy(msg.data, local_buf, length + 1);
@@ -347,7 +347,7 @@ FAST int rt_kprintf(const char *fmt, ...)
             // 可选：如果队列满了，为了不丢失重要日志，可以尝试同步输出
         }
     } else {
-        /* 3. 同步模式：直接输出 (用于中断、系统启动前、异常状态) */
+        /* 同步模式：直接输出 (用于中断、系统启动前、异常状态) */
         rt_hw_console_output(local_buf);
     }
 

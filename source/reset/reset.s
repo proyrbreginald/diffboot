@@ -11,25 +11,32 @@
 .word _fast_ram_start         /* 快速代码段在RAM中的起始地址 */
 .word _fast_ram_end           /* 快速代码段在RAM中的结束地址 */
 .word _assigned_section_addr  /* 已初始化数据段在Flash中的起始地址 */
-.word _dtcm_init_start     /* 已初始化数据段在RAM中的起始地址 */
-.word _dtcm_init_end       /* 已初始化数据段在RAM中的结束地址 */
-.word _dtcm_uninit_start   /* 未初始化数据段在RAM中的起始地址 */
-.word _dtcm_uninit_end     /* 未初始化数据段在RAM中的结束地址 */
+.word _dtcm_init_start        /* 已初始化数据段在RAM中的起始地址 */
+.word _dtcm_init_end          /* 已初始化数据段在RAM中的结束地址 */
+.word _dtcm_uninit_start      /* 未初始化数据段在RAM中的起始地址 */
+.word _dtcm_uninit_end        /* 未初始化数据段在RAM中的结束地址 */
 
 /* 复位处理函数 */
 .section .text.reset_handler
 .type reset_handler, %function
 
 reset_handler:
-  /* 设置初始堆栈指针 */
+  /* 设置系统栈底地址 */
   ldr sp, =stack_start
 
-  /* 退出可能的低功耗模式，切换到正常模式并配置电源供应 */
-  bl ExitRun0Mode 
+  /* 开启FPU权限 */
+  bl fpu_init
 
-  /* 初始化FPU、时钟系统并配置中断向量表 */
-  bl SystemInit 
- 
+  /* 复位时钟系统 */
+  bl rcc_init
+
+  /* 开启RAM时钟与备份RAM */
+  bl ram_init
+
+  /* 尝试加载app程序 */
+  bl load_app
+
+  /* 加载boot程序数据 */ 
   /* 初始化fast段数据 */
   ldr r0, =_fast_ram_start        /* 源地址：快速代码段的起始地址 */
   ldr r1, =_fast_ram_end          /* 目标地址：快速代码段的结束地址 */
@@ -48,8 +55,8 @@ loop_copy_fast:
   bcc copy_fast                   /* 如果未达到结束位置则继续复制 */
 
   /* 初始化assigned段数据 */
-  ldr r0, =_dtcm_init_start    /* 源地址：数据段的起始地址 */
-  ldr r1, =_dtcm_init_end      /* 目标地址：数据段的结束地址 */
+  ldr r0, =_dtcm_init_start       /* 源地址：数据段的起始地址 */
+  ldr r1, =_dtcm_init_end         /* 目标地址：数据段的结束地址 */
   ldr r2, =_assigned_section_addr /* Flash中存储的初始化数据地址 */
   movs r3, #0                     /* 偏移量初始化为0 */
   b loop_copy_data
@@ -65,8 +72,8 @@ loop_copy_data:
   bcc copy_data                   /* 如果未达到结束位置则继续复制 */
 
   /* 初始化unassigned段数据 */
-  ldr r2, =_dtcm_uninit_start  /* 获取未初始化数据段起始地址 */
-  ldr r4, =_dtcm_uninit_end    /* 获取未初始化数据段结束地址 */
+  ldr r2, =_dtcm_uninit_start     /* 获取未初始化数据段起始地址 */
+  ldr r4, =_dtcm_uninit_end       /* 获取未初始化数据段结束地址 */
   movs r3, #0                     /* 偏移量初始化为0 */
   b loop_fill_bss_zero
 
@@ -78,8 +85,8 @@ loop_fill_bss_zero:
   cmp r2, r4                      /* 比较当前地址与未初始化数据段结束地址 */
   bcc fill_bss_zero               /* 如果未到达结束地址则继续填充 */
 
-  /* 调用程序 */
-  bl entry                        /* 进入RTOS启动流程 */
+  /* 启动boot程序 */ 
+  bl load_boot                    /* 启动boot程序 */
   bx lr                           /* 正常情况下不会执行到这里 */
 
 .size reset_handler, .-reset_handler
