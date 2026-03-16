@@ -34,6 +34,8 @@ targets:
         - libs/libc/bsp/include
         - libs/ymodem/include
         - libs/ringbuffer/include
+        - libs/patch/include
+        - libs/heatshrink/include
       libList: []
     excludeList:
       - libs/libstm32h743/hal/source/stm32h7xx_hal_msp_template.c
@@ -43,6 +45,8 @@ targets:
       - libs/cubemx/Core/Src/sysmem.c
       - libs/cubemx/Core/Src/syscalls.c
       - libs/cubemx/startup_stm32h743xx.s
+      - libs/patch/examples/dump_restore/main.c
+      - libs/patch/examples/in_place/main.c
     toolchain: GCC
     toolchainConfigMap:
       GCC:

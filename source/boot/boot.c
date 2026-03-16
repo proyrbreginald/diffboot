@@ -40,7 +40,7 @@ static void count_thread_entry(void *parameter)
         if (++cnt % 1 == 0)
         {
             /* 占用率 = 100 - (睡眠占比) */
-            LOG_D("cpu usage per s: %.2f%%",
+            LOG_I("cpu usage per s: %.2f%%",
                   100.0f - ((float)sleep_cnt / 1000000) * 100.0f);
             cnt = 0;
         }
