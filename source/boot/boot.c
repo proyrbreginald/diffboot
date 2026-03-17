@@ -1,6 +1,14 @@
-#include <boot/ld.h>
+/**
+ * @file boot.c
+ * @author reginald.yang (proyrb@yeah.net)
+ * @version 0.1
+ * @date 2026-03-16
+ * @copyright Copyright (c) 2026
+ * @brief
+ */
+
 #include <main.h>
-#include <mcu/partition.h>
+#include <mcu/mcu.h>
 #include <reset/start.h>
 #include <rthw.h>
 #include <rtthread.h>
@@ -14,6 +22,7 @@
 #undef THREAD_NAME
 #define THREAD_NAME "count"
 // cpu使用率统计线程
+
 static void count_thread_entry(void *parameter)
 {
     // 将毫秒转换为系统的Tick数
@@ -109,14 +118,14 @@ FAST static int ymodem_on_begin(const char *name, uint32_t size)
     {
         flash_erase_configuration.Banks = FLASH_BANK_1;
         flash_erase_configuration.Sector =
-            (USER_START - MCU_FLASH0_START) / MCU_FLASH_SECTOR_SIZE;
+            (USER_START - MCU_FLASH_START) / MCU_FLASH_SECTOR_SIZE;
         iap_zone = IAP_USER;
     }
     else if (strcmp(name, "oem.bin") == 0)
     {
         flash_erase_configuration.Banks = FLASH_BANK_2;
         flash_erase_configuration.Sector =
-            (OEM_START - MCU_FLASH1_START) / MCU_FLASH_SECTOR_SIZE;
+            OEM_START / MCU_FLASH_SECTOR_SIZE - 8;
         iap_zone = IAP_OEM;
     }
     else

@@ -22,7 +22,7 @@
 
 reset_handler:
   /* 设置系统栈底地址 */
-  ldr sp, =stack_start
+  ldr sp, =_stack_start
 
   /* 开启FPU权限 */
   bl fpu_init
@@ -105,7 +105,7 @@ loop:
 .type isr_table, %object
 
 isr_table:
-.word stack_start                           /* 初始堆栈指针值 */
+.word _stack_start                          /* 初始堆栈指针值 */
 .word reset_handler                         /* 复位处理程序 */
 
 /* Cortex-M内核中断 */

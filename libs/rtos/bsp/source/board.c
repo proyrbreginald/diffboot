@@ -1,5 +1,5 @@
 #include <board.h>
-#include <boot/ld.h>
+#include <mcu/mcu.h>
 #include <boot/section.h>
 #include <lptim.h>
 #include <rthw.h>
@@ -186,8 +186,8 @@ void rt_hw_mcu_init(void)
 
 #if defined(RT_USING_HEAP)
     // 初始化rtos堆内存
-    rt_system_heap_init((void *)&_heap_start, (void *)&heap_end);
-    LOG_V("heap: [0x%p, 0x%p]", &_heap_start, &heap_end);
+    rt_system_heap_init((void *)&_heap_start, (void *)&_heap_end);
+    LOG_V("heap: [0x%p, 0x%p]", &_heap_start, &_heap_end);
 #endif
 
     // 设置空闲钩子

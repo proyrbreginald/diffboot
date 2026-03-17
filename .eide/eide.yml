@@ -65,7 +65,7 @@ targets:
           beforeBuildTasks:
             - name: build link script
               abortAfterFailed: false
-              command: ${CompilerPrefix}gcc.exe -E -P -x c -I include -DBUILD_LOADER ${workspaceFolder}\include\script\common.ld -o ${OutDir}\${projectName}.ld
+              command: ${CompilerPrefix}gcc.exe -E -P -x c -DBUILD_LOADER ${workspaceFolder}\include\mcu\mcu_port.ld -o ${OutDir}\boot.ld
               disable: false
               stopBuildAfterFailed: true
           c/cpp-compiler:
@@ -93,7 +93,7 @@ targets:
             LIB_FLAGS: -lgcc
             output-format: elf
             remove-unused-input-sections: true
-        scatterFilePath: ${OutDir}\${projectName}.ld
+        scatterFilePath: ${OutDir}\boot.ld
         storageLayout:
           RAM: []
           ROM: []

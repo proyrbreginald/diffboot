@@ -1,5 +1,5 @@
 #include <main.h>
-#include <mcu/partition.h>
+#include <mcu/mcu.h>
 #include <reset/start.h>
 #include <startup.h>
 #include <stm32h7xx.h>
