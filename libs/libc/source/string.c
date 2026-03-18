@@ -1,4 +1,4 @@
-#include <boot/section.h>
+#include <mcu/mcu.h>
 #include <stddef.h>
 #include <stdint.h>
 

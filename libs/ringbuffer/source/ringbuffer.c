@@ -1,8 +1,9 @@
+#include <mcu/mcu.h>
 #include <ringbuffer.h>
 #include <string.h>
-#include <boot/section.h>
 
-void rt_ringbuffer_init(struct rt_ringbuffer *rb, rt_uint8_t *pool, rt_uint16_t size)
+void rt_ringbuffer_init(struct rt_ringbuffer *rb, rt_uint8_t *pool,
+                        rt_uint16_t size)
 {
     rb->buffer_ptr = pool;
     rb->buffer_size = size;
@@ -29,13 +30,16 @@ ITCM rt_size_t rt_ringbuffer_data_len(struct rt_ringbuffer *rb)
         return rb->buffer_size - (rb->read_index - rb->write_index);
 }
 
-ITCM rt_size_t rt_ringbuffer_put(struct rt_ringbuffer *rb, const rt_uint8_t *ptr, rt_uint16_t length)
+ITCM rt_size_t rt_ringbuffer_put(struct rt_ringbuffer *rb,
+                                 const rt_uint8_t *ptr, rt_uint16_t length)
 {
     rt_uint16_t size;
     rt_uint16_t free_len = rb->buffer_size - rt_ringbuffer_data_len(rb);
 
-    if (free_len == 0) return 0;
-    if (length > free_len) length = free_len;
+    if (free_len == 0)
+        return 0;
+    if (length > free_len)
+        length = free_len;
 
     size = rb->buffer_size - rb->write_index;
     if (size > length)
@@ -53,13 +57,16 @@ ITCM rt_size_t rt_ringbuffer_put(struct rt_ringbuffer *rb, const rt_uint8_t *ptr
     return length;
 }
 
-ITCM rt_size_t rt_ringbuffer_get(struct rt_ringbuffer *rb, rt_uint8_t *ptr, rt_uint16_t length)
+ITCM rt_size_t rt_ringbuffer_get(struct rt_ringbuffer *rb, rt_uint8_t *ptr,
+                                 rt_uint16_t length)
 {
     rt_uint16_t size;
     rt_uint16_t data_len = rt_ringbuffer_data_len(rb);
 
-    if (data_len == 0) return 0;
-    if (length > data_len) length = data_len;
+    if (data_len == 0)
+        return 0;
+    if (length > data_len)
+        length = data_len;
 
     size = rb->buffer_size - rb->read_index;
     if (size > length)

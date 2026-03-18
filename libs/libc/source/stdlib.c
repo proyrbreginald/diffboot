@@ -1,4 +1,4 @@
-#include <boot/section.h>
+#include <mcu/mcu.h>
 #include <stdlib.h>
 
 ITCM int atoi(const char *p)

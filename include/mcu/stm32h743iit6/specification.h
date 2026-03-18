@@ -2,7 +2,7 @@
  * @file specification.h
  * @author reginald.yang (proyrb@yeah.net)
  * @version 0.1
- * @date 2026-03-16
+ * @date 2026-03-18
  * @copyright Copyright (c) 2026
  * @brief 在不同MCU上需要适配以下的宏定义，
  * 以执行正确的内存划分与段分配。

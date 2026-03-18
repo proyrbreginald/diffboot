@@ -1,12 +1,3 @@
-/**
- * @file boot.c
- * @author reginald.yang (proyrb@yeah.net)
- * @version 0.1
- * @date 2026-03-16
- * @copyright Copyright (c) 2026
- * @brief
- */
-
 #include <boot/start.h>
 #include <main.h>
 #include <mcu/mcu.h>

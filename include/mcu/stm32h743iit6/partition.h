@@ -2,7 +2,7 @@
  * @file partition.h
  * @author reginald.yang (proyrb@yeah.net)
  * @version 0.1
- * @date 2026-03-16
+ * @date 2026-03-18
  * @copyright Copyright (c) 2026
  * @brief 划分flash的逻辑分区。
  */

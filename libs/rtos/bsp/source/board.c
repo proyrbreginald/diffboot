@@ -1,6 +1,5 @@
 #include <board.h>
 #include <mcu/mcu.h>
-#include <boot/section.h>
 #include <lptim.h>
 #include <rthw.h>
 

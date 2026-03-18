@@ -121,3 +121,9 @@ __attribute__((naked)) void reset_handler(void)
     // 正常不会执行到这里
     default_handler(); //!< 进入默认处理函数，执行死循环
 }
+
+WEAK void default_handler(void)
+{
+    while (1)
+        ;
+}

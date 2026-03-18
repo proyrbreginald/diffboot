@@ -7,21 +7,12 @@
 .global isr_table                           /* 导出复位中断向量表 */
 .global default_handler                     /* 导出默认处理函数 */
 
-/* 默认处理函数 */
-.section .text.default_handler, "ax", %progbits
-.type default_handler, %function
-
-default_handler:
-loop:
-  b loop                                    /* 陷入无限循环 */
-
-.size default_handler, .-default_handler
-
 /* 导入堆栈范围符号定义 */
 .extern _stack_start                        /* 初始栈地址(从高地址向底地址生长) */
 
 /* 导入外部声明的函数 */
 .extern reset_handler
+.extern default_handler
 
 /* 复位中断向量表定义 */
 .section .isr_vector, "a", %progbits
@@ -30,7 +21,8 @@ loop:
 isr_table:
 .word _stack_start                          /* 初始堆栈指针值 */
 .word reset_handler                         /* 复位处理程序 */
-/* Cortex-M内核中断 */
+
+/* 内核中断表 */
 .word NMI_Handler                           /* 不可屏蔽中断处理程序 */
 .word HardFault_Handler                     /* 硬件错误中断处理程序 */
 .word MemManage_Handler                     /* 内存管理中断处理程序 */
@@ -45,7 +37,8 @@ isr_table:
 .word 0                                     /* 保留 */
 .word PendSV_Handler                        /* 可挂起的系统服务 */
 .word SysTick_Handler                       /* 系统节拍定时器中断 */
-/* 外部中断向量表 - STM32H743特有中断 */
+
+/* 外部中断向量表 */
 .word WWDG_IRQHandler                       /* 窗口看门狗中断 */
 .word PVD_AVD_IRQHandler                    /* 掉电/可编程电压检测器通过外部中断线路 */
 .word TAMP_STAMP_IRQHandler                 /* 防篡改和时间戳通过外部中断线路 */
@@ -198,6 +191,7 @@ isr_table:
 .word WAKEUP_PIN_IRQHandler                 /* 6个唤醒引脚中断 */
 .size isr_table, .-isr_table
 
+/* 中断处理函数使用默认处理函数 */
 .weak NMI_Handler
 .thumb_set NMI_Handler, default_handler
 

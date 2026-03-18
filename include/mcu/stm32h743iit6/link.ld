@@ -2,7 +2,7 @@
  * @file link.ld
  * @author reginald.yang (proyrb@yeah.net)
  * @version 0.1
- * @date 2026-03-16
+ * @date 2026-03-18
  * @copyright Copyright (c) 2026
  * @brief 此文件为bootloader和app的链接脚本，
  * 通过在预处理阶段设置对应的宏来生成对应bootloader或者app的链接脚本。

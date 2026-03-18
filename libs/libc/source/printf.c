@@ -1,7 +1,7 @@
+#include <mcu/mcu.h>
 #include <printf.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <boot/section.h>
 
 // 格式化标记位
 #define FLAG_LEFT 0x01
@@ -41,8 +41,8 @@ static inline void out_char(out_ctx_t *ctx, char c)
 
 // 快速整数转字符串并输出
 ITCM static void print_int(out_ctx_t *ctx, uint64_t value, int base,
-                      bool is_negative, int width, int precision, int flags,
-                      bool uppercase)
+                           bool is_negative, int width, int precision,
+                           int flags, bool uppercase)
 {
     char buf[32]; // 足够容纳 64位八进制/十进制的长度
     int len = 0;
@@ -156,8 +156,8 @@ ITCM static void print_int(out_ctx_t *ctx, uint64_t value, int base,
 
 // 可选：浮点数打印 (针对嵌入式的轻量级实现)
 #if ENABLE_VSNPRINTF_FLOAT
-ITCM static void print_float(out_ctx_t *ctx, double value, int width, int precision,
-                        int flags)
+ITCM static void print_float(out_ctx_t *ctx, double value, int width,
+                             int precision, int flags)
 {
     if (precision < 0)
         precision = 6; // 默认6位小数
