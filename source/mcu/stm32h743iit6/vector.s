@@ -3,102 +3,25 @@
 .fpu fpv5-d16
 .thumb
 
-.global isr_table       /* 导出复位中断向量表 */
-.global default_handler /* 导出默认处理函数 */
-
-/* 复位后RAM数据初始化 */
-.extern _itcm_section_addr      /* 快速代码段在Flash中的起始地址 */
-.extern _itcm_ram_start         /* 快速代码段在RAM中的起始地址 */
-.extern _itcm_ram_end           /* 快速代码段在RAM中的结束地址 */
-.extern _dtcm_ram_section_addr  /* 已初始化数据段在Flash中的起始地址 */
-.extern _dtcm_init_start        /* 已初始化数据段在RAM中的起始地址 */
-.extern _dtcm_init_end          /* 已初始化数据段在RAM中的结束地址 */
-.extern _dtcm_uninit_start      /* 未初始化数据段在RAM中的起始地址 */
-.extern _dtcm_uninit_end        /* 未初始化数据段在RAM中的结束地址 */
-
-/* 复位处理函数 */
-.section .text.reset_handler
-.type reset_handler, %function
-
-reset_handler:
-  /* 设置系统栈底地址 */
-  ldr sp, =_stack_start
-
-  /* 开启FPU权限 */
-  bl fpu_init
-
-  /* 复位时钟系统 */
-  bl rcc_init
-
-  /* 开启RAM时钟与备份RAM */
-  bl ram_init
-
-  /* 尝试加载app程序 */
-  // bl load_app
-
-  /* 加载boot程序数据 */ 
-  /* 初始化fast段数据 */
-  ldr r0, =_itcm_ram_start        /* 源地址：快速代码段的起始地址 */
-  ldr r1, =_itcm_ram_end          /* 目标地址：快速代码段的结束地址 */
-  ldr r2, =_itcm_section_addr     /* Flash中存储的快速代码段地址 */
-  movs r3, #0                     /* 偏移量初始化为0 */
-  b loop_copy_fast
-
-copy_fast:
-  ldr r4, [r2, r3]                /* 从Flash加载一个字到r4 */
-  str r4, [r0, r3]                /* 存储到SRAM中对应位置 */
-  adds r3, r3, #4                 /* 地址偏移增加4个字节(32位) */
-
-loop_copy_fast:
-  adds r4, r0, r3                 /* 计算当前处理的位置 */
-  cmp r4, r1                      /* 比较当前位置与结束位置 */
-  bcc copy_fast                   /* 如果未达到结束位置则继续复制 */
-
-  /* 初始化assigned段数据 */
-  ldr r0, =_dtcm_ram_init_start   /* 源地址：数据段的起始地址 */
-  ldr r1, =_dtcm_ram_init_end     /* 目标地址：数据段的结束地址 */
-  ldr r2, =_dtcm_ram_section_addr /* Flash中存储的初始化数据地址 */
-  movs r3, #0                     /* 偏移量初始化为0 */
-  b loop_copy_data
-
-copy_data:
-  ldr r4, [r2, r3]                /* 从Flash加载一个字到r4 */
-  str r4, [r0, r3]                /* 存储到SRAM中对应位置 */
-  adds r3, r3, #4                 /* 地址偏移增加4个字节(32位) */
-
-loop_copy_data:
-  adds r4, r0, r3                 /* 计算当前处理的位置 */
-  cmp r4, r1                      /* 比较当前位置与结束位置 */
-  bcc copy_data                   /* 如果未达到结束位置则继续复制 */
-
-  /* 初始化unassigned段数据 */
-  ldr r2, =_dtcm_ram_uninit_start /* 获取未初始化数据段起始地址 */
-  ldr r4, =_dtcm_ram_uninit_end   /* 获取未初始化数据段结束地址 */
-  movs r3, #0                     /* 偏移量初始化为0 */
-  b loop_fill_bss_zero
-
-fill_bss_zero:
-  str r3, [r2]                    /* 将0写入当前地址 */
-  adds r2, r2, #4                 /* 地址前进4个字节 */
-
-loop_fill_bss_zero:
-  cmp r2, r4                      /* 比较当前地址与未初始化数据段结束地址 */
-  bcc fill_bss_zero               /* 如果未到达结束地址则继续填充 */
-
-  /* 启动boot程序 */ 
-  bl load_boot                    /* 启动boot程序 */
-  bx lr                           /* 正常情况下不会执行到这里 */
-
-.size reset_handler, .-reset_handler
+/* 导出符号 */
+.global isr_table                           /* 导出复位中断向量表 */
+.global default_handler                     /* 导出默认处理函数 */
 
 /* 默认处理函数 */
 .section .text.default_handler, "ax", %progbits
+.type default_handler, %function
 
 default_handler:
 loop:
-  b loop /* 陷入无限循环 */
+  b loop                                    /* 陷入无限循环 */
 
 .size default_handler, .-default_handler
+
+/* 导入堆栈范围符号定义 */
+.extern _stack_start                        /* 初始栈地址(从高地址向底地址生长) */
+
+/* 导入外部声明的函数 */
+.extern reset_handler
 
 /* 复位中断向量表定义 */
 .section .isr_vector, "a", %progbits
@@ -107,7 +30,6 @@ loop:
 isr_table:
 .word _stack_start                          /* 初始堆栈指针值 */
 .word reset_handler                         /* 复位处理程序 */
-
 /* Cortex-M内核中断 */
 .word NMI_Handler                           /* 不可屏蔽中断处理程序 */
 .word HardFault_Handler                     /* 硬件错误中断处理程序 */
@@ -123,7 +45,6 @@ isr_table:
 .word 0                                     /* 保留 */
 .word PendSV_Handler                        /* 可挂起的系统服务 */
 .word SysTick_Handler                       /* 系统节拍定时器中断 */
-
 /* 外部中断向量表 - STM32H743特有中断 */
 .word WWDG_IRQHandler                       /* 窗口看门狗中断 */
 .word PVD_AVD_IRQHandler                    /* 掉电/可编程电压检测器通过外部中断线路 */
@@ -276,9 +197,6 @@ isr_table:
 .word 0                                     /* 保留 */
 .word WAKEUP_PIN_IRQHandler                 /* 6个唤醒引脚中断 */
 .size isr_table, .-isr_table
-
-/* 定义所有中断处理程序的弱符号，并将它们映射到默认处理程序 */
-/* 弱符号允许用户在C代码中重定义这些处理程序 */
 
 .weak NMI_Handler
 .thumb_set NMI_Handler, default_handler

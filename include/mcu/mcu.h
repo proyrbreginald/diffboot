@@ -14,6 +14,6 @@
 #include <stdint.h>
 #include "macro.h"                                      //!< 导入mcu相关宏定义
 #include DIFFBOOT_MCU_INCLUDE_LINK_SYMBOL(DIFFBOOT_MCU) //!< 导入链接脚本符号
-//#include "reset.h"                                      //!< 导入复位处理函数
+#include "reset.h"                                      //!< 导入复位处理函数
 
 #endif
