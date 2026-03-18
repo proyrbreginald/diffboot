@@ -61,7 +61,7 @@ SECTIONS
     /* 普通代码段 */
     .code : ALIGN(4)
     {
-        KEEP(*(.isr_vector))        /* 中断向量表 */
+        KEEP(*(.reset_vector))      /* 复位向量表 */
         *(.text*)                   /* 普通代码 */
         *(.glue_7*)                 /* ARM/Thumb胶水代码 */
         KEEP(*(SORT(.rti_fn*)))     /* RTOS启动时自动执行 */

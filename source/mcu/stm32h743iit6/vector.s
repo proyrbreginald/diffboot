@@ -4,7 +4,7 @@
 .thumb
 
 /* 导出符号 */
-.global isr_table                           /* 导出复位中断向量表 */
+.global vector_table                        /* 导出复位向量表 */
 .global default_handler                     /* 导出默认处理函数 */
 
 /* 导入堆栈范围符号定义 */
@@ -12,13 +12,22 @@
 
 /* 导入外部声明的函数 */
 .extern reset_handler
-.extern default_handler
 
-/* 复位中断向量表定义 */
-.section .isr_vector, "a", %progbits
-.type isr_table, %object
+/* 默认处理函数 */
+.section .text.default_handler, "ax", %progbits
+.type default_handler, %function
 
-isr_table:
+default_handler:
+loop:
+  b loop                                    /* 允许中断嵌套调用 */
+
+.size default_handler, .-default_handler
+
+/* 复位向量表定义 */
+.section .reset_vector, "a", %progbits
+.type vector_table, %object
+
+vector_table:
 .word _stack_start                          /* 初始堆栈指针值 */
 .word reset_handler                         /* 复位处理程序 */
 
@@ -189,7 +198,7 @@ isr_table:
 .word 0                                     /* 保留 */
 .word 0                                     /* 保留 */
 .word WAKEUP_PIN_IRQHandler                 /* 6个唤醒引脚中断 */
-.size isr_table, .-isr_table
+.size vector_table, .-vector_table
 
 /* 中断处理函数使用默认处理函数 */
 .weak NMI_Handler

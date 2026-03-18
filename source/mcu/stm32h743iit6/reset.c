@@ -2,12 +2,12 @@
 #include <main.h>
 #include <mcu/mcu.h>
 
-void fpu_init(void)
+NONE void fpu_init(void)
 {
     SCB->CPACR |= ((3UL << (10 * 2)) | (3UL << (11 * 2)));
 }
 
-void rcc_init(void)
+NONE void rcc_init(void)
 {
     if (FLASH_LATENCY_DEFAULT > (READ_BIT((FLASH->ACR), FLASH_ACR_LATENCY)))
     {
@@ -57,7 +57,7 @@ void rcc_init(void)
     }
 }
 
-void ram_init(void)
+NONE void ram_init(void)
 {
     RCC->AHB2ENR |=
         (RCC_AHB2ENR_D2SRAM1EN | RCC_AHB2ENR_D2SRAM2EN | RCC_AHB2ENR_D2SRAM3EN);
@@ -73,7 +73,7 @@ void ram_init(void)
  * 包括设置栈初始指针、开启mcu内核相关配置、初始化ram数据、
  * 根据条件跳转到指定程序开始执行。
  */
-__attribute__((naked)) void reset_handler(void)
+NAKED void reset_handler(void)
 {
     // 设置初始栈指针
     __set_MSP((uint32_t)_stack_start); //!< 执行后可以正常使用栈空间
@@ -120,10 +120,4 @@ __attribute__((naked)) void reset_handler(void)
 
     // 正常不会执行到这里
     default_handler(); //!< 进入默认处理函数，执行死循环
-}
-
-WEAK void default_handler(void)
-{
-    while (1)
-        ;
 }

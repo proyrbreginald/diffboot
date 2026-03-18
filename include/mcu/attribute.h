@@ -12,6 +12,11 @@
 #define _ATTRIBUTE_H_
 
 /**
+ * @brief 不添加任何属性。
+ */
+#define NONE
+
+/**
  * @brief 将函数放在itcm运行，提高代码执行速度或者避免与flash操作冲突。
  */
 #define ITCM __attribute__((section(".itcm"), noinline))
@@ -44,5 +49,20 @@
  * @brief 指定函数为弱符号，实现可被覆盖。
  */
 #define WEAK __attribute__((weak))
+
+/**
+ * @brief 避免函数因优化而剔除。
+ */
+#define USED __attribute__((used))
+
+/**
+ * @brief 禁止编译器自动给函数添加任何汇编代码。
+ */
+#define NAKED __attribute__((naked))
+
+/**
+ * @brief 强制内联函数。
+ */
+#define INLINE __attribute__((always_inline))
 
 #endif

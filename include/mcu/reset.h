@@ -15,6 +15,22 @@
 #include <stdint.h>
 #include <string.h>
 #include <stddef.h>
+#include "attribute.h"
+
+/**
+ * @brief 开启fpu权限。
+ */
+extern void fpu_init(void);
+
+/**
+ * @brief 配置默认的系统时钟树。
+ */
+extern void rcc_init(void);
+
+/**
+ * @brief 开启所有ram区域。
+ */
+extern void ram_init(void);
 
 /**
  * @brief 默认处理函数。
@@ -27,8 +43,8 @@ extern void default_handler(void);
  * @param src 从该地址拷贝数据。
  * @param len 拷贝字节数.
  */
-__attribute__((always_inline)) static inline void reset_copy_ram_init(
-    const char *dest, const char *src, size_t len)
+INLINE static inline void reset_copy_ram_init(const char *dest, const char *src,
+                                              size_t len)
 {
     memcpy((void *)dest, (void *)src, len);
 }
@@ -38,25 +54,10 @@ __attribute__((always_inline)) static inline void reset_copy_ram_init(
  * @param start 起始地址。
  * @param end   结束地址。
  */
-__attribute__((always_inline)) static inline void reset_clear_ram_uninit(
-    const char *start, const char *end)
+INLINE static inline void reset_clear_ram_uninit(const char *start,
+                                                 const char *end)
 {
     memset((void *)start, 0, (size_t)end - (size_t)start);
 }
-
-/**
- * @brief 开启fpu权限。
- */
-void fpu_init(void);
-
-/**
- * @brief 配置默认的系统时钟树。
- */
-void rcc_init(void);
-
-/**
- * @brief 开启所有ram区域。
- */
-void ram_init(void);
 
 #endif
