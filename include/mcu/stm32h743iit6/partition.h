@@ -10,12 +10,10 @@
 #ifndef _PARTITION_H_
 #define _PARTITION_H_
 
-#include "specification.h"
+#include "specification.h" //!< 导入内存划分与段分配
 
 /**
  * @brief 各分区占用扇区数量。
- * @version 0.1
- * @date 2026-03-16
  */
 #define LOADER_SECTOR_COUNT 2 //!< 引导程序占用扇区数量
 #define USER_SECTOR_COUNT   6 //!< 用户程序占用扇区数量
@@ -24,8 +22,6 @@
 
 /**
  * @brief 内存各分区占用大小。
- * @version 0.1
- * @date 2026-03-16
  */
 #define LOADER_SIZE                                                            \
     (LOADER_SECTOR_COUNT * MCU_FLASH_SECTOR_SIZE) //!< 引导程序占用大小
@@ -38,8 +34,6 @@
 
 /**
  * @brief 各分区起始地址。
- * @version 0.1
- * @date 2026-03-16
  */
 #define LOADER_START MCU_FLASH_START              //!< 引导程序起始地址
 #define USER_START   (LOADER_START + LOADER_SIZE) //!< 用户程序起始地址

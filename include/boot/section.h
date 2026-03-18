@@ -16,7 +16,7 @@
  * @version 0.1
  * @date 2026-03-17
  */
-#define FAST __attribute__((section(".fast"), noinline))
+#define ITCM __attribute__((section(".itcm"), noinline))
 
 /**
  * @brief 将数据放在boot与app共享的ram，

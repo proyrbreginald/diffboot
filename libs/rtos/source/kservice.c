@@ -278,12 +278,6 @@ static struct rt_thread log_thread;
 static uint8_t log_stack[ASYNC_LOG_THREAD_STK];
 static rt_bool_t is_async_ready = RT_FALSE;
 
-RT_WEAK void rt_hw_console_output(const char *str)
-{
-    /* empty console output */
-}
-RTM_EXPORT(rt_hw_console_output);
-
 /**
  * 消费线程：负责把队列里的日志真正打印出来
  */
@@ -321,7 +315,7 @@ INIT_APP_EXPORT(log_thread_init); // 自动初始化
  *
  * @return The number of characters actually written to buffer.
  */
-FAST int rt_kprintf(const char *fmt, ...)
+int rt_kprintf(const char *fmt, ...)
 {
     va_list args;
     rt_size_t length;

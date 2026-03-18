@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-FAST int memcmp(const void *s1, const void *s2, size_t n)
+int memcmp(const void *s1, const void *s2, size_t n)
 {
     const unsigned char *p1 = (const unsigned char *)s1;
     const unsigned char *p2 = (const unsigned char *)s2;
@@ -27,7 +27,7 @@ FAST int memcmp(const void *s1, const void *s2, size_t n)
  * @param n    要拷贝的字节数
  * @return     返回目标地址 dest
  */
-FAST void *memcpy(void *dest, const void *src, size_t n)
+void *memcpy(void *dest, const void *src, size_t n)
 {
     // 1. 保存返回用的原始 dest 指针
     void *ret = dest;
@@ -91,7 +91,7 @@ FAST void *memcpy(void *dest, const void *src, size_t n)
     return ret;
 }
 
-FAST void *memmove(void *dest, const void *src, size_t n)
+void *memmove(void *dest, const void *src, size_t n)
 {
     unsigned char *d = (unsigned char *)dest;
     const unsigned char *s = (const unsigned char *)src;
@@ -172,7 +172,7 @@ FAST void *memmove(void *dest, const void *src, size_t n)
  * @param n Number of bytes to be set to the value
  * @return Returns a pointer to the memory block 's'
  */
-FAST void *memset(void *s, int v, size_t n)
+void *memset(void *s, int v, size_t n)
 {
     uint8_t *p = (uint8_t *)s; // Cast input pointer to uint8_t pointer
     while (n--)                // Loop n times, decrementing counter
@@ -183,7 +183,7 @@ FAST void *memset(void *s, int v, size_t n)
     return s; // Return original pointer to memory block
 }
 
-FAST char *strcat(char *dest, const char *src)
+char *strcat(char *dest, const char *src)
 {
     char *d = dest;
     // 1. 找到 dest 的末尾 ('\0' 的位置)
@@ -199,7 +199,7 @@ FAST char *strcat(char *dest, const char *src)
     return dest;
 }
 
-FAST char *strchr(const char *s, int c)
+char *strchr(const char *s, int c)
 {
     unsigned char target = (unsigned char)c;
 
@@ -270,7 +270,7 @@ FAST char *strchr(const char *s, int c)
     }
 }
 
-FAST int strcmp(const char *s1, const char *s2)
+int strcmp(const char *s1, const char *s2)
 {
     while (*s1 && (*s1 == *s2))
     {
@@ -281,7 +281,7 @@ FAST int strcmp(const char *s1, const char *s2)
     return *(unsigned char *)s1 - *(unsigned char *)s2;
 }
 
-FAST char *strcpy(char *dest, const char *src)
+char *strcpy(char *dest, const char *src)
 {
     char *d = dest;
     while ((*d++ = *src++))
@@ -291,7 +291,7 @@ FAST char *strcpy(char *dest, const char *src)
     return dest;
 }
 
-FAST size_t strlen(const char *s)
+size_t strlen(const char *s)
 {
     const char *p = s;
     while (*p)
@@ -301,7 +301,7 @@ FAST size_t strlen(const char *s)
     return (size_t)(p - s);
 }
 
-FAST int strncmp(const char *s1, const char *s2, size_t n)
+int strncmp(const char *s1, const char *s2, size_t n)
 {
     if (n == 0)
         return 0;
@@ -316,7 +316,7 @@ FAST int strncmp(const char *s1, const char *s2, size_t n)
     return *(unsigned char *)s1 - *(unsigned char *)s2;
 }
 
-FAST char *strncpy(char *dest, const char *src, size_t n)
+char *strncpy(char *dest, const char *src, size_t n)
 {
     size_t i = 0;
 
@@ -356,7 +356,7 @@ FAST char *strncpy(char *dest, const char *src, size_t n)
     return dest;
 }
 
-FAST char *strstr(const char *haystack, const char *needle)
+char *strstr(const char *haystack, const char *needle)
 {
     if (!*needle)
         return (char *)haystack;
@@ -379,7 +379,7 @@ FAST char *strstr(const char *haystack, const char *needle)
     return NULL;
 }
 
-FAST int strcasecmp(const char *s1, const char *s2)
+int strcasecmp(const char *s1, const char *s2)
 {
     static const unsigned char ascii_tolower_map[256] = {
         0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b,

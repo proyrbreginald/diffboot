@@ -1,7 +1,7 @@
 #include <boot/section.h>
 #include <stdlib.h>
 
-FAST int atoi(const char *p)
+ITCM int atoi(const char *p)
 {
     long res = 0;
     while (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r')

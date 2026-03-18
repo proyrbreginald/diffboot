@@ -30,7 +30,7 @@ void ymodem_set_ops(ymodem_ops_t *const ops)
  * @param len 数据长度。
  * @return uint16_t 计算结果。
  */
-FAST static uint16_t crc16_ccitt(const uint8_t *buf, uint32_t len)
+ITCM static uint16_t crc16_ccitt(const uint8_t *buf, uint32_t len)
 {
     uint16_t crc = 0;
     while (len--)

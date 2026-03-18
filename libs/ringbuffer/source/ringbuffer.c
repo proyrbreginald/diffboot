@@ -17,7 +17,7 @@ void rt_ringbuffer_reset(struct rt_ringbuffer *rb)
     rb->write_index = 0;
 }
 
-FAST rt_size_t rt_ringbuffer_data_len(struct rt_ringbuffer *rb)
+ITCM rt_size_t rt_ringbuffer_data_len(struct rt_ringbuffer *rb)
 {
     if (rb->read_index == rb->write_index)
     {
@@ -29,7 +29,7 @@ FAST rt_size_t rt_ringbuffer_data_len(struct rt_ringbuffer *rb)
         return rb->buffer_size - (rb->read_index - rb->write_index);
 }
 
-FAST rt_size_t rt_ringbuffer_put(struct rt_ringbuffer *rb, const rt_uint8_t *ptr, rt_uint16_t length)
+ITCM rt_size_t rt_ringbuffer_put(struct rt_ringbuffer *rb, const rt_uint8_t *ptr, rt_uint16_t length)
 {
     rt_uint16_t size;
     rt_uint16_t free_len = rb->buffer_size - rt_ringbuffer_data_len(rb);
@@ -53,7 +53,7 @@ FAST rt_size_t rt_ringbuffer_put(struct rt_ringbuffer *rb, const rt_uint8_t *ptr
     return length;
 }
 
-FAST rt_size_t rt_ringbuffer_get(struct rt_ringbuffer *rb, rt_uint8_t *ptr, rt_uint16_t length)
+ITCM rt_size_t rt_ringbuffer_get(struct rt_ringbuffer *rb, rt_uint8_t *ptr, rt_uint16_t length)
 {
     rt_uint16_t size;
     rt_uint16_t data_len = rt_ringbuffer_data_len(rb);

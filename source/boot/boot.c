@@ -106,7 +106,7 @@ static iap_zone_t iap_zone = IAP_USER;
  * @param size 文件内容的字节大小。
  * @return int 返回0表示继续接收此文件，否则拒绝接收。
  */
-FAST static int ymodem_on_begin(const char *name, uint32_t size)
+ITCM static int ymodem_on_begin(const char *name, uint32_t size)
 {
     int result = 0;
     FLASH_EraseInitTypeDef flash_erase_configuration = {
@@ -187,7 +187,7 @@ exit:
  * @param offset 当前文件偏移量。
  * @return int 0: 处理成功; 非0: 错误 (例如写入失败)，将终止传输。
  */
-FAST static int ymodem_on_data(const uint8_t *data, uint32_t len,
+ITCM static int ymodem_on_data(const uint8_t *data, uint32_t len,
                                uint32_t offset)
 {
     int result = 0;
@@ -282,7 +282,7 @@ exit:
  *
  * @param status 0: 成功; 非0: 异常终止 (超时、校验失败、被取消等)
  */
-FAST static void ymodem_on_end(int status)
+ITCM static void ymodem_on_end(int status)
 {
     if (status == 0)
     {

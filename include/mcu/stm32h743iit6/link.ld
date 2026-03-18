@@ -12,8 +12,6 @@
 
 /**
  * @brief 定义flash与ram。
- * @version 0.1
- * @date 2026-03-16
  */
 MEMORY
 {
@@ -57,8 +55,6 @@ _heap_end = _stack_start - _stack_min_size;
 
 /**
  * @brief 定义段如何分配。
- * @version 0.1
- * @date 2026-03-16
  */
 SECTIONS
 {
@@ -72,13 +68,13 @@ SECTIONS
     } > CODE_PARTITION
 
     /* 快速代码段 */
-    .fast : ALIGN(4)
+    .itcm : ALIGN(4)
     {
-        _fast_ram_start = .;        /* 起始地址 */
-        KEEP(*(.fast*))             /* 快速代码 */
-        _fast_ram_end = .;          /* 结束地址 */
+        _itcm_ram_start = .;        /* 起始地址 */
+        KEEP(*(.itcm*))             /* 快速代码 */
+        _itcm_ram_end = .;          /* 结束地址 */
     } > ITCM AT > CODE_PARTITION
-    _fast_section_addr = LOADADDR(.fast);
+    _itcm_section_addr = LOADADDR(.itcm);
 
     /* 常量数据段 */
     .const : ALIGN(4)
@@ -89,18 +85,18 @@ SECTIONS
     /* DTCM已初始化数据段 */
     .dtcm_init : ALIGN(4)
     {
-        _dtcm_init_start = .;       /* 起始地址 */
+        _dtcm_ram_init_start = .;       /* 起始地址 */
         *(.data*)                   /* 已初始化数据 */
-        _dtcm_init_end = .;         /* 结束地址 */
+        _dtcm_ram_init_end = .;         /* 结束地址 */
     } > DTCM AT > CODE_PARTITION
-    _assigned_section_addr = LOADADDR(.dtcm_init);
+    _dtcm_ram_section_addr = LOADADDR(.dtcm_init);
 
     /* DTCM未初始化数据段 */
     .dtcm_uninit : ALIGN(4)
     {
-        _dtcm_uninit_start = .;     /* 起始地址 */
+        _dtcm_ram_uninit_start = .;     /* 起始地址 */
         *(.bss*)                    /* 未初始化数据 */
-        _dtcm_uninit_end = .;       /* 结束地址 */
+        _dtcm_ram_uninit_end = .;       /* 结束地址 */
     } > DTCM
 
     /* 堆空间段 */
@@ -150,8 +146,8 @@ SECTIONS
     /* AHBRAM1已初始化数据段 */
     .ahb_ram1_init : ALIGN(4)
     {
-        _ahb1_ram_init_start = .;   /* 起始地址 */
-        _ahb1_ram_init_end = .;     /* 结束地址 */
+        _ahb_ram1_init_start = .;   /* 起始地址 */
+        _ahb_ram1_init_end = .;     /* 结束地址 */
     } > AHBRAM1 AT > LOADER
     _ahb_ram1_section_addr = LOADADDR(.ahb_ram1_init);
 

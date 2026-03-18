@@ -40,7 +40,7 @@ static inline void out_char(out_ctx_t *ctx, char c)
 }
 
 // 快速整数转字符串并输出
-FAST static void print_int(out_ctx_t *ctx, uint64_t value, int base,
+ITCM static void print_int(out_ctx_t *ctx, uint64_t value, int base,
                       bool is_negative, int width, int precision, int flags,
                       bool uppercase)
 {
@@ -156,7 +156,7 @@ FAST static void print_int(out_ctx_t *ctx, uint64_t value, int base,
 
 // 可选：浮点数打印 (针对嵌入式的轻量级实现)
 #if ENABLE_VSNPRINTF_FLOAT
-FAST static void print_float(out_ctx_t *ctx, double value, int width, int precision,
+ITCM static void print_float(out_ctx_t *ctx, double value, int width, int precision,
                         int flags)
 {
     if (precision < 0)
@@ -198,7 +198,7 @@ FAST static void print_float(out_ctx_t *ctx, double value, int width, int precis
 }
 #endif
 
-FAST int vsnprintf(char *buffer, size_t size, const char *format, va_list ap)
+ITCM int vsnprintf(char *buffer, size_t size, const char *format, va_list ap)
 {
     out_ctx_t ctx = {buffer, size, 0};
 
@@ -435,7 +435,7 @@ FAST int vsnprintf(char *buffer, size_t size, const char *format, va_list ap)
     return (int)ctx.count;
 }
 
-FAST int sprintf(char *buffer, const char *format, ...)
+ITCM int sprintf(char *buffer, const char *format, ...)
 {
     va_list va;
     va_start(va, format);

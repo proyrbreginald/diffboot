@@ -18,7 +18,7 @@ static volatile uint64_t total_sleep_ticks = 0;
  * @brief 空闲任务运行时的钩子函数。
  *
  */
-FAST static void idle_hook_wfi(void)
+ITCM static void idle_hook_wfi(void)
 {
     uint16_t start, end;
     rt_base_t level;
@@ -86,7 +86,7 @@ static bool rt_hw_dwt_init(void)
  *
  * @return uint64_t 空闲任务睡眠了多少tick。
  */
-FAST uint64_t rt_idle_total_sleep_get(void)
+ITCM uint64_t rt_idle_total_sleep_get(void)
 {
     return total_sleep_ticks;
 }
@@ -95,7 +95,7 @@ FAST uint64_t rt_idle_total_sleep_get(void)
  * @brief 清除空闲任务睡眠的tick数。
  *
  */
-FAST void rt_idle_total_sleep_clear(void)
+ITCM void rt_idle_total_sleep_clear(void)
 {
     total_sleep_ticks = 0;
 }
@@ -104,7 +104,7 @@ FAST void rt_idle_total_sleep_clear(void)
  * @brief 系统滴答定时器中断处理。
  *
  */
-FAST void SysTick_Handler(void)
+ITCM void SysTick_Handler(void)
 {
     rt_interrupt_enter();
     HAL_IncTick();
@@ -117,7 +117,7 @@ FAST void SysTick_Handler(void)
  *
  * @param us 延时长度(微秒)。
  */
-FAST void rt_hw_us_delay(rt_uint32_t us)
+ITCM void rt_hw_us_delay(rt_uint32_t us)
 {
     rt_uint32_t ticks = us * ticks_per_us;
     rt_uint32_t start = DWT->CYCCNT;
@@ -133,7 +133,7 @@ FAST void rt_hw_us_delay(rt_uint32_t us)
  * 
  * @param str 输出内容指针。
  */
-FAST void rt_hw_console_output(const char *str)
+ITCM void rt_hw_console_output(const char *str)
 {
     while (*str != '\0')
     {
@@ -186,8 +186,8 @@ void rt_hw_mcu_init(void)
 
 #if defined(RT_USING_HEAP)
     // 初始化rtos堆内存
-    rt_system_heap_init((void *)&_heap_start, (void *)&_heap_end);
-    LOG_V("heap: [0x%p, 0x%p]", &_heap_start, &_heap_end);
+    rt_system_heap_init((void *)_heap_start, (void *)_heap_end);
+    LOG_V("heap: [0x%p, 0x%p]", _heap_start, _heap_end);
 #endif
 
     // 设置空闲钩子
