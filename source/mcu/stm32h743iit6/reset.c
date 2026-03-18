@@ -1,6 +1,6 @@
 #include <load/load.h>
+#include <main.h>
 #include <mcu/mcu.h>
-#include <stm32h7xx.h>
 
 void fpu_init(void)
 {
@@ -76,7 +76,7 @@ void ram_init(void)
 __attribute__((naked)) void reset_handler(void)
 {
     // 设置初始栈指针
-    __set_MSP((uint32_t )_stack_start); //!< 执行后可以正常使用栈空间
+    __set_MSP((uint32_t)_stack_start); //!< 执行后可以正常使用栈空间
 
     // 调用初始化函数
     fpu_init(); //!< 开启fpu执行权限
@@ -84,7 +84,7 @@ __attribute__((naked)) void reset_handler(void)
     ram_init(); //!< 开启所有ram区域
 
     // 尝试启动app程序
-    // load_app(); //!< 所有app不满足启动要求则返回并开始启动boot
+    load_app(); //!< 所有app不满足启动要求则返回并开始启动boot
 
     /* 加载itcm的数据 */
     reset_copy_ram_init(_itcm_ram_start, _itcm_section_addr,
@@ -114,14 +114,6 @@ __attribute__((naked)) void reset_handler(void)
             (size_t)_ahb_ram_init_start); //!< 拷贝ahbram的有值数据
     reset_clear_ram_uninit(_ahb_ram_uninit_start,
                            _ahb_ram_uninit_end); //!< 清空ahbram的无值数据
-
-    /* 加载ahbram1的数据 */
-    reset_copy_ram_init(
-        _ahb_ram1_init_start, _ahb_ram1_section_addr,
-        (size_t)_ahb_ram1_init_end -
-            (size_t)_ahb_ram1_init_start); //!< 拷贝ahbram1的有值数据
-    reset_clear_ram_uninit(_ahb_ram1_uninit_start,
-                           _ahb_ram1_uninit_end); //!< 清空ahbram1的无值数据
 
     // 程序数据已经加载完成，开始启动boot程序
     load_boot();

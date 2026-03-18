@@ -1,6 +1,6 @@
 #include <board.h>
-#include <rthw.h>
 #include <boot/boot.h>
+#include <rthw.h>
 
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__
@@ -73,7 +73,7 @@ void rt_components_init(void)
 #endif
 
 // rtos启动流程
-void rtthread_startup(void)
+void rtthread_launch(void)
 {
     // 屏蔽中断
     rt_hw_interrupt_disable();
