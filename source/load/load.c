@@ -1,7 +1,36 @@
+#include <algo/algo.h>
 #include <launch.h>
 #include <load/load.h>
 #include <main.h>
-#include <mcu/mcu.h>
+
+SHARE static load_config_t load_config;
+
+load_config_t *load_get_config(void)
+{
+    return &load_config;
+}
+
+uint8_t load_read_config_which(void)
+{
+    return load_config.info.which;
+}
+
+uint16_t load_read_config_crc(void)
+{
+    return load_config.crc;
+}
+
+void load_write_config_which(uint8_t which)
+{
+    load_config.info.which = which;
+}
+
+uint16_t load_update_config_crc(void)
+{
+    load_config.crc =
+        algo_crc16((uint8_t *)&load_config, sizeof(load_config_info_t));
+    return load_config.crc;
+}
 
 void load_app(void)
 {

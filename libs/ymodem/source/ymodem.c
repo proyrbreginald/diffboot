@@ -11,7 +11,7 @@
 #define UART_RX_BUF_SIZE (1024 * 2)
 #define YMODEM_RB_SIZE (1024 * 4)
 
-SHARE static uint8_t uart_rx_buf[UART_RX_BUF_SIZE];
+SHARE_UNINIT static uint8_t uart_rx_buf[UART_RX_BUF_SIZE];
 static uint32_t last_read_end_pos = 0;
 static struct rt_semaphore uart_rx_sem;
 static struct rt_ringbuffer ymodem_rb;

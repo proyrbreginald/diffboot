@@ -83,37 +83,39 @@ NAKED void reset_handler(void)
     rcc_init(); //!< 配置默认的系统时钟树
     ram_init(); //!< 开启所有ram区域
 
-    // 尝试启动app程序
-    load_app(); //!< 所有app不满足启动要求则返回并开始启动boot
-
     /* 加载itcm的数据 */
-    reset_copy_ram_init(_itcm_ram_start, _itcm_section_addr,
+    reset_copy_ram_init((char *)_itcm_ram_start, _itcm_section_addr,
                         (size_t)_itcm_ram_end -
                             (size_t)_itcm_ram_start); //!< 拷贝itcm的数据
 
+#if defined(BUILD_LOADER)
+    // 尝试启动app程序
+    load_app(); //!< 所有app不满足启动要求则返回并开始启动boot
+#endif
+
     /* 加载dtcm的数据 */
     reset_copy_ram_init(
-        _dtcm_ram_init_start, _dtcm_ram_section_addr,
+        (char *)_dtcm_ram_init_start, _dtcm_ram_section_addr,
         (size_t)_dtcm_ram_init_end -
             (size_t)_dtcm_ram_init_start); //!< 拷贝dtcm的有值数据
-    reset_clear_ram_uninit(_dtcm_ram_uninit_start,
-                           _dtcm_ram_uninit_end); //!< 清空dtcm的无值数据
+    reset_clear_ram_uninit((char *)_dtcm_ram_uninit_start,
+                           (char *)_dtcm_ram_uninit_end); //!< 清空dtcm的无值数据
 
     /* 加载axiram的数据 */
     reset_copy_ram_init(
-        _axi_ram_init_start, _axi_ram_section_addr,
+        (char *)_axi_ram_init_start, _axi_ram_section_addr,
         (size_t)_axi_ram_init_end -
             (size_t)_axi_ram_init_start); //!< 拷贝axiram的有值数据
-    reset_clear_ram_uninit(_axi_ram_uninit_start,
-                           _axi_ram_uninit_end); //!< 清空axiram的无值数据
+    reset_clear_ram_uninit((char *)_axi_ram_uninit_start,
+                           (char *)_axi_ram_uninit_end); //!< 清空axiram的无值数据
 
     /* 加载ahbram的数据 */
     reset_copy_ram_init(
-        _ahb_ram_init_start, _ahb_ram_section_addr,
+        (char *)_ahb_ram_init_start, _ahb_ram_section_addr,
         (size_t)_ahb_ram_init_end -
             (size_t)_ahb_ram_init_start); //!< 拷贝ahbram的有值数据
-    reset_clear_ram_uninit(_ahb_ram_uninit_start,
-                           _ahb_ram_uninit_end); //!< 清空ahbram的无值数据
+    reset_clear_ram_uninit((char *)_ahb_ram_uninit_start,
+                           (char *)_ahb_ram_uninit_end); //!< 清空ahbram的无值数据
 
     // 程序数据已经加载完成，开始启动boot程序
     load_boot();

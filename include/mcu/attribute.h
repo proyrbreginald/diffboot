@@ -19,7 +19,7 @@
 /**
  * @brief 将函数放在itcm运行，提高代码执行速度或者避免与flash操作冲突。
  */
-#define ITCM __attribute__((section(".itcm"), noinline))
+#define ITCM __attribute__((section(".itcm")))
 
 /**
  * @brief 将数据放在boot与app共享的ram，
@@ -64,5 +64,10 @@
  * @brief 强制内联函数。
  */
 #define INLINE __attribute__((always_inline))
+
+/**
+ * @brief 消除结构体成员之间的填充，实现紧凑存储。
+ */
+#define PACKED __attribute__((packed))
 
 #endif

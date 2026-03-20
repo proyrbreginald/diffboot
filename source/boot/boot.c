@@ -1,4 +1,5 @@
 #include <boot/start.h>
+#include <load/load.h>
 #include <main.h>
 #include <mcu/mcu.h>
 #include <rthw.h>
@@ -7,7 +8,7 @@
 
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__
-#define DBG_LVL DBG_INFO
+#define DBG_LVL DBG_DEBUG
 #include <rtdbg.h>
 
 #undef THREAD_NAME
@@ -59,7 +60,7 @@ static int count_thread_init(void)
 {
     rt_err_t result = RT_EOK;
     rt_thread_t tid = rt_thread_create(THREAD_NAME, count_thread_entry, RT_NULL,
-                                       1024, RT_THREAD_PRIORITY_MAX - 2, 0);
+                                       1024 * 2, RT_THREAD_PRIORITY_MAX - 2, 0);
     if (tid != RT_NULL)
     {
         LOG_I(THREAD_NAME " thread create success");
@@ -362,7 +363,7 @@ static void boot_thread_entry(void *parameter)
     {
         LOG_D(THREAD_NAME " thread running");
         HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-        detect_app();
+        // detect_app();
         rt_thread_mdelay(500);
     }
 }
@@ -371,8 +372,8 @@ static void boot_thread_entry(void *parameter)
 static int boot_thread_init(void)
 {
     rt_err_t result = RT_EOK;
-    rt_thread_t tid =
-        rt_thread_create(THREAD_NAME, boot_thread_entry, RT_NULL, 1024, 1, 0);
+    rt_thread_t tid = rt_thread_create(THREAD_NAME, boot_thread_entry, RT_NULL,
+                                       1024 * 2, 1, 0);
     if (tid != RT_NULL)
     {
         LOG_I(THREAD_NAME " thread create success");
