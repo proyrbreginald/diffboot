@@ -4,7 +4,7 @@
  * @version 0.1
  * @date 2026-03-18
  * @copyright Copyright (c) 2026
- * @brief 导出app与boot的启动函数。
+ * @brief 定义如何启动程序。
  */
 
 #ifndef _LOAD_H_

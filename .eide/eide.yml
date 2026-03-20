@@ -4,8 +4,15 @@ type: ARM
 deviceName: null
 packDir: null
 srcDirs:
+  - bsp/source
+  - libs/arch/arm/cm7
+  - libs/cubemx/Core/Src
+  - libs/libc/source
+  - libs/libstm32h743/hal/source
+  - libs/ringbuffer/source
+  - libs/rtthread
+  - libs/ymodem/source
   - source
-  - libs
 virtualFolder:
   name: <virtual_root>
   files: []
@@ -19,25 +26,22 @@ targets:
     cppPreprocessAttrs:
       defineList:
         - STM32H743xx
+        - USE_PWR_LDO_SUPPLY
         - USE_FULL_LL_DRIVER
         - USE_HAL_DRIVER
-        - USE_PWR_LDO_SUPPLY
         - BUILD_LOADER
       incList:
+        - bsp/include
         - include
         - libs/cubemx/Core/Inc
-        - libs/libstm32h743/hal/include
-        - libs/libstm32h743/cmsis/include
-        - libs/libstm32h743/cmsis/device/st/stm32h7/include
-        - libs/rtos/include
-        - libs/rtos/bsp/include
         - libs/libc/include
-        - libs/libc/bsp/include
-        - libs/ymodem/include
+        - libs/libstm32h743/cmsis/device/st/stm32h7/include
+        - libs/libstm32h743/cmsis/include
+        - libs/libstm32h743/hal/include
         - libs/ringbuffer/include
-        - libs/patch/include
-        - libs/heatshrink/include
-        - libs/mcu/include
+        - libs/rtthread/bsp/include
+        - libs/rtthread/include
+        - libs/ymodem/include
       libList: []
     excludeList:
       - libs/libstm32h743/hal/source/stm32h7xx_hal_msp_template.c
@@ -46,9 +50,6 @@ targets:
       - libs/libstm32h743/hal/source/stm32h7xx_hal_timebase_tim_template.c
       - libs/cubemx/Core/Src/sysmem.c
       - libs/cubemx/Core/Src/syscalls.c
-      - libs/cubemx/startup_stm32h743xx.s
-      - libs/patch/examples/dump_restore/main.c
-      - libs/patch/examples/in_place/main.c
     toolchain: GCC
     toolchainConfigMap:
       GCC:
@@ -60,14 +61,14 @@ targets:
           afterBuildTasks:
             - name: build bin
               abortAfterFailed: false
-              command: ${CompilerPrefix}objcopy.exe -O binary ${outDir}\${projectName}.elf ${outDir}\${projectName}.bin
+              command: ${CompilerPrefix}objcopy.exe -O binary ${outDir}/${projectName}.elf ${outDir}/${projectName}.bin
               disable: false
           asm-compiler:
             ASM_FLAGS: -ffreestanding -fno-common
           beforeBuildTasks:
             - name: build link script
               abortAfterFailed: false
-              command: ${CompilerPrefix}gcc.exe -E -P -x c -DBUILD_LOADER ${workspaceFolder}\libs\mcu\include\mcu_port.ld -o ${OutDir}\boot.ld
+              command: ${CompilerPrefix}gcc.exe -E -P -x c -DBUILD_LOADER ${workspaceFolder}/bsp/include/mcu_port.ld -o ${OutDir}/boot.ld
               disable: false
               stopBuildAfterFailed: true
           c/cpp-compiler:
