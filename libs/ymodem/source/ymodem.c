@@ -1,4 +1,4 @@
-#include <mcu/mcu.h>
+#include <mcu.h>
 #include <main.h>
 #include <ringbuffer.h>
 #include <stdlib.h>

@@ -11,7 +11,7 @@
 #define _LOAD_H_
 
 #include <stdint.h>
-#include <mcu/mcu.h>
+#include <mcu.h>
 
 /**
  * @brief 定义启动选项。
@@ -37,8 +37,6 @@ typedef struct load_config_t {
     load_config_info_t info; //!< 配置信息
     volatile uint16_t crc;   //!< crc校验码
 } load_config_t;
-
-load_config_t *load_get_config(void);
 
 /**
  * @brief 读取如何启动。

@@ -5,11 +5,6 @@
 
 SHARE static load_config_t load_config;
 
-load_config_t *load_get_config(void)
-{
-    return &load_config;
-}
-
 uint8_t load_read_config_which(void)
 {
     return load_config.info.which;

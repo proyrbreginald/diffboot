@@ -1,5 +1,5 @@
 #include <board.h>
-#include <mcu/mcu.h>
+#include <mcu.h>
 #include <lptim.h>
 #include <rthw.h>
 

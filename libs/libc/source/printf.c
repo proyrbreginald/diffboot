@@ -1,4 +1,4 @@
-#include <mcu/mcu.h>
+#include <mcu.h>
 #include <printf.h>
 #include <stdbool.h>
 #include <stdint.h>

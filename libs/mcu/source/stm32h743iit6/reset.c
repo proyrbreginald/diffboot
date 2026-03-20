@@ -1,6 +1,6 @@
 #include <load/load.h>
 #include <main.h>
-#include <mcu/mcu.h>
+#include <mcu.h>
 
 NONE void fpu_init(void)
 {

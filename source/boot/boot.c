@@ -1,7 +1,7 @@
 #include <boot/start.h>
 #include <load/load.h>
 #include <main.h>
-#include <mcu/mcu.h>
+#include <mcu.h>
 #include <rthw.h>
 #include <rtthread.h>
 #include <ymodem.h>

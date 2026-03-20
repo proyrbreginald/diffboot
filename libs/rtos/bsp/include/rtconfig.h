@@ -70,6 +70,6 @@
 #define ASYNC_LOG_THREAD_STK  512                          // 消费线程栈
 #define ASYNC_LOG_THREAD_PRIO (RT_THREAD_PRIORITY_MAX - 2) // 极低优先级
 
-#include <mcu/mcu.h>
+#include <mcu.h>
 
 #endif

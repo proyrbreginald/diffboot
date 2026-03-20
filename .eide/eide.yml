@@ -37,6 +37,7 @@ targets:
         - libs/ringbuffer/include
         - libs/patch/include
         - libs/heatshrink/include
+        - libs/mcu/include
       libList: []
     excludeList:
       - libs/libstm32h743/hal/source/stm32h7xx_hal_msp_template.c
@@ -66,7 +67,7 @@ targets:
           beforeBuildTasks:
             - name: build link script
               abortAfterFailed: false
-              command: ${CompilerPrefix}gcc.exe -E -P -x c -DBUILD_LOADER ${workspaceFolder}\include\mcu\mcu_port.ld -o ${OutDir}\boot.ld
+              command: ${CompilerPrefix}gcc.exe -E -P -x c -DBUILD_LOADER ${workspaceFolder}\libs\mcu\include\mcu_port.ld -o ${OutDir}\boot.ld
               disable: false
               stopBuildAfterFailed: true
           c/cpp-compiler:

@@ -1,5 +1,5 @@
 #include <algo/algo.h>
-#include <mcu/mcu.h>
+#include <mcu.h>
 
 /**
  * @brief crc16查表，多项式: 0x1021，初始值: 0x0000。
