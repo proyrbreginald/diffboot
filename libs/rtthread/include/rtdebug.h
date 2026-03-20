@@ -91,7 +91,7 @@
     do {                                                                       \
         rt_base_t level;                                                       \
         level = rt_hw_interrupt_disable();                                     \
-        if (rt_thread_self() == RT_NULL) {                                     \
+        if (rt_thread_self() == NULL) {                                     \
             rt_kprintf(                                                        \
                 "Function[%s] shall not be used before scheduler start\n",     \
                 __FUNCTION__);                                                 \

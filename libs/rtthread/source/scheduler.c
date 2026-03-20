@@ -43,7 +43,7 @@ uint8_t rt_thread_ready_table[32];
 #ifndef RT_USING_SMP
 extern volatile uint8_t rt_interrupt_nest;
 static int16_t rt_scheduler_lock_nest;
-struct rt_thread *rt_current_thread = RT_NULL;
+struct rt_thread *rt_current_thread = NULL;
 uint8_t rt_current_priority;
 #endif /* RT_USING_SMP */
 
@@ -92,7 +92,7 @@ void rt_scheduler_switch_sethook(void (*hook)(struct rt_thread *tid))
 #ifdef RT_USING_OVERFLOW_CHECK
 static void _scheduler_stack_check(struct rt_thread *thread)
 {
-    RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(thread != NULL);
 
 #ifdef ARCH_CPU_STACK_GROWS_UPWARD
     if (*((uint8_t *)((rt_ubase_t)thread->stack_addr + thread->stack_size - 1)) != '#' ||
@@ -223,7 +223,7 @@ void rt_system_scheduler_init(void)
 
         pcpu->irq_switch_flag = 0;
         pcpu->current_priority = RT_THREAD_PRIORITY_MAX - 1;
-        pcpu->current_thread = RT_NULL;
+        pcpu->current_thread = NULL;
         pcpu->priority_group = 0;
 
 #if RT_THREAD_PRIORITY_MAX > 32
@@ -284,7 +284,7 @@ void rt_system_scheduler_start(void)
  *
  * @param vector is the number of IPI interrupt for system scheduling.
  *
- * @param param is not used, and can be set to RT_NULL.
+ * @param param is not used, and can be set to NULL.
  *
  * @note this function should be invoke or register as ISR in BSP.
  */
@@ -397,14 +397,14 @@ void rt_schedule(void)
     level = rt_hw_interrupt_disable();
     if (current_thread->stat & RT_THREAD_STAT_SIGNAL_PENDING)
     {
-        extern void rt_thread_handle_sig(rt_bool_t clean_state);
+        extern void rt_thread_handle_sig(bool clean_state);
 
         current_thread->stat &= ~RT_THREAD_STAT_SIGNAL_PENDING;
 
         rt_hw_interrupt_enable(level);
 
         /* check signal status */
-        rt_thread_handle_sig(RT_TRUE);
+        rt_thread_handle_sig(true);
     }
     else
     {
@@ -490,7 +490,7 @@ void rt_schedule(void)
 
                 if (rt_interrupt_nest == 0)
                 {
-                    extern void rt_thread_handle_sig(rt_bool_t clean_state);
+                    extern void rt_thread_handle_sig(bool clean_state);
 
                     RT_OBJECT_HOOK_CALL(rt_scheduler_switch_hook, (from_thread));
 
@@ -505,14 +505,14 @@ void rt_schedule(void)
                     level = rt_hw_interrupt_disable();
                     if (rt_current_thread->stat & RT_THREAD_STAT_SIGNAL_PENDING)
                     {
-                        extern void rt_thread_handle_sig(rt_bool_t clean_state);
+                        extern void rt_thread_handle_sig(bool clean_state);
 
                         rt_current_thread->stat &= ~RT_THREAD_STAT_SIGNAL_PENDING;
 
                         rt_hw_interrupt_enable(level);
 
                         /* check signal status */
-                        rt_thread_handle_sig(RT_TRUE);
+                        rt_thread_handle_sig(true);
                     }
                     else
                     {
@@ -657,7 +657,7 @@ void rt_schedule_insert_thread(struct rt_thread *thread)
     uint32_t cpu_mask;
     rt_base_t level;
 
-    RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(thread != NULL);
 
     /* disable interrupt */
     level = rt_hw_interrupt_disable();
@@ -740,7 +740,7 @@ void rt_schedule_insert_thread(struct rt_thread *thread)
 {
     rt_base_t level;
 
-    RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(thread != NULL);
 
     /* disable interrupt */
     level = rt_hw_interrupt_disable();
@@ -794,7 +794,7 @@ void rt_schedule_remove_thread(struct rt_thread *thread)
 {
     rt_base_t level;
 
-    RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(thread != NULL);
 
     /* disable interrupt */
     level = rt_hw_interrupt_disable();
@@ -846,7 +846,7 @@ void rt_schedule_remove_thread(struct rt_thread *thread)
 {
     rt_base_t level;
 
-    RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(thread != NULL);
 
     /* disable interrupt */
     level = rt_hw_interrupt_disable();
@@ -895,7 +895,7 @@ void rt_enter_critical(void)
     }
 
     /*
-     * the maximal number of nest is RT_UINT16_MAX, which is big
+     * the maximal number of nest is UINT16_MAX, which is big
      * enough and does not check here
      */
 
@@ -926,7 +926,7 @@ void rt_enter_critical(void)
     level = rt_hw_interrupt_disable();
 
     /*
-     * the maximal number of nest is RT_UINT16_MAX, which is big
+     * the maximal number of nest is UINT16_MAX, which is big
      * enough and does not check here
      */
     rt_scheduler_lock_nest ++;

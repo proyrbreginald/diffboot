@@ -56,17 +56,17 @@
   */
 struct rt_small_mem_item
 {
-    rt_ubase_t              pool_ptr;         /**< small memory object addr */
+    rt_ubase_t              pool_ptr;         //!< small memory object addr */
 #ifdef ARCH_CPU_64BIT
     uint32_t             resv;
 #endif /* ARCH_CPU_64BIT */
-    size_t               next;             /**< next free item */
-    size_t               prev;             /**< prev free item */
+    size_t               next;             //!< next free item */
+    size_t               prev;             //!< prev free item */
 #ifdef RT_USING_MEMTRACE
 #ifdef ARCH_CPU_64BIT
-    uint8_t              thread[8];       /**< thread name */
+    uint8_t              thread[8];       //!< thread name */
 #else
-    uint8_t              thread[4];       /**< thread name */
+    uint8_t              thread[4];       //!< thread name */
 #endif /* ARCH_CPU_64BIT */
 #endif /* RT_USING_MEMTRACE */
 };
@@ -76,11 +76,11 @@ struct rt_small_mem_item
  */
 struct rt_small_mem
 {
-    struct rt_memory            parent;                 /**< inherit from rt_memory */
-    uint8_t                 *heap_ptr;               /**< pointer to the heap */
+    struct rt_memory            parent;                 //!< inherit from rt_memory */
+    uint8_t                 *heap_ptr;               //!< pointer to the heap */
     struct rt_small_mem_item   *heap_end;
     struct rt_small_mem_item   *lfree;
-    size_t                   mem_size_aligned;       /**< aligned memory size */
+    size_t                   mem_size_aligned;       //!< aligned memory size */
 };
 
 #define HEAP_MAGIC 0x1ea0
@@ -173,7 +173,7 @@ static void plug_holes(struct rt_small_mem *m, struct rt_small_mem_item *mem)
  *
  * @param size is the size of the memory.
  *
- * @return Return a pointer to the memory object. When the return value is RT_NULL, it means the init failed.
+ * @return Return a pointer to the memory object. When the return value is NULL, it means the init failed.
  */
 rt_smem_t rt_smem_init(const char    *name,
                      void          *begin_addr,
@@ -200,7 +200,7 @@ rt_smem_t rt_smem_init(const char    *name,
         rt_kprintf("mem init, error begin address 0x%x, and end address 0x%x\n",
                    (rt_ubase_t)begin_addr, (rt_ubase_t)begin_addr + size);
 
-        return RT_NULL;
+        return NULL;
     }
 
     rt_memset(small_mem, 0, sizeof(*small_mem));
@@ -251,7 +251,7 @@ RTM_EXPORT(rt_smem_init);
  */
 rt_err_t rt_smem_detach(rt_smem_t m)
 {
-    RT_ASSERT(m != RT_NULL);
+    RT_ASSERT(m != NULL);
     RT_ASSERT(rt_object_get_type(&m->parent) == RT_Object_Class_Memory);
     RT_ASSERT(rt_object_is_systemobject(&m->parent));
 
@@ -283,9 +283,9 @@ void *rt_smem_alloc(rt_smem_t m, size_t size)
     struct rt_small_mem *small_mem;
 
     if (size == 0)
-        return RT_NULL;
+        return NULL;
 
-    RT_ASSERT(m != RT_NULL);
+    RT_ASSERT(m != NULL);
     RT_ASSERT(rt_object_get_type(&m->parent) == RT_Object_Class_Memory);
     RT_ASSERT(rt_object_is_systemobject(&m->parent));
 
@@ -311,7 +311,7 @@ void *rt_smem_alloc(rt_smem_t m, size_t size)
     {
         RT_DEBUG_LOG(RT_DEBUG_MEM, ("no memory\n"));
 
-        return RT_NULL;
+        return NULL;
     }
 
     for (ptr = (uint8_t *)small_mem->lfree - small_mem->heap_ptr;
@@ -404,7 +404,7 @@ void *rt_smem_alloc(rt_smem_t m, size_t size)
         }
     }
 
-    return RT_NULL;
+    return NULL;
 }
 RTM_EXPORT(rt_smem_alloc);
 
@@ -427,7 +427,7 @@ void *rt_smem_realloc(rt_smem_t m, void *rmem, size_t newsize)
     struct rt_small_mem *small_mem;
     void *nmem;
 
-    RT_ASSERT(m != RT_NULL);
+    RT_ASSERT(m != NULL);
     RT_ASSERT(rt_object_get_type(&m->parent) == RT_Object_Class_Memory);
     RT_ASSERT(rt_object_is_systemobject(&m->parent));
 
@@ -438,16 +438,16 @@ void *rt_smem_realloc(rt_smem_t m, void *rmem, size_t newsize)
     {
         RT_DEBUG_LOG(RT_DEBUG_MEM, ("realloc: out of memory\n"));
 
-        return RT_NULL;
+        return NULL;
     }
     else if (newsize == 0)
     {
         rt_smem_free(rmem);
-        return RT_NULL;
+        return NULL;
     }
 
     /* allocate a new memory block */
-    if (rmem == RT_NULL)
+    if (rmem == NULL)
         return rt_smem_alloc(&small_mem->parent, newsize);
 
     RT_ASSERT((((rt_ubase_t)rmem) & (RT_ALIGN_SIZE - 1)) == 0);
@@ -497,7 +497,7 @@ void *rt_smem_realloc(rt_smem_t m, void *rmem, size_t newsize)
 
     /* expand memory */
     nmem = rt_smem_alloc(&small_mem->parent, newsize);
-    if (nmem != RT_NULL) /* check memory */
+    if (nmem != NULL) /* check memory */
     {
         rt_memcpy(nmem, rmem, size < newsize ? size : newsize);
         rt_smem_free(rmem);
@@ -518,7 +518,7 @@ void rt_smem_free(void *rmem)
     struct rt_small_mem_item *mem;
     struct rt_small_mem *small_mem;
 
-    if (rmem == RT_NULL)
+    if (rmem == NULL)
         return;
 
     RT_ASSERT((((rt_ubase_t)rmem) & (RT_ALIGN_SIZE - 1)) == 0);
@@ -533,7 +533,7 @@ void rt_smem_free(void *rmem)
 
     /* ... which has to be in a used state ... */
     small_mem = MEM_POOL(mem);
-    RT_ASSERT(small_mem != RT_NULL);
+    RT_ASSERT(small_mem != NULL);
     RT_ASSERT(MEM_ISUSED(mem));
     RT_ASSERT(rt_object_get_type(&small_mem->parent.parent) == RT_Object_Class_Memory);
     RT_ASSERT(rt_object_is_systemobject(&small_mem->parent.parent));
@@ -575,7 +575,7 @@ int memcheck(int argc, char *argv[])
     struct rt_object *object;
     char *name;
 
-    name = argc > 1 ? argv[1] : RT_NULL;
+    name = argc > 1 ? argv[1] : NULL;
     level = rt_hw_interrupt_disable();
     /* get mem object */
     information = rt_object_get_information(RT_Object_Class_Memory);
@@ -585,7 +585,7 @@ int memcheck(int argc, char *argv[])
     {
         object = rt_list_entry(node, struct rt_object, list);
         /* find the specified object */
-        if (name != RT_NULL && rt_strncmp(name, object->name, RT_NAME_MAX) != 0)
+        if (name != NULL && rt_strncmp(name, object->name, RT_NAME_MAX) != 0)
             continue;
         /* mem object */
         m = (struct rt_small_mem *)object;
@@ -622,7 +622,7 @@ int memtrace(int argc, char **argv)
     struct rt_object *object;
     char *name;
 
-    name = argc > 1 ? argv[1] : RT_NULL;
+    name = argc > 1 ? argv[1] : NULL;
     /* get mem object */
     information = rt_object_get_information(RT_Object_Class_Memory);
     for (node = information->object_list.next;
@@ -631,7 +631,7 @@ int memtrace(int argc, char **argv)
     {
         object = rt_list_entry(node, struct rt_object, list);
         /* find the specified object */
-        if (name != RT_NULL && rt_strncmp(name, object->name, RT_NAME_MAX) != 0)
+        if (name != NULL && rt_strncmp(name, object->name, RT_NAME_MAX) != 0)
             continue;
         /* mem object */
         m = (struct rt_small_mem *)object;

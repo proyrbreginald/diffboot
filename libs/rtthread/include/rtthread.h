@@ -26,7 +26,7 @@ rt_object_t rt_object_allocate(enum rt_object_class_type type,
                                const char *name);
 void rt_object_delete(rt_object_t object);
 #endif
-rt_bool_t rt_object_is_systemobject(rt_object_t object);
+bool rt_object_is_systemobject(rt_object_t object);
 uint8_t rt_object_get_type(rt_object_t object);
 rt_object_t rt_object_find(const char *name, uint8_t type);
 #ifdef RT_USING_HOOK

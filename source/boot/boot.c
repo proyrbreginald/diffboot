@@ -58,9 +58,9 @@ static void count_thread_entry(void *parameter)
 static int count_thread_init(void)
 {
     rt_err_t result = RT_EOK;
-    rt_thread_t tid = rt_thread_create(THREAD_NAME, count_thread_entry, RT_NULL,
+    rt_thread_t tid = rt_thread_create(THREAD_NAME, count_thread_entry, NULL,
                                        1024 * 2, RT_THREAD_PRIORITY_MAX - 2, 0);
-    if (tid != RT_NULL)
+    if (tid != NULL)
     {
         LOG_I(THREAD_NAME " thread create success");
         result = rt_thread_startup(tid);
@@ -80,7 +80,7 @@ static int count_thread_init(void)
     }
     return result;
 }
-INIT_APP_EXPORT(count_thread_init);
+RUN_APP_EXPORT(count_thread_init);
 
 typedef enum
 {
@@ -370,9 +370,9 @@ static void boot_thread_entry(void *parameter)
 static int boot_thread_init(void)
 {
     rt_err_t result = RT_EOK;
-    rt_thread_t tid = rt_thread_create(THREAD_NAME, boot_thread_entry, RT_NULL,
+    rt_thread_t tid = rt_thread_create(THREAD_NAME, boot_thread_entry, NULL,
                                        1024 * 2, 1, 0);
-    if (tid != RT_NULL)
+    if (tid != NULL)
     {
         LOG_I(THREAD_NAME " thread create success");
         result = rt_thread_startup(tid);
@@ -392,7 +392,7 @@ static int boot_thread_init(void)
     }
     return result;
 }
-INIT_APP_EXPORT(boot_thread_init);
+RUN_APP_EXPORT(boot_thread_init);
 
 // 创建业务层任务
 void rt_app_init(void)

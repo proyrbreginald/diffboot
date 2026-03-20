@@ -28,39 +28,39 @@
  */
 enum rt_object_info_type
 {
-    RT_Object_Info_Thread = 0,                         /**< The object is a thread. */
+    RT_Object_Info_Thread = 0,                         //!< The object is a thread. */
 #ifdef RT_USING_SEMAPHORE
-    RT_Object_Info_Semaphore,                          /**< The object is a semaphore. */
+    RT_Object_Info_Semaphore,                          //!< The object is a semaphore. */
 #endif
 #ifdef RT_USING_MUTEX
-    RT_Object_Info_Mutex,                              /**< The object is a mutex. */
+    RT_Object_Info_Mutex,                              //!< The object is a mutex. */
 #endif
 #ifdef RT_USING_EVENT
-    RT_Object_Info_Event,                              /**< The object is a event. */
+    RT_Object_Info_Event,                              //!< The object is a event. */
 #endif
 #ifdef RT_USING_MAILBOX
-    RT_Object_Info_MailBox,                            /**< The object is a mail box. */
+    RT_Object_Info_MailBox,                            //!< The object is a mail box. */
 #endif
 #ifdef RT_USING_MESSAGEQUEUE
-    RT_Object_Info_MessageQueue,                       /**< The object is a message queue. */
+    RT_Object_Info_MessageQueue,                       //!< The object is a message queue. */
 #endif
 #ifdef RT_USING_MEMHEAP
-    RT_Object_Info_MemHeap,                            /**< The object is a memory heap */
+    RT_Object_Info_MemHeap,                            //!< The object is a memory heap */
 #endif
 #ifdef RT_USING_MEMPOOL
-    RT_Object_Info_MemPool,                            /**< The object is a memory pool. */
+    RT_Object_Info_MemPool,                            //!< The object is a memory pool. */
 #endif
 #ifdef RT_USING_DEVICE
-    RT_Object_Info_Device,                             /**< The object is a device */
+    RT_Object_Info_Device,                             //!< The object is a device */
 #endif
-    RT_Object_Info_Timer,                              /**< The object is a timer. */
+    RT_Object_Info_Timer,                              //!< The object is a timer. */
 #ifdef RT_USING_MODULE
-    RT_Object_Info_Module,                             /**< The object is a module. */
+    RT_Object_Info_Module,                             //!< The object is a module. */
 #endif
 #ifdef RT_USING_HEAP
-    RT_Object_Info_Memory,                            /**< The object is a memory. */
+    RT_Object_Info_Memory,                            //!< The object is a memory. */
 #endif
-    RT_Object_Info_Unknown,                            /**< The object is unknown. */
+    RT_Object_Info_Unknown,                            //!< The object is unknown. */
 };
 
 #define _OBJ_CONTAINER_LIST_INIT(c)     \
@@ -228,7 +228,7 @@ void rt_object_put_sethook(void (*hook)(struct rt_object *object))
  * @param type is the type of object, which can be
  *             RT_Object_Class_Thread/Semaphore/Mutex... etc
  *
- * @return the object type information or RT_NULL
+ * @return the object type information or NULL
  */
 struct rt_object_information *
 rt_object_get_information(enum rt_object_class_type type)
@@ -238,7 +238,7 @@ rt_object_get_information(enum rt_object_class_type type)
     for (index = 0; index < RT_Object_Info_Unknown; index ++)
         if (_object_container[index].type == type) return &_object_container[index];
 
-    return RT_NULL;
+    return NULL;
 }
 RTM_EXPORT(rt_object_get_information);
 
@@ -254,11 +254,11 @@ int rt_object_get_length(enum rt_object_class_type type)
 {
     int count = 0;
     rt_base_t level;
-    struct rt_list_node *node = RT_NULL;
-    struct rt_object_information *information = RT_NULL;
+    struct rt_list_node *node = NULL;
+    struct rt_object_information *information = NULL;
 
     information = rt_object_get_information((enum rt_object_class_type)type);
-    if (information == RT_NULL) return 0;
+    if (information == NULL) return 0;
 
     level = rt_hw_interrupt_disable();
     /* get the count of objects */
@@ -291,13 +291,13 @@ int rt_object_get_pointers(enum rt_object_class_type type, rt_object_t *pointers
     rt_base_t level;
 
     struct rt_object *object;
-    struct rt_list_node *node = RT_NULL;
-    struct rt_object_information *information = RT_NULL;
+    struct rt_list_node *node = NULL;
+    struct rt_object_information *information = NULL;
 
     if (maxlen <= 0) return 0;
 
     information = rt_object_get_information((enum rt_object_class_type)type);
-    if (information == RT_NULL) return 0;
+    if (information == NULL) return 0;
 
     level = rt_hw_interrupt_disable();
     /* retrieve pointer of object */
@@ -331,7 +331,7 @@ void rt_object_init(struct rt_object         *object,
                     const char               *name)
 {
     rt_base_t level;
-    struct rt_list_node *node = RT_NULL;
+    struct rt_list_node *node = NULL;
     struct rt_object_information *information;
 #ifdef RT_USING_MODULE
     struct rt_dlmodule *module = dlmodule_self();
@@ -339,7 +339,7 @@ void rt_object_init(struct rt_object         *object,
 
     /* get object information */
     information = rt_object_get_information(type);
-    RT_ASSERT(information != RT_NULL);
+    RT_ASSERT(information != NULL);
 
     /* check object type to avoid re-initialization */
 
@@ -400,7 +400,7 @@ void rt_object_detach(rt_object_t object)
     rt_base_t level;
 
     /* object check */
-    RT_ASSERT(object != RT_NULL);
+    RT_ASSERT(object != NULL);
 
     RT_OBJECT_HOOK_CALL(rt_object_detach_hook, (object));
 
@@ -440,13 +440,13 @@ rt_object_t rt_object_allocate(enum rt_object_class_type type, const char *name)
 
     /* get object information */
     information = rt_object_get_information(type);
-    RT_ASSERT(information != RT_NULL);
+    RT_ASSERT(information != NULL);
 
     object = (struct rt_object *)RT_KERNEL_MALLOC(information->object_size);
-    if (object == RT_NULL)
+    if (object == NULL)
     {
         /* no memory can be allocated */
-        return RT_NULL;
+        return NULL;
     }
 
     /* clean memory data of object */
@@ -498,7 +498,7 @@ void rt_object_delete(rt_object_t object)
     rt_base_t level;
 
     /* object check */
-    RT_ASSERT(object != RT_NULL);
+    RT_ASSERT(object != NULL);
     RT_ASSERT(!(object->type & RT_Object_Class_Static));
 
     RT_OBJECT_HOOK_CALL(rt_object_detach_hook, (object));
@@ -528,17 +528,17 @@ void rt_object_delete(rt_object_t object)
  *
  * @param object is the specified object to be judged.
  *
- * @return RT_TRUE if a system object, RT_FALSE for others.
+ * @return true if a system object, false for others.
  */
-rt_bool_t rt_object_is_systemobject(rt_object_t object)
+bool rt_object_is_systemobject(rt_object_t object)
 {
     /* object check */
-    RT_ASSERT(object != RT_NULL);
+    RT_ASSERT(object != NULL);
 
     if (object->type & RT_Object_Class_Static)
-        return RT_TRUE;
+        return true;
 
-    return RT_FALSE;
+    return false;
 }
 
 /**
@@ -552,7 +552,7 @@ rt_bool_t rt_object_is_systemobject(rt_object_t object)
 uint8_t rt_object_get_type(rt_object_t object)
 {
     /* object check */
-    RT_ASSERT(object != RT_NULL);
+    RT_ASSERT(object != NULL);
 
     return object->type & ~RT_Object_Class_Static;
 }
@@ -565,21 +565,21 @@ uint8_t rt_object_get_type(rt_object_t object)
  *
  * @param type is the type of object
  *
- * @return the found object or RT_NULL if there is no this object
+ * @return the found object or NULL if there is no this object
  * in object container.
  *
  * @note this function shall not be invoked in interrupt status.
  */
 rt_object_t rt_object_find(const char *name, uint8_t type)
 {
-    struct rt_object *object = RT_NULL;
-    struct rt_list_node *node = RT_NULL;
-    struct rt_object_information *information = RT_NULL;
+    struct rt_object *object = NULL;
+    struct rt_list_node *node = NULL;
+    struct rt_object_information *information = NULL;
 
     information = rt_object_get_information((enum rt_object_class_type)type);
 
     /* parameter check */
-    if ((name == RT_NULL) || (information == RT_NULL)) return RT_NULL;
+    if ((name == NULL) || (information == NULL)) return NULL;
 
     /* which is invoke in interrupt status */
     RT_DEBUG_NOT_IN_INTERRUPT;
@@ -603,7 +603,7 @@ rt_object_t rt_object_find(const char *name, uint8_t type)
     /* leave critical */
     rt_exit_critical();
 
-    return RT_NULL;
+    return NULL;
 }
 
 /**@}*/

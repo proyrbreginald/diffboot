@@ -61,103 +61,103 @@ SECTIONS
     /* 普通代码段 */
     .code : ALIGN(4)
     {
-        KEEP(*(.reset_vector))      /* 复位向量表 */
-        *(.text*)                   /* 普通代码 */
-        *(.glue_7*)                 /* ARM/Thumb胶水代码 */
-        KEEP(*(SORT(.rti_fn*)))     /* RTOS启动时自动执行 */
+        KEEP(*(.reset_vector))          /* 复位向量表 */
+        *(.text*)                       /* 普通代码 */
+        *(.glue_7*)                     /* ARM/Thumb胶水代码 */
+        KEEP(*(SORT(.rt_launch_run.*))) /* os启动时自动执行 */
     } > CODE_PARTITION
 
     /* 快速代码段 */
     .itcm : ALIGN(4)
     {
-        _itcm_ram_start = .;        /* 起始地址 */
-        KEEP(*(.itcm*))             /* 快速代码 */
-        _itcm_ram_end = .;          /* 结束地址 */
+        _itcm_ram_start = .;            /* 起始地址 */
+        KEEP(*(.itcm*))                 /* 快速代码 */
+        _itcm_ram_end = .;              /* 结束地址 */
     } > ITCM AT > CODE_PARTITION
     _itcm_section_addr = LOADADDR(.itcm);
 
     /* 常量数据段 */
     .const : ALIGN(4)
     {
-        *(.rodata*)                 /* 常量数据 */
+        *(.rodata*)                     /* 常量数据 */
     } > CODE_PARTITION
 
     /* DTCM已初始化数据段 */
     .dtcm_init : ALIGN(4)
     {
-        _dtcm_ram_init_start = .;   /* 起始地址 */
-        *(.data*)                   /* 已初始化数据 */
-        _dtcm_ram_init_end = .;     /* 结束地址 */
+        _dtcm_ram_init_start = .;       /* 起始地址 */
+        *(.data*)                       /* 已初始化数据 */
+        _dtcm_ram_init_end = .;         /* 结束地址 */
     } > DTCM AT > CODE_PARTITION
     _dtcm_ram_section_addr = LOADADDR(.dtcm_init);
 
     /* DTCM未初始化数据段 */
     .dtcm_uninit : ALIGN(4)
     {
-        _dtcm_ram_uninit_start = .; /* 起始地址 */
-        *(.bss*)                    /* 未初始化数据 */
-        _dtcm_ram_uninit_end = .;   /* 结束地址 */
+        _dtcm_ram_uninit_start = .;     /* 起始地址 */
+        *(.bss*)                        /* 未初始化数据 */
+        _dtcm_ram_uninit_end = .;       /* 结束地址 */
     } > DTCM
 
     /* 堆空间段 */
     .heap : ALIGN(8)
     {
-        _heap_start = .;            /* 紧跟在数据段之后 */
+        _heap_start = .;                /* 紧跟在数据段之后 */
     } > DTCM
 
     /* 栈空间段 */
     .stack : ALIGN(8)
     {
-        . = . + _stack_min_size;    /* 不足以分配最小栈空间时报错 */
+        . = . + _stack_min_size;        /* 不足以分配最小栈空间时报错 */
     } > DTCM
 
     /* AXIRAM已初始化数据段 */
     .axi_ram_init : ALIGN(4)
     {
-        _axi_ram_init_start = .;    /* 起始地址 */
-        _axi_ram_init_end = .;      /* 结束地址 */
+        _axi_ram_init_start = .;        /* 起始地址 */
+        _axi_ram_init_end = .;          /* 结束地址 */
     } > AXIRAM AT > LOADER
     _axi_ram_section_addr = LOADADDR(.axi_ram_init);
 
     /* AXIRAM未初始化数据段 */
     .axi_ram_uninit : ALIGN(4)
     {
-        _axi_ram_uninit_start = .;  /* 起始地址 */
-        _axi_ram_uninit_end = .;    /* 结束地址 */
+        _axi_ram_uninit_start = .;      /* 起始地址 */
+        _axi_ram_uninit_end = .;        /* 结束地址 */
     } > AXIRAM
 
     /* AHBRAM已初始化数据段 */
     .ahb_ram_init : ALIGN(4)
     {
-        _ahb_ram_init_start = .;    /* 起始地址 */
-        *(.share_init)              /* 已初始化数据 */
-        _ahb_ram_init_end = .;      /* 结束地址 */
+        _ahb_ram_init_start = .;        /* 起始地址 */
+        *(.share_init)                  /* 已初始化数据 */
+        _ahb_ram_init_end = .;          /* 结束地址 */
     } > AHBRAM AT > LOADER
     _ahb_ram_section_addr = LOADADDR(.ahb_ram_init);
 
     /* AHBRAM未初始化数据段 */
     .ahb_ram_uninit : ALIGN(4)
     {
-        _ahb_ram_uninit_start = .;  /* 起始地址 */
-        *(.share_uninit)            /* 未初始化数据 */
-        _ahb_ram_uninit_end = .;    /* 结束地址 */
+        _ahb_ram_uninit_start = .;      /* 起始地址 */
+        *(.share_uninit)                /* 未初始化数据 */
+        _ahb_ram_uninit_end = .;        /* 结束地址 */
     } > AHBRAM
 
     /* share数据段 */
     .share_ram : ALIGN(4)
     {
-        _share_ram_start = .;       /* 起始地址 */
-        *(.share)                   /* 程序之间共享的数据 */
-        _share_ram_end = .;         /* 结束地址 */
+        _share_ram_start = .;           /* 起始地址 */
+        *(.share)                       /* 程序之间共享的数据 */
+        _share_ram_end = .;             /* 结束地址 */
     } > AHBRAM1 AT > LOADER
     _share_ram_section_addr = LOADADDR(.share_ram);
 
     /* BKPRAM已初始化数据段 */
     .bkp_ram : ALIGN(4)
     {
-        _bkp_ram_start = .;         /* 起始地址 */
-        *(.backup)                  /* 备份数据 */
-        _bkp_ram_end = .;           /* 结束地址 */
+        _bkp_ram_start = .;             /* 起始地址 */
+        *(.backup)                      /* 备份数据 */
+        _bkp_ram_end = .;               /* 结束地址 */
     } > BKPRAM
 
     /* 显式丢弃的内容 */

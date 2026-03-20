@@ -175,7 +175,7 @@ rt_base_t rt_cpus_lock(void)
     level = rt_hw_local_irq_disable();
 
     pcpu = rt_cpu_self();
-    if (pcpu->current_thread != RT_NULL)
+    if (pcpu->current_thread != NULL)
     {
         register rt_ubase_t lock_nest = pcpu->current_thread->cpus_lock_nest;
 
@@ -200,7 +200,7 @@ void rt_cpus_unlock(rt_base_t level)
 {
     struct rt_cpu* pcpu = rt_cpu_self();
 
-    if (pcpu->current_thread != RT_NULL)
+    if (pcpu->current_thread != NULL)
     {
         pcpu->current_thread->cpus_lock_nest--;
 

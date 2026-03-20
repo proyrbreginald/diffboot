@@ -33,7 +33,7 @@ uint32_t rt_interrupt_from_thread;
 uint32_t rt_interrupt_to_thread;
 uint32_t rt_thread_switch_interrupt_flag;
 /* exception hook */
-static rt_err_t (*rt_exception_hook)(void *context) = RT_NULL;
+static rt_err_t (*rt_exception_hook)(void *context) = NULL;
 
 struct exception_stack_frame
 {
@@ -376,7 +376,7 @@ void rt_hw_hard_fault_exception(struct exception_info *exception_info)
     struct exception_stack_frame *exception_stack = &exception_info->stack_frame.exception_stack_frame;
     __attribute__((unused)) struct stack_frame *context = &exception_info->stack_frame;
 
-    if (rt_exception_hook != RT_NULL)
+    if (rt_exception_hook != NULL)
     {
         rt_err_t result;
 

@@ -43,7 +43,7 @@
 static volatile int __rt_errno;
 
 #if defined(RT_USING_DEVICE) && defined(RT_USING_CONSOLE)
-static rt_device_t _console_device = RT_NULL;
+static rt_device_t _console_device = NULL;
 #endif
 
 WEAK void rt_hw_us_delay(uint32_t us)
@@ -103,7 +103,7 @@ rt_err_t rt_get_errno(void)
     }
 
     tid = rt_thread_self();
-    if (tid == RT_NULL)
+    if (tid == NULL)
         return __rt_errno;
 
     return tid->error;
@@ -128,7 +128,7 @@ void rt_set_errno(rt_err_t error)
     }
 
     tid = rt_thread_self();
-    if (tid == RT_NULL)
+    if (tid == NULL)
     {
         __rt_errno = error;
 
@@ -152,7 +152,7 @@ int *_rt_errno(void)
         return (int *)&__rt_errno;
 
     tid = rt_thread_self();
-    if (tid != RT_NULL)
+    if (tid != NULL)
         return (int *) & (tid->error);
 
     return (int *)&__rt_errno;
@@ -218,7 +218,7 @@ INLINE static inline int divide(long *n, int base)
 /**
  * This function returns the device using in console.
  *
- * @return Returns the console device pointer or RT_NULL.
+ * @return Returns the console device pointer or NULL.
  */
 rt_device_t rt_console_get_device(void)
 {
@@ -233,7 +233,7 @@ RTM_EXPORT(rt_console_get_device);
  *
  * @param  name is the name of new console device.
  *
- * @return the old console device handler on successful, or RT_NULL on failure.
+ * @return the old console device handler on successful, or NULL on failure.
  */
 rt_device_t rt_console_set_device(const char *name)
 {
@@ -246,11 +246,11 @@ rt_device_t rt_console_set_device(const char *name)
     new_device = rt_device_find(name);
 
     /* check whether it's a same device */
-    if (new_device == old_device) return RT_NULL;
+    if (new_device == old_device) return NULL;
 
-    if (new_device != RT_NULL)
+    if (new_device != NULL)
     {
-        if (_console_device != RT_NULL)
+        if (_console_device != NULL)
         {
             /* close old console device */
             rt_device_close(_console_device);
@@ -276,7 +276,7 @@ static struct rt_messagequeue log_mq;
 static uint8_t mq_pool[(sizeof(rt_log_msg_t) + sizeof(void*)) * ASYNC_LOG_MSG_COUNT];
 static struct rt_thread log_thread;
 static uint8_t log_stack[ASYNC_LOG_THREAD_STK];
-static rt_bool_t is_async_ready = RT_FALSE;
+static bool is_async_ready = false;
 
 /**
  * 消费线程：负责把队列里的日志真正打印出来
@@ -299,14 +299,14 @@ int log_thread_init(void) {
     rt_mq_init(&log_mq, "log_mq", &mq_pool[0], 
                sizeof(rt_log_msg_t), sizeof(mq_pool), RT_IPC_FLAG_FIFO);
 
-    rt_thread_init(&log_thread, "log", log_thread_entry, RT_NULL,
+    rt_thread_init(&log_thread, "log", log_thread_entry, NULL,
                    &log_stack[0], sizeof(log_stack), ASYNC_LOG_THREAD_PRIO, 0);
     
     rt_thread_startup(&log_thread);
-    is_async_ready = RT_TRUE;
+    is_async_ready = true;
     return 0;
 }
-INIT_APP_EXPORT(log_thread_init); // 自动初始化
+RUN_APP_EXPORT(log_thread_init); // 自动初始化
 
 /**
  * This function will print a formatted string on system console.
@@ -332,7 +332,7 @@ int rt_kprintf(const char *fmt, ...)
 
     /* 判断当前环境是否支持异步 */
     /* 如果OS已启动、不在中断中、且队列已初始化 */
-    if (is_async_ready && rt_thread_self() != RT_NULL && rt_interrupt_get_nest() == 0) {
+    if (is_async_ready && rt_thread_self() != NULL && rt_interrupt_get_nest() == 0) {
         rt_log_msg_t msg;
         memcpy(msg.data, local_buf, length + 1);
         
@@ -488,8 +488,8 @@ INLINE static inline void _slab_info(size_t *total,
 #define _MEM_INFO       _slab_info
 #else
 #define _MEM_INIT(...)
-#define _MEM_MALLOC(...)     RT_NULL
-#define _MEM_REALLOC(...)    RT_NULL
+#define _MEM_MALLOC(...)     NULL
+#define _MEM_REALLOC(...)    NULL
 #define _MEM_FREE(...)
 #define _MEM_INFO(...)
 #endif
@@ -603,7 +603,7 @@ WEAK void rt_free(void *rmem)
     /* call 'rt_free' hook */
     RT_OBJECT_HOOK_CALL(rt_free_hook, (rmem));
     /* NULL check */
-    if (rmem == RT_NULL) return;
+    if (rmem == NULL) return;
     /* Enter critical zone */
     level = _heap_lock();
     _MEM_FREE(rmem);
@@ -673,7 +673,7 @@ void rt_page_free(void *addr, size_t npages)
  * @param  align is the alignment size.
  *
  * @return The memory block address was returned successfully, otherwise it was
- *         returned empty RT_NULL.
+ *         returned empty NULL.
  */
 WEAK void *rt_malloc_align(size_t size, size_t align)
 {
@@ -693,7 +693,7 @@ WEAK void *rt_malloc_align(size_t size, size_t align)
     align_size = ((size + uintptr_size) & ~uintptr_size) + align;
     /* allocate memory block from heap */
     ptr = rt_malloc(align_size);
-    if (ptr != RT_NULL)
+    if (ptr != NULL)
     {
         /* the allocated memory block is aligned */
         if (((rt_ubase_t)ptr & (align - 1)) == 0)
@@ -726,7 +726,7 @@ WEAK void rt_free_align(void *ptr)
     void *real_ptr;
 
     /* NULL check */
-    if (ptr == RT_NULL) return;
+    if (ptr == NULL) return;
     real_ptr = (void *) * (rt_ubase_t *)((rt_ubase_t)ptr - sizeof(void *));
     rt_free(real_ptr);
 }
@@ -839,7 +839,7 @@ void rt_assert_handler(const char *ex_string, const char *func, size_t line)
 {
     volatile char dummy = 0;
 
-    if (rt_assert_hook == RT_NULL)
+    if (rt_assert_hook == NULL)
     {
 #ifdef RT_USING_MODULE
         if (dlmodule_self())

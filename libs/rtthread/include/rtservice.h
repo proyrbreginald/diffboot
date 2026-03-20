@@ -147,7 +147,7 @@ INLINE static inline unsigned int rt_list_len(const rt_list_t *l)
 #define rt_list_first_entry(ptr, type, member)                                 \
     rt_list_entry((ptr)->next, type, member)
 
-#define RT_SLIST_OBJECT_INIT(object) {RT_NULL}
+#define RT_SLIST_OBJECT_INIT(object) {NULL}
 
 /**
  * @brief initialize a single list
@@ -155,7 +155,7 @@ INLINE static inline unsigned int rt_list_len(const rt_list_t *l)
  * @param l the single list to be initialized
  */
 INLINE static inline void rt_slist_init(rt_slist_t *l)
-{ l->next = RT_NULL; }
+{ l->next = NULL; }
 
 INLINE static inline void rt_slist_append(rt_slist_t *l, rt_slist_t *n)
 {
@@ -166,7 +166,7 @@ INLINE static inline void rt_slist_append(rt_slist_t *l, rt_slist_t *n)
 
     /* append the node to the tail */
     node->next = n;
-    n->next    = RT_NULL;
+    n->next    = NULL;
 }
 
 INLINE static inline void rt_slist_insert(rt_slist_t *l, rt_slist_t *n)
@@ -179,7 +179,7 @@ INLINE static inline unsigned int rt_slist_len(const rt_slist_t *l)
 {
     unsigned int len       = 0;
     const rt_slist_t *list = l->next;
-    while (list != RT_NULL) {
+    while (list != NULL) {
         list = list->next;
         len++;
     }
@@ -211,7 +211,7 @@ INLINE static inline rt_slist_t *rt_slist_next(rt_slist_t *n)
 { return n->next; }
 
 INLINE static inline int rt_slist_isempty(rt_slist_t *l)
-{ return l->next == RT_NULL; }
+{ return l->next == NULL; }
 
 /**
  * @brief get the struct for this single list node
@@ -227,7 +227,7 @@ INLINE static inline int rt_slist_isempty(rt_slist_t *l)
  * @head   the head for your single list.
  */
 #define rt_slist_for_each(pos, head)                                           \
-    for (pos = (head)->next; pos != RT_NULL; pos = pos->next)
+    for (pos = (head)->next; pos != NULL; pos = pos->next)
 
 /**
  * rt_slist_for_each_entry  -   iterate over single list of given type
@@ -237,7 +237,7 @@ INLINE static inline int rt_slist_isempty(rt_slist_t *l)
  */
 #define rt_slist_for_each_entry(pos, head, member)                             \
     for (pos = rt_slist_entry((head)->next, typeof(*pos), member);             \
-         &pos->member != (RT_NULL);                                            \
+         &pos->member != (NULL);                                            \
          pos = rt_slist_entry(pos->member.next, typeof(*pos), member))
 
 /**

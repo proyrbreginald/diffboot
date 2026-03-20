@@ -7,52 +7,39 @@
 #define DBG_LVL DBG_DEBUG
 #include <rtdbg.h>
 
-/*
- * 初始化顺序
- * rti_start        --> 0
- * rti_board_start  --> 0.end
- * BOARD_EXPORT     --> 1       ->  INIT_BOARD_EXPORT
- * rti_board_end    --> 1.end
- * PREV_EXPORT      --> 2       ->  INIT_PREV_EXPORT
- * DEVICE_EXPORT    --> 3       ->  INIT_DEVICE_EXPORT
- * COMPONENT_EXPORT --> 4       ->  INIT_COMPONENT_EXPORT
- * ENV_EXPORT       --> 5       ->  INIT_ENV_EXPORT
- * APP_EXPORT       --> 6       ->  INIT_APP_EXPORT
- * rti_end          --> 6.end
- */
 static int rti_start(void)
 {
     LOG_I("start to auto init");
     return 0;
 }
-INIT_EXPORT(rti_start, "0");
+RT_LAUNCH_RUN_EXPORT(rti_start, "0");
 
 static int rti_board_start(void)
 {
     LOG_I("auto init board");
     return 0;
 }
-INIT_EXPORT(rti_board_start, "0.end");
+RT_LAUNCH_RUN_EXPORT(rti_board_start, "0.end");
 
 static int rti_board_end(void)
 {
     LOG_I("start to auto init components");
     return 0;
 }
-INIT_EXPORT(rti_board_end, "1.end");
+RT_LAUNCH_RUN_EXPORT(rti_board_end, "1.end");
 
 static int rti_end(void)
 {
     LOG_I("auto init finish");
     return 0;
 }
-INIT_EXPORT(rti_end, "6.end");
+RT_LAUNCH_RUN_EXPORT(rti_end, "6.end");
 
 // 初始化系统板
 void rt_hw_board_init(void)
 {
-    volatile const init_fn_t *fn_ptr;
-    for (fn_ptr = &__rt_init_rti_start; fn_ptr < &__rt_init_rti_board_end;
+    volatile const int_fn_void_t *fn_ptr;
+    for (fn_ptr = &rt_init_rti_start; fn_ptr < &rt_init_rti_board_end;
          fn_ptr++)
     {
         (*fn_ptr)();
@@ -63,8 +50,8 @@ void rt_hw_board_init(void)
 // 初始化rtos组件
 void rt_components_init(void)
 {
-    volatile const init_fn_t *fn_ptr;
-    for (fn_ptr = &__rt_init_rti_board_end; fn_ptr <= &__rt_init_rti_end;
+    volatile const int_fn_void_t *fn_ptr;
+    for (fn_ptr = &rt_init_rti_board_end; fn_ptr <= &rt_init_rti_end;
          fn_ptr++)
     {
         (*fn_ptr)();

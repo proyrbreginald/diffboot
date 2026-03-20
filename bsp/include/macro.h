@@ -11,6 +11,12 @@
 #define _MACRO_H_
 
 /**
+ * @brief 返回uint32_t型版本号。
+ */
+#define VERSION_UINT32(major, minor, revise)                                   \
+    (((uint32_t)major * 10000u) + ((uint32_t)minor * 100u) + (uint32_t)revise)
+
+/**
  * @brief 将输入标识符转换成字符串。
  */
 #define CONVERT_TO_STR(x) #x

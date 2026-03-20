@@ -91,7 +91,7 @@ rt_err_t rt_thread_idle_sethook(void (*hook)(void))
 
     for (i = 0; i < RT_IDLE_HOOK_LIST_SIZE; i++)
     {
-        if (idle_hook_list[i] == RT_NULL)
+        if (idle_hook_list[i] == NULL)
         {
             idle_hook_list[i] = hook;
             ret = RT_EOK;
@@ -125,7 +125,7 @@ rt_err_t rt_thread_idle_delhook(void (*hook)(void))
     {
         if (idle_hook_list[i] == hook)
         {
-            idle_hook_list[i] = RT_NULL;
+            idle_hook_list[i] = NULL;
             ret = RT_EOK;
             break;
         }
@@ -157,7 +157,7 @@ void rt_thread_defunct_enqueue(rt_thread_t thread)
 rt_thread_t rt_thread_defunct_dequeue(void)
 {
     rt_base_t level;
-    rt_thread_t thread = RT_NULL;
+    rt_thread_t thread = NULL;
     rt_list_t *l = &_rt_thread_defunct;
 
 #ifdef RT_USING_SMP
@@ -195,15 +195,15 @@ static void rt_defunct_execute(void)
     while (1)
     {
         rt_thread_t thread;
-        rt_bool_t object_is_systemobject;
+        bool object_is_systemobject;
         void (*cleanup)(struct rt_thread *tid);
 
 #ifdef RT_USING_MODULE
-        struct rt_dlmodule *module = RT_NULL;
+        struct rt_dlmodule *module = NULL;
 #endif
         /* get defunct thread */
         thread = rt_thread_defunct_dequeue();
-        if (thread == RT_NULL)
+        if (thread == NULL)
         {
             break;
         }
@@ -224,21 +224,21 @@ static void rt_defunct_execute(void)
 
         /* if it's a system object, not delete it */
         object_is_systemobject = rt_object_is_systemobject((rt_object_t)thread);
-        if (object_is_systemobject == RT_TRUE)
+        if (object_is_systemobject == true)
         {
             /* detach this object */
             rt_object_detach((rt_object_t)thread);
         }
 
         /* invoke thread cleanup */
-        if (cleanup != RT_NULL)
+        if (cleanup != NULL)
         {
             cleanup(thread);
         }
 
 #ifdef RT_USING_HEAP
         /* if need free, delete it */
-        if (object_is_systemobject == RT_FALSE)
+        if (object_is_systemobject == false)
         {
             /* release thread's stack */
             RT_KERNEL_FREE(thread->stack_addr);
@@ -271,7 +271,7 @@ static void rt_thread_idle_entry(void *parameter)
         for (size_t  i = 0; i < RT_IDLE_HOOK_LIST_SIZE; i++)
         {
             void (*idle_hook)(void) = idle_hook_list[i];
-            if (idle_hook != RT_NULL)
+            if (idle_hook != NULL)
             {
                 idle_hook();
             }
@@ -312,7 +312,7 @@ void rt_thread_idle_init(void)
         rt_thread_init(&idle[i],
                 tidle_name,
                 rt_thread_idle_entry,
-                RT_NULL,
+                NULL,
                 &rt_thread_stack[i][0],
                 sizeof(rt_thread_stack[i]),
                 RT_THREAD_PRIORITY_MAX - 1,
@@ -333,7 +333,7 @@ void rt_thread_idle_init(void)
     rt_thread_init(&rt_system_thread,
             "tsystem",
             rt_thread_system_entry,
-            RT_NULL,
+            NULL,
             rt_system_stack,
             sizeof(rt_system_stack),
             RT_THREAD_PRIORITY_MAX - 2,

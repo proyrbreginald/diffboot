@@ -22,6 +22,16 @@
 #define USED __attribute__((used))
 
 /**
+ * @brief 明确指定不使用该函数。
+ */
+#define UNUSE_FUNC __attribute__((unused))
+
+/**
+ * @brief 明确指定不使用该变量。
+ */
+#define UNUSE_VAR(x) ((void)x)
+
+/**
  * @brief 禁止编译器自动给函数添加任何汇编代码。
  */
 #define NAKED __attribute__((naked))

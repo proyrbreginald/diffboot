@@ -131,7 +131,7 @@ static void _thread_timeout(void *parameter)
     thread = (struct rt_thread *)parameter;
 
     /* parameter check */
-    RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(thread != NULL);
     RT_ASSERT((thread->stat & RT_THREAD_STAT_MASK) == RT_THREAD_SUSPEND);
     RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
 
@@ -238,14 +238,14 @@ static rt_err_t _thread_init(struct rt_thread *thread,
     thread->sig_pending = 0x00;
 
 #ifndef RT_USING_SMP
-    thread->sig_ret     = RT_NULL;
+    thread->sig_ret     = NULL;
 #endif /* RT_USING_SMP */
-    thread->sig_vectors = RT_NULL;
-    thread->si_list     = RT_NULL;
+    thread->sig_vectors = NULL;
+    thread->si_list     = NULL;
 #endif /* RT_USING_SIGNALS */
 
 #ifdef RT_USING_LWP
-    thread->lwp = RT_NULL;
+    thread->lwp = NULL;
 #endif /* RT_USING_LWP */
 
 #ifdef RT_USING_CPU_USAGE
@@ -253,7 +253,7 @@ static rt_err_t _thread_init(struct rt_thread *thread,
 #endif /* RT_USING_CPU_USAGE */
 
 #ifdef RT_USING_PTHREADS
-    thread->pthread_data = RT_NULL;
+    thread->pthread_data = NULL;
 #endif /* RT_USING_PTHREADS */
 
 #ifdef RT_USING_MODULE
@@ -304,8 +304,8 @@ rt_err_t rt_thread_init(struct rt_thread *thread,
                         uint32_t       tick)
 {
     /* parameter check */
-    RT_ASSERT(thread != RT_NULL);
-    RT_ASSERT(stack_start != RT_NULL);
+    RT_ASSERT(thread != NULL);
+    RT_ASSERT(stack_start != NULL);
 
     /* initialize thread object */
     rt_object_init((rt_object_t)thread, RT_Object_Class_Thread, name);
@@ -355,7 +355,7 @@ RTM_EXPORT(rt_thread_self);
 rt_err_t rt_thread_startup(rt_thread_t thread)
 {
     /* parameter check */
-    RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(thread != NULL);
     RT_ASSERT((thread->stat & RT_THREAD_STAT_MASK) == RT_THREAD_INIT);
     RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
 
@@ -374,7 +374,7 @@ rt_err_t rt_thread_startup(rt_thread_t thread)
     thread->stat = RT_THREAD_SUSPEND;
     /* then resume it */
     rt_thread_resume(thread);
-    if (rt_thread_self() != RT_NULL)
+    if (rt_thread_self() != NULL)
     {
         /* do a scheduling */
         rt_schedule();
@@ -398,7 +398,7 @@ rt_err_t rt_thread_detach(rt_thread_t thread)
     rt_base_t level;
 
     /* parameter check */
-    RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(thread != NULL);
     RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
     RT_ASSERT(rt_object_is_systemobject((rt_object_t)thread));
 
@@ -448,7 +448,7 @@ RTM_EXPORT(rt_thread_detach);
  * @param   tick is the time slice if there are same priority thread.
  *
  * @return  If the return value is a rt_thread structure pointer, the function is successfully executed.
- *          If the return value is RT_NULL, it means this operation failed.
+ *          If the return value is NULL, it means this operation failed.
  */
 rt_thread_t rt_thread_create(const char *name,
                              void (*entry)(void *parameter),
@@ -462,16 +462,16 @@ rt_thread_t rt_thread_create(const char *name,
 
     thread = (struct rt_thread *)rt_object_allocate(RT_Object_Class_Thread,
                                                     name);
-    if (thread == RT_NULL)
-        return RT_NULL;
+    if (thread == NULL)
+        return NULL;
 
     stack_start = (void *)RT_KERNEL_MALLOC(stack_size);
-    if (stack_start == RT_NULL)
+    if (stack_start == NULL)
     {
         /* allocate stack failure */
         rt_object_delete((rt_object_t)thread);
 
-        return RT_NULL;
+        return NULL;
     }
 
     _thread_init(thread,
@@ -501,9 +501,9 @@ rt_err_t rt_thread_delete(rt_thread_t thread)
     rt_base_t level;
 
     /* parameter check */
-    RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(thread != NULL);
     RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
-    RT_ASSERT(rt_object_is_systemobject((rt_object_t)thread) == RT_FALSE);
+    RT_ASSERT(rt_object_is_systemobject((rt_object_t)thread) == false);
 
     if ((thread->stat & RT_THREAD_STAT_MASK) == RT_THREAD_CLOSE)
         return RT_EOK;
@@ -574,7 +574,7 @@ rt_err_t rt_thread_sleep(rt_tick_t tick)
 
     /* set to current thread */
     thread = rt_thread_self();
-    RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(thread != NULL);
     RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
 
     /* disable interrupt */
@@ -632,11 +632,11 @@ rt_err_t rt_thread_delay_until(rt_tick_t *tick, rt_tick_t inc_tick)
     struct rt_thread *thread;
     rt_tick_t cur_tick;
 
-    RT_ASSERT(tick != RT_NULL);
+    RT_ASSERT(tick != NULL);
 
     /* set to current thread */
     thread = rt_thread_self();
-    RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(thread != NULL);
     RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
 
     /* disable interrupt */
@@ -724,7 +724,7 @@ rt_err_t rt_thread_control(rt_thread_t thread, int cmd, void *arg)
     rt_base_t level;
 
     /* parameter check */
-    RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(thread != NULL);
     RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
 
     switch (cmd)
@@ -783,7 +783,7 @@ rt_err_t rt_thread_control(rt_thread_t thread, int cmd, void *arg)
         {
             rt_err_t rt_err;
 
-            if (rt_object_is_systemobject((rt_object_t)thread) == RT_TRUE)
+            if (rt_object_is_systemobject((rt_object_t)thread) == true)
             {
                 rt_err = rt_thread_detach(thread);
             }
@@ -843,7 +843,7 @@ rt_err_t rt_thread_suspend(rt_thread_t thread)
     rt_base_t level;
 
     /* parameter check */
-    RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(thread != NULL);
     RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
     RT_ASSERT(thread == rt_thread_self());
 
@@ -887,7 +887,7 @@ rt_err_t rt_thread_resume(rt_thread_t thread)
     rt_base_t level;
 
     /* parameter check */
-    RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(thread != NULL);
     RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
 
     RT_DEBUG_LOG(RT_DEBUG_THREAD, ("thread resume:  %s\n", thread->name));
@@ -927,7 +927,7 @@ RTM_EXPORT(rt_thread_resume);
  * @param   name is the name of thread finding.
  *
  * @return  If the return value is a rt_thread structure pointer, the function is successfully executed.
- *          If the return value is RT_NULL, it means this operation failed.
+ *          If the return value is NULL, it means this operation failed.
  */
 rt_thread_t rt_thread_find(char *name)
 {

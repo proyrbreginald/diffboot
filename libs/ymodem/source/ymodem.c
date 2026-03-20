@@ -16,7 +16,7 @@ static uint32_t last_read_end_pos = 0;
 static struct rt_semaphore uart_rx_sem;
 static struct rt_ringbuffer ymodem_rb;
 static uint8_t rb_mem[YMODEM_RB_SIZE];
-static ymodem_ops_t *ymodem_cb = RT_NULL;
+static ymodem_ops_t *ymodem_cb = NULL;
 
 void ymodem_set_ops(ymodem_ops_t *const ops)
 {
@@ -316,8 +316,8 @@ static int ymodem_thread_init(void)
 {
     rt_err_t result = RT_EOK;
     rt_thread_t tid = rt_thread_create(THREAD_NAME, ymodem_thread_entry,
-                                       RT_NULL, 1024 * 2, 2, 0);
-    if (tid != RT_NULL)
+                                       NULL, 1024 * 2, 2, 0);
+    if (tid != NULL)
     {
         LOG_I(THREAD_NAME " thread create success");
         result = rt_thread_startup(tid);
@@ -337,7 +337,7 @@ static int ymodem_thread_init(void)
     }
     return result;
 }
-INIT_APP_EXPORT(ymodem_thread_init);
+RUN_APP_EXPORT(ymodem_thread_init);
 
 /**
  * @brief uart4中断处理函数。

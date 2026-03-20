@@ -96,9 +96,9 @@ rt_err_t rt_mp_init(struct rt_mempool *mp,
     size_t offset;
 
     /* parameter check */
-    RT_ASSERT(mp != RT_NULL);
-    RT_ASSERT(name != RT_NULL);
-    RT_ASSERT(start != RT_NULL);
+    RT_ASSERT(mp != NULL);
+    RT_ASSERT(name != NULL);
+    RT_ASSERT(start != NULL);
     RT_ASSERT(size > 0 && block_size > 0);
 
     /* initialize object */
@@ -128,7 +128,7 @@ rt_err_t rt_mp_init(struct rt_mempool *mp,
     }
 
     *(uint8_t **)(block_ptr + (offset - 1) * (block_size + sizeof(uint8_t *))) =
-        RT_NULL;
+        NULL;
 
     mp->block_list = block_ptr;
 
@@ -149,7 +149,7 @@ rt_err_t rt_mp_detach(struct rt_mempool *mp)
     rt_base_t level;
 
     /* parameter check */
-    RT_ASSERT(mp != RT_NULL);
+    RT_ASSERT(mp != NULL);
     RT_ASSERT(rt_object_get_type(&mp->parent) == RT_Object_Class_MemPool);
     RT_ASSERT(rt_object_is_systemobject(&mp->parent));
 
@@ -206,14 +206,14 @@ rt_mp_t rt_mp_create(const char *name,
     RT_DEBUG_NOT_IN_INTERRUPT;
 
     /* parameter check */
-    RT_ASSERT(name != RT_NULL);
+    RT_ASSERT(name != NULL);
     RT_ASSERT(block_count > 0 && block_size > 0);
 
     /* allocate object */
     mp = (struct rt_mempool *)rt_object_allocate(RT_Object_Class_MemPool, name);
     /* allocate object failed */
-    if (mp == RT_NULL)
-        return RT_NULL;
+    if (mp == NULL)
+        return NULL;
 
     /* initialize memory pool */
     block_size     = RT_ALIGN(block_size, RT_ALIGN_SIZE);
@@ -223,12 +223,12 @@ rt_mp_t rt_mp_create(const char *name,
     /* allocate memory */
     mp->start_address = rt_malloc((block_size + sizeof(uint8_t *)) *
                                   block_count);
-    if (mp->start_address == RT_NULL)
+    if (mp->start_address == NULL)
     {
         /* no memory, delete memory pool object */
         rt_object_delete(&(mp->parent));
 
-        return RT_NULL;
+        return NULL;
     }
 
     mp->block_total_count = block_count;
@@ -246,7 +246,7 @@ rt_mp_t rt_mp_create(const char *name,
     }
 
     *(uint8_t **)(block_ptr + (offset - 1) * (block_size + sizeof(uint8_t *)))
-        = RT_NULL;
+        = NULL;
 
     mp->block_list = block_ptr;
 
@@ -269,9 +269,9 @@ rt_err_t rt_mp_delete(rt_mp_t mp)
     RT_DEBUG_NOT_IN_INTERRUPT;
 
     /* parameter check */
-    RT_ASSERT(mp != RT_NULL);
+    RT_ASSERT(mp != NULL);
     RT_ASSERT(rt_object_get_type(&mp->parent) == RT_Object_Class_MemPool);
-    RT_ASSERT(rt_object_is_systemobject(&mp->parent) == RT_FALSE);
+    RT_ASSERT(rt_object_is_systemobject(&mp->parent) == false);
 
     /* wake up all suspended threads */
     while (!rt_list_isempty(&(mp->suspend_thread)))
@@ -314,7 +314,7 @@ RTM_EXPORT(rt_mp_delete);
  * @param time is the maximum waiting time for allocating memory.
  *             - 0 for not waiting, allocating memory immediately.
  *
- * @return the allocated memory block or RT_NULL on allocated failed.
+ * @return the allocated memory block or NULL on allocated failed.
  */
 void *rt_mp_alloc(rt_mp_t mp, int32_t time)
 {
@@ -324,7 +324,7 @@ void *rt_mp_alloc(rt_mp_t mp, int32_t time)
     uint32_t before_sleep = 0;
 
     /* parameter check */
-    RT_ASSERT(mp != RT_NULL);
+    RT_ASSERT(mp != NULL);
 
     /* get current thread */
     thread = rt_thread_self();
@@ -342,7 +342,7 @@ void *rt_mp_alloc(rt_mp_t mp, int32_t time)
 
             rt_set_errno(-RT_ETIMEOUT);
 
-            return RT_NULL;
+            return NULL;
         }
 
         RT_DEBUG_NOT_IN_INTERRUPT;
@@ -372,7 +372,7 @@ void *rt_mp_alloc(rt_mp_t mp, int32_t time)
         rt_schedule();
 
         if (thread->error != RT_EOK)
-            return RT_NULL;
+            return NULL;
 
         if (time > 0)
         {
@@ -389,7 +389,7 @@ void *rt_mp_alloc(rt_mp_t mp, int32_t time)
 
     /* get block from block list */
     block_ptr = mp->block_list;
-    RT_ASSERT(block_ptr != RT_NULL);
+    RT_ASSERT(block_ptr != NULL);
 
     /* Setup the next free node. */
     mp->block_list = *(uint8_t **)block_ptr;
@@ -420,7 +420,7 @@ void rt_mp_free(void *block)
     rt_base_t level;
 
     /* parameter check */
-    if (block == RT_NULL) return;
+    if (block == NULL) return;
 
     /* get the control block of pool which the block belongs to */
     block_ptr = (uint8_t **)((uint8_t *)block - sizeof(uint8_t *));
