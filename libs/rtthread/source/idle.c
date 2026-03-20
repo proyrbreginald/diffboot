@@ -20,6 +20,7 @@
 
 #include <rthw.h>
 #include <rtthread.h>
+#include <attribute.h>
 
 #ifdef RT_USING_MODULE
 #include <dlmodule.h>
@@ -49,7 +50,7 @@ static rt_list_t _rt_thread_defunct = RT_LIST_OBJECT_INIT(_rt_thread_defunct);
 
 static struct rt_thread idle[_CPUS_NR];
 ALIGN(RT_ALIGN_SIZE)
-static rt_uint8_t rt_thread_stack[_CPUS_NR][IDLE_THREAD_STACK_SIZE];
+static uint8_t rt_thread_stack[_CPUS_NR][IDLE_THREAD_STACK_SIZE];
 
 #ifdef RT_USING_SMP
 #ifndef SYSTEM_THREAD_STACK_SIZE
@@ -57,7 +58,7 @@ static rt_uint8_t rt_thread_stack[_CPUS_NR][IDLE_THREAD_STACK_SIZE];
 #endif
 static struct rt_thread rt_system_thread;
 ALIGN(RT_ALIGN_SIZE)
-static rt_uint8_t rt_system_stack[SYSTEM_THREAD_STACK_SIZE];
+static uint8_t rt_system_stack[SYSTEM_THREAD_STACK_SIZE];
 static struct rt_semaphore system_sem;
 #endif
 
@@ -81,7 +82,7 @@ static void (*idle_hook_list[RT_IDLE_HOOK_LIST_SIZE])(void);
  */
 rt_err_t rt_thread_idle_sethook(void (*hook)(void))
 {
-    rt_size_t i;
+    size_t i;
     rt_base_t level;
     rt_err_t ret = -RT_EFULL;
 
@@ -113,7 +114,7 @@ rt_err_t rt_thread_idle_sethook(void (*hook)(void))
  */
 rt_err_t rt_thread_idle_delhook(void (*hook)(void))
 {
-    rt_size_t i;
+    size_t i;
     rt_base_t level;
     rt_err_t ret = -RT_ENOSYS;
 
@@ -267,7 +268,7 @@ static void rt_thread_idle_entry(void *parameter)
 #endif /* RT_USING_SMP */
 
 #ifdef RT_USING_IDLE_HOOK
-        for (rt_size_t  i = 0; i < RT_IDLE_HOOK_LIST_SIZE; i++)
+        for (size_t  i = 0; i < RT_IDLE_HOOK_LIST_SIZE; i++)
         {
             void (*idle_hook)(void) = idle_hook_list[i];
             if (idle_hook != RT_NULL)

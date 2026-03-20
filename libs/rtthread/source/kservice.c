@@ -46,7 +46,7 @@ static volatile int __rt_errno;
 static rt_device_t _console_device = RT_NULL;
 #endif
 
-RT_WEAK void rt_hw_us_delay(rt_uint32_t us)
+WEAK void rt_hw_us_delay(uint32_t us)
 {
     (void) us;
     RT_DEBUG_LOG(RT_DEBUG_DEVICE, ("rt_hw_us_delay() doesn't support for this board."
@@ -180,9 +180,9 @@ RTM_EXPORT(rt_show_version);
  * @return the duplicated string pointer.
  */
 #ifdef RT_KPRINTF_USING_LONGLONG
-rt_inline int divide(long long *n, int base)
+INLINE static inline int divide(long long *n, int base)
 #else
-rt_inline int divide(long *n, int base)
+INLINE static inline int divide(long *n, int base)
 #endif /* RT_KPRINTF_USING_LONGLONG */
 {
     int res;
@@ -318,7 +318,7 @@ INIT_APP_EXPORT(log_thread_init); // 自动初始化
 int rt_kprintf(const char *fmt, ...)
 {
     va_list args;
-    rt_size_t length;
+    size_t length;
     
     /* 使用局部变量替代static，确保线程安全 */
     char local_buf[ASYNC_LOG_BUF_SIZE]; 
@@ -352,7 +352,7 @@ RTM_EXPORT(rt_kprintf);
 
 #if defined(RT_USING_HEAP) && !defined(RT_USING_USERHEAP)
 #ifdef RT_USING_HOOK
-static void (*rt_malloc_hook)(void *ptr, rt_size_t size);
+static void (*rt_malloc_hook)(void *ptr, size_t size);
 static void (*rt_free_hook)(void *ptr);
 
 /**
@@ -367,7 +367,7 @@ static void (*rt_free_hook)(void *ptr);
  *
  * @param hook the hook function.
  */
-void rt_malloc_sethook(void (*hook)(void *ptr, rt_size_t size))
+void rt_malloc_sethook(void (*hook)(void *ptr, size_t size))
 {
     rt_malloc_hook = hook;
 }
@@ -392,7 +392,7 @@ void rt_free_sethook(void (*hook)(void *ptr))
 static struct rt_mutex _lock;
 #endif
 
-rt_inline void _heap_lock_init(void)
+INLINE static inline void _heap_lock_init(void)
 {
 #if defined(RT_USING_HEAP_ISR)
 #elif defined(RT_USING_MUTEX)
@@ -400,7 +400,7 @@ rt_inline void _heap_lock_init(void)
 #endif
 }
 
-rt_inline rt_base_t _heap_lock(void)
+INLINE static inline rt_base_t _heap_lock(void)
 {
 #if defined(RT_USING_HEAP_ISR)
     return rt_hw_interrupt_disable();
@@ -415,7 +415,7 @@ rt_inline rt_base_t _heap_lock(void)
 #endif
 }
 
-rt_inline void _heap_unlock(rt_base_t level)
+INLINE static inline void _heap_unlock(rt_base_t level)
 {
 #if defined(RT_USING_HEAP_ISR)
     rt_hw_interrupt_enable(level);
@@ -430,8 +430,8 @@ rt_inline void _heap_unlock(rt_base_t level)
 
 #if defined(RT_USING_SMALL_MEM_AS_HEAP)
 static rt_smem_t system_heap;
-rt_inline void _smem_info(rt_size_t *total,
-    rt_size_t *used, rt_size_t *max_used)
+INLINE static inline void _smem_info(size_t *total,
+    size_t *used, size_t *max_used)
 {
     if (total)
         *total = system_heap->total;
@@ -452,9 +452,9 @@ rt_inline void _smem_info(rt_size_t *total,
     _smem_info(_total, _used, _max)
 #elif defined(RT_USING_MEMHEAP_AS_HEAP)
 static struct rt_memheap system_heap;
-void *_memheap_alloc(struct rt_memheap *heap, rt_size_t size);
+void *_memheap_alloc(struct rt_memheap *heap, size_t size);
 void _memheap_free(void *rmem);
-void *_memheap_realloc(struct rt_memheap *heap, void *rmem, rt_size_t newsize);
+void *_memheap_realloc(struct rt_memheap *heap, void *rmem, size_t newsize);
 #define _MEM_INIT(_name, _start, _size) \
     rt_memheap_init(&system_heap, _name, _start, _size)
 #define _MEM_MALLOC(_size)  \
@@ -467,8 +467,8 @@ void *_memheap_realloc(struct rt_memheap *heap, void *rmem, rt_size_t newsize);
     rt_memheap_info(&system_heap, _total, _used, _max)
 #elif defined(RT_USING_SLAB_AS_HEAP)
 static rt_slab_t system_heap;
-rt_inline void _slab_info(rt_size_t *total,
-    rt_size_t *used, rt_size_t *max_used)
+INLINE static inline void _slab_info(size_t *total,
+    size_t *used, size_t *max_used)
 {
     if (total)
         *total = system_heap->total;
@@ -501,7 +501,7 @@ rt_inline void _slab_info(rt_size_t *total,
  *
  * @param end_addr the end address of system page.
  */
-RT_WEAK void rt_system_heap_init(void *begin_addr, void *end_addr)
+WEAK void rt_system_heap_init(void *begin_addr, void *end_addr)
 {
     rt_ubase_t begin_align = RT_ALIGN((rt_ubase_t)begin_addr, RT_ALIGN_SIZE);
     rt_ubase_t end_align   = RT_ALIGN_DOWN((rt_ubase_t)end_addr, RT_ALIGN_SIZE);
@@ -521,7 +521,7 @@ RT_WEAK void rt_system_heap_init(void *begin_addr, void *end_addr)
  *
  * @return the pointer to allocated memory or NULL if no free memory was found.
  */
-RT_WEAK void *rt_malloc(rt_size_t size)
+WEAK void *rt_malloc(size_t size)
 {
     rt_base_t level;
     void *ptr;
@@ -547,7 +547,7 @@ RTM_EXPORT(rt_malloc);
  *
  * @return the changed memory block address.
  */
-RT_WEAK void *rt_realloc(void *rmem, rt_size_t newsize)
+WEAK void *rt_realloc(void *rmem, size_t newsize)
 {
     rt_base_t level;
     void *nptr;
@@ -575,7 +575,7 @@ RTM_EXPORT(rt_realloc);
  *
  * @return pointer to allocated memory / NULL pointer if there is an error.
  */
-RT_WEAK void *rt_calloc(rt_size_t count, rt_size_t size)
+WEAK void *rt_calloc(size_t count, size_t size)
 {
     void *p;
 
@@ -596,7 +596,7 @@ RTM_EXPORT(rt_calloc);
  *
  * @param rmem the address of memory which will be released.
  */
-RT_WEAK void rt_free(void *rmem)
+WEAK void rt_free(void *rmem)
 {
     rt_base_t level;
 
@@ -622,9 +622,9 @@ RTM_EXPORT(rt_free);
 *
 * @param max_used is a pointer to get the maximum memory used.
 */
-RT_WEAK void rt_memory_info(rt_size_t *total,
-                            rt_size_t *used,
-                            rt_size_t *max_used)
+WEAK void rt_memory_info(size_t *total,
+                            size_t *used,
+                            size_t *max_used)
 {
     rt_base_t level;
 
@@ -637,7 +637,7 @@ RT_WEAK void rt_memory_info(rt_size_t *total,
 RTM_EXPORT(rt_memory_info);
 
 #if defined(RT_USING_SLAB) && defined(RT_USING_SLAB_AS_HEAP)
-void *rt_page_alloc(rt_size_t npages)
+void *rt_page_alloc(size_t npages)
 {
     rt_base_t level;
     void *ptr;
@@ -651,7 +651,7 @@ void *rt_page_alloc(rt_size_t npages)
     return ptr;
 }
 
-void rt_page_free(void *addr, rt_size_t npages)
+void rt_page_free(void *addr, size_t npages)
 {
     rt_base_t level;
 
@@ -675,12 +675,12 @@ void rt_page_free(void *addr, rt_size_t npages)
  * @return The memory block address was returned successfully, otherwise it was
  *         returned empty RT_NULL.
  */
-RT_WEAK void *rt_malloc_align(rt_size_t size, rt_size_t align)
+WEAK void *rt_malloc_align(size_t size, size_t align)
 {
     void *ptr;
     void *align_ptr;
     int uintptr_size;
-    rt_size_t align_size;
+    size_t align_size;
 
     /* sizeof pointer */
     uintptr_size = sizeof(void*);
@@ -721,7 +721,7 @@ RTM_EXPORT(rt_malloc_align);
  *
  * @param ptr is the memory block pointer.
  */
-RT_WEAK void rt_free_align(void *ptr)
+WEAK void rt_free_align(void *ptr)
 {
     void *real_ptr;
 
@@ -735,7 +735,7 @@ RTM_EXPORT(rt_free_align);
 
 #ifndef RT_USING_CPU_FFS
 #ifdef RT_USING_TINY_FFS
-const rt_uint8_t __lowest_bit_bitmap[] =
+const uint8_t __lowest_bit_bitmap[] =
 {
     /*  0 - 7  */  0,  1,  2, 27,  3, 24, 28, 32,
     /*  8 - 15 */  4, 17, 25, 31, 29, 12, 32, 14,
@@ -756,10 +756,10 @@ const rt_uint8_t __lowest_bit_bitmap[] =
  */
 int __rt_ffs(int value)
 {
-    return __lowest_bit_bitmap[(rt_uint32_t)(value & (value - 1) ^ value) % 37];
+    return __lowest_bit_bitmap[(uint32_t)(value & (value - 1) ^ value) % 37];
 }
 #else
-const rt_uint8_t __lowest_bit_bitmap[] =
+const uint8_t __lowest_bit_bitmap[] =
 {
     /* 00 */ 0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
     /* 10 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
@@ -814,14 +814,14 @@ int __rt_ffs(int value)
 #ifdef RT_DEBUG
 /* RT_ASSERT(EX)'s hook */
 
-void (*rt_assert_hook)(const char *ex, const char *func, rt_size_t line);
+void (*rt_assert_hook)(const char *ex, const char *func, size_t line);
 
 /**
  * This function will set a hook function to RT_ASSERT(EX). It will run when the expression is false.
  *
  * @param hook is the hook function.
  */
-void rt_assert_set_hook(void (*hook)(const char *ex, const char *func, rt_size_t line))
+void rt_assert_set_hook(void (*hook)(const char *ex, const char *func, size_t line))
 {
     rt_assert_hook = hook;
 }
@@ -835,7 +835,7 @@ void rt_assert_set_hook(void (*hook)(const char *ex, const char *func, rt_size_t
  *
  * @param line is the file line number when assertion.
  */
-void rt_assert_handler(const char *ex_string, const char *func, rt_size_t line)
+void rt_assert_handler(const char *ex_string, const char *func, size_t line)
 {
     volatile char dummy = 0;
 

@@ -51,7 +51,7 @@
  */
 rt_err_t rt_device_register(rt_device_t dev,
                             const char *name,
-                            rt_uint16_t flags)
+                            uint16_t flags)
 {
     if (dev == RT_NULL)
         return -RT_ERROR;
@@ -200,7 +200,7 @@ rt_err_t rt_device_init(rt_device_t dev)
  *
  * @return the result, RT_EOK on successfully.
  */
-rt_err_t rt_device_open(rt_device_t dev, rt_uint16_t oflag)
+rt_err_t rt_device_open(rt_device_t dev, uint16_t oflag)
 {
     rt_err_t result = RT_EOK;
 
@@ -311,10 +311,10 @@ RTM_EXPORT(rt_device_close);
  *
  * @note the unit of size/pos is a block for block device.
  */
-rt_size_t rt_device_read(rt_device_t dev,
+size_t rt_device_read(rt_device_t dev,
                          rt_off_t    pos,
                          void       *buffer,
-                         rt_size_t   size)
+                         size_t   size)
 {
     /* parameter check */
     RT_ASSERT(dev != RT_NULL);
@@ -354,10 +354,10 @@ RTM_EXPORT(rt_device_read);
  *
  * @note the unit of size/pos is a block for block device.
  */
-rt_size_t rt_device_write(rt_device_t dev,
+size_t rt_device_write(rt_device_t dev,
                           rt_off_t    pos,
                           const void *buffer,
-                          rt_size_t   size)
+                          size_t   size)
 {
     /* parameter check */
     RT_ASSERT(dev != RT_NULL);
@@ -421,7 +421,7 @@ RTM_EXPORT(rt_device_control);
  */
 rt_err_t rt_device_set_rx_indicate(rt_device_t dev,
                                    rt_err_t (*rx_ind)(rt_device_t dev,
-                                   rt_size_t size))
+                                   size_t size))
 {
     /* parameter check */
     RT_ASSERT(dev != RT_NULL);

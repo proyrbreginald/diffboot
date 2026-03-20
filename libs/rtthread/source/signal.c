@@ -141,7 +141,7 @@ static void _signal_deliver(rt_thread_t tid)
                 cpu_id = tid->oncpu;
                 if ((cpu_id != RT_CPU_DETACHED) && (cpu_id != rt_hw_cpu_id()))
                 {
-                    rt_uint32_t cpu_mask;
+                    uint32_t cpu_mask;
 
                     cpu_mask = RT_CPU_MASK ^ (1 << cpu_id);
                     rt_hw_ipi_send(RT_SCHEDULE_IPI, cpu_mask);
@@ -318,7 +318,7 @@ void rt_signal_unmask(int signo)
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the signal wait failed.
  */
-int rt_signal_wait(const rt_sigset_t *set, rt_siginfo_t *si, rt_int32_t timeout)
+int rt_signal_wait(const rt_sigset_t *set, rt_siginfo_t *si, int32_t timeout)
 {
     int ret = RT_EOK;
     rt_base_t level;

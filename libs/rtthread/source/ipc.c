@@ -8,7 +8,7 @@
  * 2006-03-14     Bernard      the first version
  * 2006-04-25     Bernard      implement semaphore
  * 2006-05-03     Bernard      add RT_IPC_DEBUG
- *                             modify the type of IPC waiting time to rt_int32_t
+ *                             modify the type of IPC waiting time to int32_t
  * 2006-05-10     Bernard      fix the semaphore take bug and add IPC object
  * 2006-05-12     Bernard      implement mailbox and message queue
  * 2006-05-20     Bernard      implement mutex
@@ -81,7 +81,7 @@ extern void (*rt_object_put_hook)(struct rt_object *object);
  *
  * @warning  This function can be called from all IPC initialization and creation.
  */
-rt_inline rt_err_t _ipc_object_init(struct rt_ipc_object *ipc)
+INLINE static inline rt_err_t _ipc_object_init(struct rt_ipc_object *ipc)
 {
     /* initialize ipc object */
     rt_list_init(&(ipc->suspend_thread));
@@ -119,9 +119,9 @@ rt_inline rt_err_t _ipc_object_init(struct rt_ipc_object *ipc)
  *           rt_sem_take(),  rt_mutex_take(),  rt_event_recv(),   rt_mb_send_wait(),
  *           rt_mb_recv(),   rt_mq_recv(),     rt_mq_send_wait()
  */
-rt_inline rt_err_t _ipc_list_suspend(rt_list_t        *list,
+INLINE static inline rt_err_t _ipc_list_suspend(rt_list_t        *list,
                                      struct rt_thread *thread,
-                                     rt_uint8_t        flag)
+                                     uint8_t        flag)
 {
     /* suspend thread */
     rt_thread_suspend(thread);
@@ -188,7 +188,7 @@ rt_inline rt_err_t _ipc_list_suspend(rt_list_t        *list,
  *           rt_sem_release(),    rt_mutex_release(),    rt_mb_send_wait(),    rt_mq_send_wait(),
  *           rt_mb_urgent(),      rt_mb_recv(),          rt_mq_urgent(),       rt_mq_recv(),
  */
-rt_inline rt_err_t _ipc_list_resume(rt_list_t *list)
+INLINE static inline rt_err_t _ipc_list_resume(rt_list_t *list)
 {
     struct rt_thread *thread;
 
@@ -217,7 +217,7 @@ rt_inline rt_err_t _ipc_list_resume(rt_list_t *list)
  *           When the return value is any other values, it means this operation failed.
  *
  */
-rt_inline rt_err_t _ipc_list_resume_all(rt_list_t *list)
+INLINE static inline rt_err_t _ipc_list_resume_all(rt_list_t *list)
 {
     struct rt_thread *thread;
     rt_base_t level;
@@ -295,8 +295,8 @@ rt_inline rt_err_t _ipc_list_resume_all(rt_list_t *list)
  */
 rt_err_t rt_sem_init(rt_sem_t    sem,
                      const char *name,
-                     rt_uint32_t value,
-                     rt_uint8_t  flag)
+                     uint32_t value,
+                     uint8_t  flag)
 {
     RT_ASSERT(sem != RT_NULL);
     RT_ASSERT(value < 0x10000U);
@@ -309,7 +309,7 @@ rt_err_t rt_sem_init(rt_sem_t    sem,
     _ipc_object_init(&(sem->parent));
 
     /* set initial value */
-    sem->value = (rt_uint16_t)value;
+    sem->value = (uint16_t)value;
 
     /* set parent */
     sem->parent.parent.flag = flag;
@@ -387,7 +387,7 @@ RTM_EXPORT(rt_sem_detach);
  *
  * @warning  This function can NOT be called in interrupt context. You can use macor RT_DEBUG_NOT_IN_INTERRUPT to check it.
  */
-rt_sem_t rt_sem_create(const char *name, rt_uint32_t value, rt_uint8_t flag)
+rt_sem_t rt_sem_create(const char *name, uint32_t value, uint8_t flag)
 {
     rt_sem_t sem;
 
@@ -481,7 +481,7 @@ RTM_EXPORT(rt_sem_delete);
  *
  * @warning  This function can ONLY be called in the thread context. It MUST NOT BE called in interrupt context.
  */
-rt_err_t rt_sem_take(rt_sem_t sem, rt_int32_t timeout)
+rt_err_t rt_sem_take(rt_sem_t sem, int32_t timeout)
 {
     rt_base_t level;
     struct rt_thread *thread;
@@ -690,7 +690,7 @@ rt_err_t rt_sem_control(rt_sem_t sem, int cmd, void *arg)
         _ipc_list_resume_all(&sem->parent.suspend_thread);
 
         /* set new value */
-        sem->value = (rt_uint16_t)value;
+        sem->value = (uint16_t)value;
 
         /* enable interrupt */
         rt_hw_interrupt_enable(level);
@@ -738,7 +738,7 @@ RTM_EXPORT(rt_sem_control);
  *
  * @warning  This function can ONLY be called from threads.
  */
-rt_err_t rt_mutex_init(rt_mutex_t mutex, const char *name, rt_uint8_t flag)
+rt_err_t rt_mutex_init(rt_mutex_t mutex, const char *name, uint8_t flag)
 {
     /* flag parameter has been obsoleted */
     RT_UNUSED(flag);
@@ -819,7 +819,7 @@ RTM_EXPORT(rt_mutex_detach);
  *
  * @warning  This function can ONLY be called from threads.
  */
-rt_mutex_t rt_mutex_create(const char *name, rt_uint8_t flag)
+rt_mutex_t rt_mutex_create(const char *name, uint8_t flag)
 {
     struct rt_mutex *mutex;
 
@@ -911,7 +911,7 @@ RTM_EXPORT(rt_mutex_delete);
  *
  * @warning  This function can ONLY be called in the thread context. It MUST NOT BE called in interrupt context.
  */
-rt_err_t rt_mutex_take(rt_mutex_t mutex, rt_int32_t timeout)
+rt_err_t rt_mutex_take(rt_mutex_t mutex, int32_t timeout)
 {
     rt_base_t level;
     struct rt_thread *thread;
@@ -1267,7 +1267,7 @@ RTM_EXPORT(rt_mutex_control);
  *
  * @warning  This function can ONLY be called from threads.
  */
-rt_err_t rt_event_init(rt_event_t event, const char *name, rt_uint8_t flag)
+rt_err_t rt_event_init(rt_event_t event, const char *name, uint8_t flag)
 {
     /* parameter check */
     RT_ASSERT(event != RT_NULL);
@@ -1354,7 +1354,7 @@ RTM_EXPORT(rt_event_detach);
  *
  * @warning  This function can ONLY be called from threads.
  */
-rt_event_t rt_event_create(const char *name, rt_uint8_t flag)
+rt_event_t rt_event_create(const char *name, uint8_t flag)
 {
     rt_event_t event;
 
@@ -1437,7 +1437,7 @@ RTM_EXPORT(rt_event_delete);
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the event detach failed.
  */
-rt_err_t rt_event_send(rt_event_t event, rt_uint32_t set)
+rt_err_t rt_event_send(rt_event_t event, uint32_t set)
 {
     struct rt_list_node *n;
     struct rt_thread *thread;
@@ -1563,10 +1563,10 @@ RTM_EXPORT(rt_event_send);
  *           If the return value is any other values, it means that the semaphore release failed.
  */
 rt_err_t rt_event_recv(rt_event_t   event,
-                       rt_uint32_t  set,
-                       rt_uint8_t   option,
-                       rt_int32_t   timeout,
-                       rt_uint32_t *recved)
+                       uint32_t  set,
+                       uint8_t   option,
+                       int32_t   timeout,
+                       uint32_t *recved)
 {
     struct rt_thread *thread;
     rt_base_t level;
@@ -1780,8 +1780,8 @@ RTM_EXPORT(rt_event_control);
 rt_err_t rt_mb_init(rt_mailbox_t mb,
                     const char  *name,
                     void        *msgpool,
-                    rt_size_t    size,
-                    rt_uint8_t   flag)
+                    size_t    size,
+                    uint8_t   flag)
 {
     RT_ASSERT(mb != RT_NULL);
     RT_ASSERT((flag == RT_IPC_FLAG_FIFO) || (flag == RT_IPC_FLAG_PRIO));
@@ -1879,7 +1879,7 @@ RTM_EXPORT(rt_mb_detach);
  *
  * @warning  This function can ONLY be called from threads.
  */
-rt_mailbox_t rt_mb_create(const char *name, rt_size_t size, rt_uint8_t flag)
+rt_mailbox_t rt_mb_create(const char *name, size_t size, uint8_t flag)
 {
     rt_mailbox_t mb;
 
@@ -1990,11 +1990,11 @@ RTM_EXPORT(rt_mb_delete);
  */
 rt_err_t rt_mb_send_wait(rt_mailbox_t mb,
                          rt_ubase_t   value,
-                         rt_int32_t   timeout)
+                         int32_t   timeout)
 {
     struct rt_thread *thread;
     rt_base_t level;
-    rt_uint32_t tick_delta;
+    uint32_t tick_delta;
 
     /* parameter check */
     RT_ASSERT(mb != RT_NULL);
@@ -2242,11 +2242,11 @@ RTM_EXPORT(rt_mb_urgent);
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the mailbox release failed.
  */
-rt_err_t rt_mb_recv(rt_mailbox_t mb, rt_ubase_t *value, rt_int32_t timeout)
+rt_err_t rt_mb_recv(rt_mailbox_t mb, rt_ubase_t *value, int32_t timeout)
 {
     struct rt_thread *thread;
     rt_base_t level;
-    rt_uint32_t tick_delta;
+    uint32_t tick_delta;
 
     /* parameter check */
     RT_ASSERT(mb != RT_NULL);
@@ -2486,9 +2486,9 @@ struct rt_mq_message
 rt_err_t rt_mq_init(rt_mq_t     mq,
                     const char *name,
                     void       *msgpool,
-                    rt_size_t   msg_size,
-                    rt_size_t   pool_size,
-                    rt_uint8_t  flag)
+                    size_t   msg_size,
+                    size_t   pool_size,
+                    uint8_t  flag)
 {
     struct rt_mq_message *head;
     rt_base_t temp;
@@ -2521,7 +2521,7 @@ rt_err_t rt_mq_init(rt_mq_t     mq,
     mq->msg_queue_free = RT_NULL;
     for (temp = 0; temp < mq->max_msgs; temp ++)
     {
-        head = (struct rt_mq_message *)((rt_uint8_t *)mq->msg_pool +
+        head = (struct rt_mq_message *)((uint8_t *)mq->msg_pool +
                                         temp * (mq->msg_size + sizeof(struct rt_mq_message)));
         head->next = (struct rt_mq_message *)mq->msg_queue_free;
         mq->msg_queue_free = head;
@@ -2609,9 +2609,9 @@ RTM_EXPORT(rt_mq_detach);
  * @warning  This function can NOT be called in interrupt context. You can use macor RT_DEBUG_NOT_IN_INTERRUPT to check it.
  */
 rt_mq_t rt_mq_create(const char *name,
-                     rt_size_t   msg_size,
-                     rt_size_t   max_msgs,
-                     rt_uint8_t  flag)
+                     size_t   msg_size,
+                     size_t   max_msgs,
+                     uint8_t  flag)
 {
     struct rt_messagequeue *mq;
     struct rt_mq_message *head;
@@ -2655,7 +2655,7 @@ rt_mq_t rt_mq_create(const char *name,
     mq->msg_queue_free = RT_NULL;
     for (temp = 0; temp < mq->max_msgs; temp ++)
     {
-        head = (struct rt_mq_message *)((rt_uint8_t *)mq->msg_pool +
+        head = (struct rt_mq_message *)((uint8_t *)mq->msg_pool +
                                         temp * (mq->msg_size + sizeof(struct rt_mq_message)));
         head->next = (struct rt_mq_message *)mq->msg_queue_free;
         mq->msg_queue_free = head;
@@ -2748,12 +2748,12 @@ RTM_EXPORT(rt_mq_delete);
  */
 rt_err_t rt_mq_send_wait(rt_mq_t     mq,
                          const void *buffer,
-                         rt_size_t   size,
-                         rt_int32_t  timeout)
+                         size_t   size,
+                         int32_t  timeout)
 {
     rt_base_t level;
     struct rt_mq_message *msg;
-    rt_uint32_t tick_delta;
+    uint32_t tick_delta;
     struct rt_thread *thread;
 
     /* parameter check */
@@ -2932,7 +2932,7 @@ RTM_EXPORT(rt_mq_send_wait)
  *
  * @warning  This function can be called in interrupt context and thread context.
  */
-rt_err_t rt_mq_send(rt_mq_t mq, const void *buffer, rt_size_t size)
+rt_err_t rt_mq_send(rt_mq_t mq, const void *buffer, size_t size)
 {
     return rt_mq_send_wait(mq, buffer, size, 0);
 }
@@ -2957,7 +2957,7 @@ RTM_EXPORT(rt_mq_send);
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the mailbox detach failed.
  */
-rt_err_t rt_mq_urgent(rt_mq_t mq, const void *buffer, rt_size_t size)
+rt_err_t rt_mq_urgent(rt_mq_t mq, const void *buffer, size_t size)
 {
     rt_base_t level;
     struct rt_mq_message *msg;
@@ -3067,13 +3067,13 @@ RTM_EXPORT(rt_mq_urgent);
  */
 rt_err_t rt_mq_recv(rt_mq_t    mq,
                     void      *buffer,
-                    rt_size_t  size,
-                    rt_int32_t timeout)
+                    size_t  size,
+                    int32_t timeout)
 {
     struct rt_thread *thread;
     rt_base_t level;
     struct rt_mq_message *msg;
-    rt_uint32_t tick_delta;
+    uint32_t tick_delta;
 
     /* parameter check */
     RT_ASSERT(mq != RT_NULL);

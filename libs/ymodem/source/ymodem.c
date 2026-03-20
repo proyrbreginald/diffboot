@@ -92,13 +92,13 @@ static void ymodem_dma_process(void)
  * @param dest 数据去向。
  * @param len 读取指定长度数据。
  * @param timeout_ms 超时时间。
- * @return rt_size_t
+ * @return size_t
  */
-static rt_size_t rb_read_wait(uint8_t *dest, rt_size_t len,
-                              rt_uint32_t timeout_ms)
+static size_t rb_read_wait(uint8_t *dest, size_t len,
+                              uint32_t timeout_ms)
 {
     rt_tick_t start = rt_tick_get();
-    rt_size_t total = 0;
+    size_t total = 0;
     while (total < len)
     {
         total += rt_ringbuffer_get(&ymodem_rb, dest + total, len - total);

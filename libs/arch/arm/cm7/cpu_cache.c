@@ -33,9 +33,9 @@ rt_base_t rt_hw_cpu_icache_status(void)
 
 void rt_hw_cpu_icache_ops(int ops, void* addr, int size)
 {
-    rt_uint32_t address = (rt_uint32_t)addr & (rt_uint32_t) ~(L1CACHE_LINESIZE_BYTE - 1);
-    rt_int32_t size_byte = size + address - (rt_uint32_t)addr;
-    rt_uint32_t linesize = 32U;
+    uint32_t address = (uint32_t)addr & (uint32_t) ~(L1CACHE_LINESIZE_BYTE - 1);
+    int32_t size_byte = size + address - (uint32_t)addr;
+    uint32_t linesize = 32U;
     if (ops & RT_HW_CACHE_INVALIDATE)
     {
         __DSB();
@@ -67,9 +67,9 @@ rt_base_t rt_hw_cpu_dcache_status(void)
 
 void rt_hw_cpu_dcache_ops(int ops, void* addr, int size)
 {
-    rt_uint32_t startAddr = (rt_uint32_t)addr & (rt_uint32_t)~(L1CACHE_LINESIZE_BYTE - 1);
-    rt_uint32_t size_byte = size + (rt_uint32_t)addr - startAddr;
-    rt_uint32_t clean_invalid = RT_HW_CACHE_FLUSH | RT_HW_CACHE_INVALIDATE;
+    uint32_t startAddr = (uint32_t)addr & (uint32_t)~(L1CACHE_LINESIZE_BYTE - 1);
+    uint32_t size_byte = size + (uint32_t)addr - startAddr;
+    uint32_t clean_invalid = RT_HW_CACHE_FLUSH | RT_HW_CACHE_INVALIDATE;
 
     if ((ops & clean_invalid) == clean_invalid)
     {

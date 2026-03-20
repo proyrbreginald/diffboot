@@ -41,12 +41,12 @@ static rt_list_t _timer_list[RT_TIMER_SKIP_LIST_LEVEL];
 #endif /* RT_TIMER_THREAD_PRIO */
 
 /* soft timer status */
-static rt_uint8_t _soft_timer_status = RT_SOFT_TIMER_IDLE;
+static uint8_t _soft_timer_status = RT_SOFT_TIMER_IDLE;
 /* soft timer list */
 static rt_list_t _soft_timer_list[RT_TIMER_SKIP_LIST_LEVEL];
 static struct rt_thread _timer_thread;
 ALIGN(RT_ALIGN_SIZE)
-static rt_uint8_t _timer_thread_stack[RT_TIMER_THREAD_STACK_SIZE];
+static uint8_t _timer_thread_stack[RT_TIMER_THREAD_STACK_SIZE];
 #endif /* RT_USING_TIMER_SOFT */
 
 #ifndef __on_rt_object_take_hook
@@ -121,7 +121,7 @@ static void _timer_init(rt_timer_t timer,
                         void (*timeout)(void *parameter),
                         void      *parameter,
                         rt_tick_t  time,
-                        rt_uint8_t flag)
+                        uint8_t flag)
 {
     int i;
 
@@ -185,7 +185,7 @@ static rt_err_t _timer_list_next_timeout(rt_list_t timer_list[], rt_tick_t *time
  *
  * @param timer the point of the timer
  */
-rt_inline void _timer_remove(rt_timer_t timer)
+INLINE static inline void _timer_remove(rt_timer_t timer)
 {
     int i;
 
@@ -266,7 +266,7 @@ void rt_timer_init(rt_timer_t  timer,
                    void (*timeout)(void *parameter),
                    void       *parameter,
                    rt_tick_t   time,
-                   rt_uint8_t  flag)
+                   uint8_t  flag)
 {
     /* parameter check */
     RT_ASSERT(timer != RT_NULL);
@@ -343,7 +343,7 @@ rt_timer_t rt_timer_create(const char *name,
                            void (*timeout)(void *parameter),
                            void       *parameter,
                            rt_tick_t   time,
-                           rt_uint8_t  flag)
+                           uint8_t  flag)
 {
     struct rt_timer *timer;
 
@@ -598,12 +598,12 @@ rt_err_t rt_timer_control(rt_timer_t timer, int cmd, void *arg)
         if(timer->parent.flag & RT_TIMER_FLAG_ACTIVATED)
         {
             /*timer is start and run*/
-            *(rt_uint32_t *)arg = RT_TIMER_FLAG_ACTIVATED;
+            *(uint32_t *)arg = RT_TIMER_FLAG_ACTIVATED;
         }
         else
         {
             /*timer is stop*/
-            *(rt_uint32_t *)arg = RT_TIMER_FLAG_DEACTIVATED;
+            *(uint32_t *)arg = RT_TIMER_FLAG_DEACTIVATED;
         }
         break;
 
@@ -832,7 +832,7 @@ static void _timer_thread_entry(void *parameter)
  */
 void rt_system_timer_init(void)
 {
-    rt_size_t i;
+    size_t i;
 
     for (i = 0; i < sizeof(_timer_list) / sizeof(_timer_list[0]); i++)
     {

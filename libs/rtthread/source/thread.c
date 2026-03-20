@@ -159,9 +159,9 @@ static rt_err_t _thread_init(struct rt_thread *thread,
                              void (*entry)(void *parameter),
                              void             *parameter,
                              void             *stack_start,
-                             rt_uint32_t       stack_size,
-                             rt_uint8_t        priority,
-                             rt_uint32_t       tick)
+                             uint32_t       stack_size,
+                             uint8_t        priority,
+                             uint32_t       tick)
 {
     /* init thread list */
     rt_list_init(&(thread->tlist));
@@ -181,7 +181,7 @@ static rt_err_t _thread_init(struct rt_thread *thread,
                                           (void *)_thread_exit);
 #else
     thread->sp = (void *)rt_hw_stack_init(thread->entry, thread->parameter,
-                                          (rt_uint8_t *)((char *)thread->stack_addr + thread->stack_size - sizeof(rt_ubase_t)),
+                                          (uint8_t *)((char *)thread->stack_addr + thread->stack_size - sizeof(rt_ubase_t)),
                                           (void *)_thread_exit);
 #endif /* ARCH_CPU_STACK_GROWS_UPWARD */
 
@@ -299,9 +299,9 @@ rt_err_t rt_thread_init(struct rt_thread *thread,
                         void (*entry)(void *parameter),
                         void             *parameter,
                         void             *stack_start,
-                        rt_uint32_t       stack_size,
-                        rt_uint8_t        priority,
-                        rt_uint32_t       tick)
+                        uint32_t       stack_size,
+                        uint8_t        priority,
+                        uint32_t       tick)
 {
     /* parameter check */
     RT_ASSERT(thread != RT_NULL);
@@ -453,9 +453,9 @@ RTM_EXPORT(rt_thread_detach);
 rt_thread_t rt_thread_create(const char *name,
                              void (*entry)(void *parameter),
                              void       *parameter,
-                             rt_uint32_t stack_size,
-                             rt_uint8_t  priority,
-                             rt_uint32_t tick)
+                             uint32_t stack_size,
+                             uint8_t  priority,
+                             uint32_t tick)
 {
     struct rt_thread *thread;
     void *stack_start;
@@ -689,7 +689,7 @@ RTM_EXPORT(rt_thread_delay_until);
  * @return  Return the operation status. If the return value is RT_EOK, the function is successfully executed.
  *          If the return value is any other values, it means this operation failed.
  */
-rt_err_t rt_thread_mdelay(rt_int32_t ms)
+rt_err_t rt_thread_mdelay(int32_t ms)
 {
     rt_tick_t tick;
 
@@ -741,7 +741,7 @@ rt_err_t rt_thread_control(rt_thread_t thread, int cmd, void *arg)
                 rt_schedule_remove_thread(thread);
 
                 /* change thread priority */
-                thread->current_priority = *(rt_uint8_t *)arg;
+                thread->current_priority = *(uint8_t *)arg;
 
                 /* recalculate priority attribute */
     #if RT_THREAD_PRIORITY_MAX > 32
@@ -757,7 +757,7 @@ rt_err_t rt_thread_control(rt_thread_t thread, int cmd, void *arg)
             }
             else
             {
-                thread->current_priority = *(rt_uint8_t *)arg;
+                thread->current_priority = *(uint8_t *)arg;
 
                 /* recalculate priority attribute */
     #if RT_THREAD_PRIORITY_MAX > 32
@@ -800,7 +800,7 @@ rt_err_t rt_thread_control(rt_thread_t thread, int cmd, void *arg)
     #ifdef RT_USING_SMP
         case RT_THREAD_CTRL_BIND_CPU:
         {
-            rt_uint8_t cpu;
+            uint8_t cpu;
 
             if ((thread->stat & RT_THREAD_STAT_MASK) != RT_THREAD_INIT)
             {
@@ -808,7 +808,7 @@ rt_err_t rt_thread_control(rt_thread_t thread, int cmd, void *arg)
                 return RT_ERROR;
             }
 
-            cpu = (rt_uint8_t)(rt_size_t)arg;
+            cpu = (uint8_t)(size_t)arg;
             thread->bind_cpu = cpu > RT_CPUS_NR? RT_CPUS_NR : cpu;
             break;
         }

@@ -67,7 +67,7 @@ void rt_interrupt_leave_sethook(void (*hook)(void))
 #ifdef RT_USING_SMP
 #define rt_interrupt_nest rt_cpu_self()->irq_nest
 #else
-volatile rt_uint8_t rt_interrupt_nest = 0;
+volatile uint8_t rt_interrupt_nest = 0;
 #endif /* RT_USING_SMP */
 
 
@@ -88,7 +88,7 @@ void rt_interrupt_enter(void)
     rt_hw_interrupt_enable(level);
 
     RT_DEBUG_LOG(RT_DEBUG_IRQ, ("irq has come..., irq current nest:%d\n",
-                                (rt_int32_t)rt_interrupt_nest));
+                                (int32_t)rt_interrupt_nest));
 }
 RTM_EXPORT(rt_interrupt_enter);
 
@@ -105,7 +105,7 @@ void rt_interrupt_leave(void)
     rt_base_t level;
 
     RT_DEBUG_LOG(RT_DEBUG_IRQ, ("irq is going to leave, irq current nest:%d\n",
-                                (rt_int32_t)rt_interrupt_nest));
+                                (int32_t)rt_interrupt_nest));
 
     level = rt_hw_interrupt_disable();
     RT_OBJECT_HOOK_CALL(rt_interrupt_leave_hook,());
@@ -123,9 +123,9 @@ RTM_EXPORT(rt_interrupt_leave);
  *
  * @return the number of nested interrupts.
  */
-RT_WEAK rt_uint8_t rt_interrupt_get_nest(void)
+WEAK uint8_t rt_interrupt_get_nest(void)
 {
-    rt_uint8_t ret;
+    uint8_t ret;
     rt_base_t level;
 
     level = rt_hw_interrupt_disable();

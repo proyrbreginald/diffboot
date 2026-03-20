@@ -11,10 +11,8 @@
 #ifndef _MCU_H_
 #define _MCU_H_
 
-#include <stdint.h>
 #include "macro.h"                                      //!< 导入mcu相关宏定义
 #include DIFFBOOT_MCU_INCLUDE_LINK_SYMBOL(DIFFBOOT_MCU) //!< 导入链接脚本符号
 #include "attribute.h" //!< 导入函数与变量属性分配宏定义
-#include "reset.h"     //!< 导入复位处理函数
 
 #endif

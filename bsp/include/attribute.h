@@ -12,40 +12,6 @@
 #define _ATTRIBUTE_H_
 
 /**
- * @brief 不添加任何属性。
- */
-#define NONE
-
-/**
- * @brief 将函数放在itcm运行，提高代码执行速度或者避免与flash操作冲突。
- */
-#define ITCM __attribute__((section(".itcm")))
-
-/**
- * @brief 将数据放在boot与app共享的ram，
- * boot与app之间的切换不会影响这些数据。
- */
-#define SHARE __attribute__((section(".share")))
-
-/**
- * @brief 将有值数据放在外设可访问的ram，
- * boot与app之间的切换会覆盖这些数据。
- */
-#define SHARE_INIT __attribute__((section(".share_init")))
-
-/**
- * @brief 将无值数据放在外设可访问的ram，
- * boot与app之间的切换可能会覆盖这些数据。
- */
-#define SHARE_UNINIT __attribute__((section(".share_uninit")))
-
-/**
- * @brief 将数据放在备份ram，电池供电时始终保持数据存在，
- * 除非程序的显示修改。
- */
-#define BACKUP __attribute__((section(".backup")))
-
-/**
  * @brief 指定函数为弱符号，实现可被覆盖。
  */
 #define WEAK __attribute__((weak))
@@ -69,5 +35,49 @@
  * @brief 消除结构体成员之间的填充，实现紧凑存储。
  */
 #define PACKED __attribute__((packed))
+
+/**
+ * @brief 起始地址进行n字节对齐。
+ */
+#define ALIGN(n) __attribute__((aligned(n)))
+
+/**
+ * @brief 添加段分配属性。
+ */
+#define SECTION(name) __attribute__((section(name)))
+
+/**
+ * @brief 不添加任何属性。
+ */
+#define NONE
+
+/**
+ * @brief 将函数放在itcm运行，提高代码执行速度或者避免与flash操作冲突。
+ */
+#define ITCM SECTION(".itcm")
+
+/**
+ * @brief 将数据放在boot与app共享的ram，
+ * boot与app之间的切换不会影响这些数据。
+ */
+#define SHARE SECTION(".share")
+
+/**
+ * @brief 将有值数据放在外设可访问的ram，
+ * boot与app之间的切换会覆盖这些数据。
+ */
+#define SHARE_INIT SECTION(".share_init")
+
+/**
+ * @brief 将无值数据放在外设可访问的ram，
+ * boot与app之间的切换可能会覆盖这些数据。
+ */
+#define SHARE_UNINIT SECTION(".share_uninit")
+
+/**
+ * @brief 将数据放在备份ram，电池供电时始终保持数据存在，
+ * 除非程序的显示修改。
+ */
+#define BACKUP SECTION(".backup")
 
 #endif

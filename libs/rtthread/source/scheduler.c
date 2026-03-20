@@ -34,17 +34,17 @@
 #include <rthw.h>
 
 rt_list_t rt_thread_priority_table[RT_THREAD_PRIORITY_MAX];
-rt_uint32_t rt_thread_ready_priority_group;
+uint32_t rt_thread_ready_priority_group;
 #if RT_THREAD_PRIORITY_MAX > 32
 /* Maximum priority level, 256 */
-rt_uint8_t rt_thread_ready_table[32];
+uint8_t rt_thread_ready_table[32];
 #endif /* RT_THREAD_PRIORITY_MAX > 32 */
 
 #ifndef RT_USING_SMP
-extern volatile rt_uint8_t rt_interrupt_nest;
-static rt_int16_t rt_scheduler_lock_nest;
+extern volatile uint8_t rt_interrupt_nest;
+static int16_t rt_scheduler_lock_nest;
 struct rt_thread *rt_current_thread = RT_NULL;
-rt_uint8_t rt_current_priority;
+uint8_t rt_current_priority;
 #endif /* RT_USING_SMP */
 
 #ifndef __on_rt_scheduler_hook
@@ -95,9 +95,9 @@ static void _scheduler_stack_check(struct rt_thread *thread)
     RT_ASSERT(thread != RT_NULL);
 
 #ifdef ARCH_CPU_STACK_GROWS_UPWARD
-    if (*((rt_uint8_t *)((rt_ubase_t)thread->stack_addr + thread->stack_size - 1)) != '#' ||
+    if (*((uint8_t *)((rt_ubase_t)thread->stack_addr + thread->stack_size - 1)) != '#' ||
 #else
-    if (*((rt_uint8_t *)thread->stack_addr) != '#' ||
+    if (*((uint8_t *)thread->stack_addr) != '#' ||
 #endif /* ARCH_CPU_STACK_GROWS_UPWARD */
         (rt_ubase_t)thread->sp <= (rt_ubase_t)thread->stack_addr ||
         (rt_ubase_t)thread->sp >
@@ -361,7 +361,7 @@ void rt_schedule(void)
             if (to_thread != current_thread)
             {
                 /* if the destination thread is not the same as current thread */
-                pcpu->current_priority = (rt_uint8_t)highest_ready_priority;
+                pcpu->current_priority = (uint8_t)highest_ready_priority;
 
                 RT_OBJECT_HOOK_CALL(rt_scheduler_hook, (current_thread, to_thread));
 
@@ -461,7 +461,7 @@ void rt_schedule(void)
             if (to_thread != rt_current_thread)
             {
                 /* if the destination thread is not the same as current thread */
-                rt_current_priority = (rt_uint8_t)highest_ready_priority;
+                rt_current_priority = (uint8_t)highest_ready_priority;
                 from_thread         = rt_current_thread;
                 rt_current_thread   = to_thread;
 
@@ -615,7 +615,7 @@ void rt_scheduler_do_irq_switch(void *context)
             {
                 /* if the destination thread is not the same as current thread */
 
-                pcpu->current_priority = (rt_uint8_t)highest_ready_priority;
+                pcpu->current_priority = (uint8_t)highest_ready_priority;
 
                 RT_OBJECT_HOOK_CALL(rt_scheduler_hook, (current_thread, to_thread));
 
@@ -654,7 +654,7 @@ void rt_schedule_insert_thread(struct rt_thread *thread)
 {
     int cpu_id;
     int bind_cpu;
-    rt_uint32_t cpu_mask;
+    uint32_t cpu_mask;
     rt_base_t level;
 
     RT_ASSERT(thread != RT_NULL);
@@ -900,7 +900,7 @@ void rt_enter_critical(void)
      */
 
     {
-        rt_uint16_t lock_nest = current_thread->cpus_lock_nest;
+        uint16_t lock_nest = current_thread->cpus_lock_nest;
         current_thread->cpus_lock_nest++;
         if (lock_nest == 0)
         {
@@ -1016,7 +1016,7 @@ RTM_EXPORT(rt_exit_critical);
  *
  * @return the level of the scheduler lock. 0 means unlocked.
  */
-rt_uint16_t rt_critical_level(void)
+uint16_t rt_critical_level(void)
 {
 #ifdef RT_USING_SMP
     struct rt_thread *current_thread = rt_cpu_self()->current_thread;

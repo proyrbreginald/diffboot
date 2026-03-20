@@ -136,7 +136,7 @@ void rt_tick_increase(void)
  *
  * @return   Return the calculated tick.
  */
-rt_tick_t rt_tick_from_millisecond(rt_int32_t ms)
+rt_tick_t rt_tick_from_millisecond(int32_t ms)
 {
     rt_tick_t tick;
 
@@ -164,7 +164,7 @@ RTM_EXPORT(rt_tick_from_millisecond);
  *
  * @return   Return passed millisecond from boot.
  */
-RT_WEAK rt_tick_t rt_tick_get_millisecond(void)
+WEAK rt_tick_t rt_tick_get_millisecond(void)
 {
     return rt_tick_get() * (1000u / RT_TICK_PER_SECOND);
 }

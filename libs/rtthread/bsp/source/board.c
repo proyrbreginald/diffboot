@@ -8,7 +8,7 @@
 #define DBG_LVL DBG_VERBOSE
 #include <rtdbg.h>
 
-static rt_uint32_t ticks_per_us;
+static uint32_t ticks_per_us;
 
 // 累加睡眠的Tick数(虽然LPTIM是16位，但累加变量我们要用64位防止总数溢出)
 static volatile uint64_t total_sleep_ticks = 0;
@@ -116,10 +116,10 @@ ITCM void SysTick_Handler(void)
  *
  * @param us 延时长度(微秒)。
  */
-ITCM void rt_hw_us_delay(rt_uint32_t us)
+ITCM void rt_hw_us_delay(uint32_t us)
 {
-    rt_uint32_t ticks = us * ticks_per_us;
-    rt_uint32_t start = DWT->CYCCNT;
+    uint32_t ticks = us * ticks_per_us;
+    uint32_t start = DWT->CYCCNT;
 
     // 循环等待直到达到目标周期数
     // 无符号减法会自动处理0xFFFFFFFF到0的翻转

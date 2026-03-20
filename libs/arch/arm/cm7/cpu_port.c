@@ -29,133 +29,133 @@
 #endif
 
 /* exception and interrupt handler table */
-rt_uint32_t rt_interrupt_from_thread;
-rt_uint32_t rt_interrupt_to_thread;
-rt_uint32_t rt_thread_switch_interrupt_flag;
+uint32_t rt_interrupt_from_thread;
+uint32_t rt_interrupt_to_thread;
+uint32_t rt_thread_switch_interrupt_flag;
 /* exception hook */
 static rt_err_t (*rt_exception_hook)(void *context) = RT_NULL;
 
 struct exception_stack_frame
 {
-    rt_uint32_t r0;
-    rt_uint32_t r1;
-    rt_uint32_t r2;
-    rt_uint32_t r3;
-    rt_uint32_t r12;
-    rt_uint32_t lr;
-    rt_uint32_t pc;
-    rt_uint32_t psr;
+    uint32_t r0;
+    uint32_t r1;
+    uint32_t r2;
+    uint32_t r3;
+    uint32_t r12;
+    uint32_t lr;
+    uint32_t pc;
+    uint32_t psr;
 };
 
 struct stack_frame
 {
 #if USE_FPU
-    rt_uint32_t flag;
+    uint32_t flag;
 #endif /* USE_FPU */
 
     /* r4 ~ r11 register */
-    rt_uint32_t r4;
-    rt_uint32_t r5;
-    rt_uint32_t r6;
-    rt_uint32_t r7;
-    rt_uint32_t r8;
-    rt_uint32_t r9;
-    rt_uint32_t r10;
-    rt_uint32_t r11;
+    uint32_t r4;
+    uint32_t r5;
+    uint32_t r6;
+    uint32_t r7;
+    uint32_t r8;
+    uint32_t r9;
+    uint32_t r10;
+    uint32_t r11;
 
     struct exception_stack_frame exception_stack_frame;
 };
 
 struct exception_stack_frame_fpu
 {
-    rt_uint32_t r0;
-    rt_uint32_t r1;
-    rt_uint32_t r2;
-    rt_uint32_t r3;
-    rt_uint32_t r12;
-    rt_uint32_t lr;
-    rt_uint32_t pc;
-    rt_uint32_t psr;
+    uint32_t r0;
+    uint32_t r1;
+    uint32_t r2;
+    uint32_t r3;
+    uint32_t r12;
+    uint32_t lr;
+    uint32_t pc;
+    uint32_t psr;
 
 #if USE_FPU
     /* FPU register */
-    rt_uint32_t S0;
-    rt_uint32_t S1;
-    rt_uint32_t S2;
-    rt_uint32_t S3;
-    rt_uint32_t S4;
-    rt_uint32_t S5;
-    rt_uint32_t S6;
-    rt_uint32_t S7;
-    rt_uint32_t S8;
-    rt_uint32_t S9;
-    rt_uint32_t S10;
-    rt_uint32_t S11;
-    rt_uint32_t S12;
-    rt_uint32_t S13;
-    rt_uint32_t S14;
-    rt_uint32_t S15;
-    rt_uint32_t FPSCR;
-    rt_uint32_t NO_NAME;
+    uint32_t S0;
+    uint32_t S1;
+    uint32_t S2;
+    uint32_t S3;
+    uint32_t S4;
+    uint32_t S5;
+    uint32_t S6;
+    uint32_t S7;
+    uint32_t S8;
+    uint32_t S9;
+    uint32_t S10;
+    uint32_t S11;
+    uint32_t S12;
+    uint32_t S13;
+    uint32_t S14;
+    uint32_t S15;
+    uint32_t FPSCR;
+    uint32_t NO_NAME;
 #endif
 };
 
 struct stack_frame_fpu
 {
-    rt_uint32_t flag;
+    uint32_t flag;
 
     /* r4 ~ r11 register */
-    rt_uint32_t r4;
-    rt_uint32_t r5;
-    rt_uint32_t r6;
-    rt_uint32_t r7;
-    rt_uint32_t r8;
-    rt_uint32_t r9;
-    rt_uint32_t r10;
-    rt_uint32_t r11;
+    uint32_t r4;
+    uint32_t r5;
+    uint32_t r6;
+    uint32_t r7;
+    uint32_t r8;
+    uint32_t r9;
+    uint32_t r10;
+    uint32_t r11;
 
 #if USE_FPU
     /* FPU register s16 ~ s31 */
-    rt_uint32_t s16;
-    rt_uint32_t s17;
-    rt_uint32_t s18;
-    rt_uint32_t s19;
-    rt_uint32_t s20;
-    rt_uint32_t s21;
-    rt_uint32_t s22;
-    rt_uint32_t s23;
-    rt_uint32_t s24;
-    rt_uint32_t s25;
-    rt_uint32_t s26;
-    rt_uint32_t s27;
-    rt_uint32_t s28;
-    rt_uint32_t s29;
-    rt_uint32_t s30;
-    rt_uint32_t s31;
+    uint32_t s16;
+    uint32_t s17;
+    uint32_t s18;
+    uint32_t s19;
+    uint32_t s20;
+    uint32_t s21;
+    uint32_t s22;
+    uint32_t s23;
+    uint32_t s24;
+    uint32_t s25;
+    uint32_t s26;
+    uint32_t s27;
+    uint32_t s28;
+    uint32_t s29;
+    uint32_t s30;
+    uint32_t s31;
 #endif
 
     struct exception_stack_frame_fpu exception_stack_frame;
 };
 
-rt_uint8_t *rt_hw_stack_init(void       *tentry,
+uint8_t *rt_hw_stack_init(void       *tentry,
                              void       *parameter,
-                             rt_uint8_t *stack_addr,
+                             uint8_t *stack_addr,
                              void       *texit)
 {
     struct stack_frame *stack_frame;
-    rt_uint8_t         *stk;
+    uint8_t         *stk;
     unsigned long       i;
 
-    stk  = stack_addr + sizeof(rt_uint32_t);
-    stk  = (rt_uint8_t *)RT_ALIGN_DOWN((rt_uint32_t)stk, 8);
+    stk  = stack_addr + sizeof(uint32_t);
+    stk  = (uint8_t *)RT_ALIGN_DOWN((uint32_t)stk, 8);
     stk -= sizeof(struct stack_frame);
 
     stack_frame = (struct stack_frame *)stk;
 
     /* init all register */
-    for (i = 0; i < sizeof(struct stack_frame) / sizeof(rt_uint32_t); i ++)
+    for (i = 0; i < sizeof(struct stack_frame) / sizeof(uint32_t); i ++)
     {
-        ((rt_uint32_t *)stack_frame)[i] = 0xdeadbeef;
+        ((uint32_t *)stack_frame)[i] = 0xdeadbeef;
     }
 
     stack_frame->exception_stack_frame.r0  = (unsigned long)parameter; /* r0 : argument */
@@ -364,7 +364,7 @@ static void hard_fault_track(void)
 
 struct exception_info
 {
-    rt_uint32_t exc_return;
+    uint32_t exc_return;
     struct stack_frame stack_frame;
 };
 
@@ -430,7 +430,7 @@ void rt_hw_hard_fault_exception(struct exception_info *exception_info)
 /**
  * shutdown CPU
  */
-RT_WEAK void rt_hw_cpu_shutdown(void)
+WEAK void rt_hw_cpu_shutdown(void)
 {
     rt_kprintf("shutdown...\n");
 
@@ -440,7 +440,7 @@ RT_WEAK void rt_hw_cpu_shutdown(void)
 /**
  * reset CPU
  */
-RT_WEAK void rt_hw_cpu_reset(void)
+WEAK void rt_hw_cpu_reset(void)
 {
     SCB_AIRCR = SCB_RESET_VALUE;
 }

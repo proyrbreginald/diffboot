@@ -549,7 +549,7 @@ rt_bool_t rt_object_is_systemobject(rt_object_t object)
  *
  * @return the type of object.
  */
-rt_uint8_t rt_object_get_type(rt_object_t object)
+uint8_t rt_object_get_type(rt_object_t object)
 {
     /* object check */
     RT_ASSERT(object != RT_NULL);
@@ -570,7 +570,7 @@ rt_uint8_t rt_object_get_type(rt_object_t object)
  *
  * @note this function shall not be invoked in interrupt status.
  */
-rt_object_t rt_object_find(const char *name, rt_uint8_t type)
+rt_object_t rt_object_find(const char *name, uint8_t type)
 {
     struct rt_object *object = RT_NULL;
     struct rt_list_node *node = RT_NULL;

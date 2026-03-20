@@ -21,8 +21,8 @@ void rt_hw_cpu_dcache_ops(int ops, void *addr, int size);
 void rt_hw_cpu_reset(void);
 void rt_hw_cpu_shutdown(void);
 
-rt_uint8_t *rt_hw_stack_init(void *entry, void *parameter,
-                             rt_uint8_t *stack_addr, void *exit);
+uint8_t *rt_hw_stack_init(void *entry, void *parameter,
+                             uint8_t *stack_addr, void *exit);
 
 typedef void (*rt_isr_handler_t)(int vector, void *param);
 
@@ -31,7 +31,7 @@ struct rt_irq_desc {
     void *param;
 #ifdef RT_USING_INTERRUPT_INFO
     char name[RT_NAME_MAX];
-    rt_uint32_t counter;
+    uint32_t counter;
 #endif
 };
 
@@ -63,8 +63,8 @@ void rt_hw_context_switch_to(rt_ubase_t to);
 void rt_hw_context_switch_interrupt(rt_ubase_t from, rt_ubase_t to);
 #endif
 
-void rt_hw_backtrace(rt_uint32_t *fp, rt_ubase_t thread_entry);
-void rt_hw_show_memory(rt_uint32_t addr, rt_size_t size);
+void rt_hw_backtrace(uint32_t *fp, rt_ubase_t thread_entry);
+void rt_hw_show_memory(uint32_t addr, size_t size);
 
 void rt_hw_exception_install(rt_err_t (*exception_handle)(void *context));
 
