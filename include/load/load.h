@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include <mcu.h>
+#include <stdbool.h>
 
 /**
  * @brief 定义启动选项。
@@ -39,6 +40,11 @@ typedef struct load_config_t {
 } load_config_t;
 
 /**
+ * @brief 定义函数指针类型。
+ */
+typedef void (*void_fn_void_t)(void);
+
+/**
  * @brief 读取如何启动。
  * @return uint8_t 从哪个程序启动。
  */
@@ -54,7 +60,7 @@ uint16_t load_read_config_crc(void);
  * @brief 写入新配置。
  * @param which 从哪个程序启动。
  */
-void load_write_config_which(uint8_t which);
+void load_write_config_which(load_which_t which);
 
 /**
  * @brief 更新启动配置的校验值。
@@ -63,12 +69,19 @@ void load_write_config_which(uint8_t which);
 uint16_t load_update_config_crc(void);
 
 /**
+ * @brief 进行数据校验，检查数据有效性。
+ * @return true 数据有效。
+ * @return false 数据无效。
+ */
+bool load_verify_config(void);
+
+/**
  * @brief 尝试启动app程序。
  */
 extern void load_app(void);
 
 /**
- * @brief 尝试启动boot程序。
+ * @brief 启动boot程序。
  */
 extern void load_boot(void);
 

@@ -15,7 +15,7 @@ uint16_t load_read_config_crc(void)
     return load_config.crc;
 }
 
-void load_write_config_which(uint8_t which)
+void load_write_config_which(load_which_t which)
 {
     load_config.info.which = which;
 }
@@ -27,54 +27,59 @@ uint16_t load_update_config_crc(void)
     return load_config.crc;
 }
 
+bool load_verify_config(void)
+{
+    const uint16_t c_crc =
+        algo_crc16((uint8_t *)&load_config, sizeof(load_config_info_t));
+    if (c_crc != load_config.crc)
+    {
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
 void load_app(void)
 {
-    // // 待加载的app程序地址
-    // uint32_t app_bin_addr;
+    // 启动配置数据无效
+    if (!load_verify_config())
+    {
+        return; //!< 无效数据无法直接启动app程序
+    }
 
-    // // 校验跳转标志位
-    // switch (*(volatile uint32_t *)MCU_BKPRAM_START)
-    // {
-    // case LOAD_USER_CHECKSUM:
-    //     // 赋值user程序分区的地址作为app程序地址
-    //     app_bin_addr = USER_START;
-    //     break;
-    // case LOAD_OEM_CHECKSUM:
-    //     // 赋值oem程序分区的地址作为app程序地址
-    //     app_bin_addr = OEM_START;
-    //     break;
-    // default:
-    //     // 无效参数时不加载app程序
-    //     return;
-    // }
+    uint32_t app_bin_addr;            //!< 待启动的app程序地址
+    switch (load_read_config_which()) //!< 读取应该启动哪个程序
+    {
+    case LOAD_BOOT:
+        return; //!< 从boot启动
+    case LOAD_APP_USER:
+        app_bin_addr = USER_START; //!< 从用户程序启动
+        break;
+    case LOAD_APP_OEM:
+        app_bin_addr = OEM_START; //!< 从厂商程序启动
+        break;
+    default:
+        return; //!< 无效参数时不加载app程序
+    }
 
-    // // 清除跳转标志位
-    // *(volatile uint32_t *)MCU_BKPRAM_START = 0;
+    load_write_config_which(LOAD_BOOT); //!< 清除启动配置
+    load_update_config_crc();           //!< 更新校验值
 
-    // // 获取app的栈指针和复位处理函数
-    // // app程序的第一个4字节是栈地址，第二个是复位处理函数地址
-    // const uint32_t new_msp = *(volatile uint32_t *)app_bin_addr;
-    // const void_fn_void_t new_reset_handler =
-    //     (void_fn_void_t)(*(volatile uint32_t *)(app_bin_addr + 4));
+    const uint32_t new_msp =
+        *(volatile uint32_t *)app_bin_addr; //!< 获取app的栈指针
+    const void_fn_void_t new_reset_handler = (void_fn_void_t)(*(
+        volatile uint32_t *)(app_bin_addr + 4)); //!< 获取app的复位处理函数
 
-    // // 防止在跳转过程中被中断打断
-    // __disable_irq();
-
-    // // 设置向量表偏移
-    // SCB->VTOR = app_bin_addr;
-
-    // // 设置cpu的栈指针
-    // __set_MSP(new_msp);
-
-    // // 执行跳转
-    // new_reset_handler();
+    __disable_irq();          //!< 防止在跳转过程中被中断打断
+    SCB->VTOR = app_bin_addr; //!< 设置向量表偏移
+    __set_MSP(new_msp);       //!< 更新到app的初始栈指针
+    new_reset_handler();      //!< 执行跳转
 }
 
 void load_boot(void)
 {
-    // 配置时钟树与外设
-    main();
-
-    // 启动rtthread
-    rtthread_launch();
+    main();            //!< 配置时钟树与外设
+    rtthread_launch(); //!< 启动rtthread
 }
