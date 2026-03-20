@@ -14,30 +14,28 @@
 #include <mcu/mcu.h>
 
 /**
+ * @brief 定义启动选项。
+ */
+typedef enum load_which_t {
+    LOAD_BOOT     = 0x00,
+    LOAD_APP_USER = 0x01,
+    LOAD_APP_OEM  = 0x02,
+    LOAD_NULL     = 0xff,
+} load_which_t;
+
+/**
  * @brief 定义如何启动程序。
  */
 typedef struct load_config_info_t {
-    uint8_t which; //!< 启动哪个程序
-    uint8_t _gap1; //!< 手动填充间隙
-    uint8_t _gap2; //!< 手动填充间隙
-    uint8_t _gap3; //!< 手动填充间隙
-    uint8_t _gap4; //!< 手动填充间隙
-    uint8_t _gap5; //!< 手动填充间隙
-    uint8_t _gap6; //!< 手动填充间隙
-    uint8_t _gap7; //!< 手动填充间隙
+    volatile load_which_t which; //!< 启动哪个程序
 } load_config_info_t;
-
-/**
- * @brief 定义crc校验值类型。
- */
-typedef uint16_t crc_t;
 
 /**
  * @brief 定义如何校验配置。
  */
 typedef struct load_config_t {
     load_config_info_t info; //!< 配置信息
-    crc_t crc;               //!< crc校验码
+    volatile uint16_t crc;   //!< crc校验码
 } load_config_t;
 
 load_config_t *load_get_config(void);

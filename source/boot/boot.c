@@ -363,8 +363,27 @@ static void boot_thread_entry(void *parameter)
     {
         LOG_D(THREAD_NAME " thread running");
         HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-        // detect_app();
+
+        LOG_I("%u, %u, %u", sizeof(load_which_t), sizeof(load_config_info_t),
+              sizeof(load_config_t));
+
+        uint8_t which = load_read_config_which();
+        uint16_t crc = load_read_config_crc();
+        LOG_I("read > which: 0x%02x, r_crc: 0x%04x, c_crc: 0x%04x", which, crc,
+              load_update_config_crc());
+
+        load_write_config_which(++which);
+        which = load_read_config_which();
+        LOG_I("write < which: 0x%02x", which);
+        load_update_config_crc();
+
+        LOG_I("read > which: 0x%02x, r_crc: 0x%04x, c_crc: 0x%04x",
+              load_read_config_which(), load_read_config_crc(),
+              load_update_config_crc());
+
         rt_thread_mdelay(500);
+
+        NVIC_SystemReset();
     }
 }
 
