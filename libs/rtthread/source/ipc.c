@@ -44,6 +44,7 @@
  * 2022-04-08     Stanley      Correct descriptions
  */
 
+#include <string.h>
 #include <rthw.h>
 #include <rtthread.h>
 #include <rtdebug.h>
@@ -2862,7 +2863,7 @@ rt_err_t rt_mq_send_wait(rt_mq_t     mq,
     /* the msg is the new tailer of list, the next shall be NULL */
     msg->next = NULL;
     /* copy buffer */
-    rt_memcpy(msg + 1, buffer, size);
+    memcpy(msg + 1, buffer, size);
 
     /* disable interrupt */
     level = rt_hw_interrupt_disable();
@@ -2995,7 +2996,7 @@ rt_err_t rt_mq_urgent(rt_mq_t mq, const void *buffer, size_t size)
     rt_hw_interrupt_enable(level);
 
     /* copy buffer */
-    rt_memcpy(msg + 1, buffer, size);
+    memcpy(msg + 1, buffer, size);
 
     /* disable interrupt */
     level = rt_hw_interrupt_disable();
@@ -3185,7 +3186,7 @@ rt_err_t rt_mq_recv(rt_mq_t    mq,
     rt_hw_interrupt_enable(level);
 
     /* copy message */
-    rt_memcpy(buffer, msg + 1, size > mq->msg_size ? mq->msg_size : size);
+    memcpy(buffer, msg + 1, size > mq->msg_size ? mq->msg_size : size);
 
     /* disable interrupt */
     level = rt_hw_interrupt_disable();

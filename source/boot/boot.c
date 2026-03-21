@@ -1,9 +1,10 @@
 #include <load/load.h>
 #include <main.h>
 #include <mcu.h>
-#include <ymodem.h>
 #include <rthw.h>
 #include <rtthread.h>
+#include <string.h>
+#include <ymodem.h>
 
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__

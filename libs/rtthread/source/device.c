@@ -15,6 +15,7 @@
  * 2021-03-19     Meco Man     remove rt_device_init_all()
  */
 
+#include <string.h>
 #include <rtthread.h>
 #include <rtdebug.h>
 #ifdef RT_USING_POSIX_DEVIO
@@ -130,7 +131,7 @@ rt_device_t rt_device_create(int type, int attach_size)
     device = (rt_device_t)rt_malloc(size);
     if (device)
     {
-        rt_memset(device, 0x0, sizeof(struct rt_device));
+        memset(device, 0x0, sizeof(struct rt_device));
         device->type = (enum rt_device_type)type;
     }
 

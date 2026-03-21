@@ -30,6 +30,7 @@
  * 2022-01-07     Gabriel      Moving __on_rt_xxxxx_hook to scheduler.c
  */
 
+#include <string.h>
 #include <rthw.h>
 #include <rtthread.h>
 #include <rtdebug.h>
@@ -228,7 +229,7 @@ void rt_system_scheduler_init(void)
         pcpu->priority_group = 0;
 
 #if RT_THREAD_PRIORITY_MAX > 32
-        rt_memset(pcpu->ready_table, 0, sizeof(pcpu->ready_table));
+        memset(pcpu->ready_table, 0, sizeof(pcpu->ready_table));
 #endif /* RT_THREAD_PRIORITY_MAX > 32 */
     }
 #endif /* RT_USING_SMP */
@@ -238,7 +239,7 @@ void rt_system_scheduler_init(void)
 
 #if RT_THREAD_PRIORITY_MAX > 32
     /* initialize ready table */
-    rt_memset(rt_thread_ready_table, 0, sizeof(rt_thread_ready_table));
+    memset(rt_thread_ready_table, 0, sizeof(rt_thread_ready_table));
 #endif /* RT_THREAD_PRIORITY_MAX > 32 */
 }
 

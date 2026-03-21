@@ -33,6 +33,7 @@
  * 2022-01-24     THEWON       let rt_thread_sleep return thread->error when using signal
  */
 
+#include <string.h>
 #include <rthw.h>
 #include <rtthread.h>
 #include <rtdebug.h>
@@ -174,7 +175,7 @@ static rt_err_t _thread_init(struct rt_thread *thread,
     thread->stack_size = stack_size;
 
     /* init thread stack */
-    rt_memset(thread->stack_addr, '#', thread->stack_size);
+    memset(thread->stack_addr, '#', thread->stack_size);
 #ifdef ARCH_CPU_STACK_GROWS_UPWARD
     thread->sp = (void *)rt_hw_stack_init(thread->entry, thread->parameter,
                                           (void *)((char *)thread->stack_addr),

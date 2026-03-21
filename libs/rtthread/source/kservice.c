@@ -14,18 +14,19 @@
  * 2012-07-18     Arda         add the alignment display for signed integer
  * 2012-11-23     Bernard      fix IAR compiler error.
  * 2012-12-22     Bernard      fix rt_kprintf issue, which found by Grissiom.
- * 2013-06-24     Bernard      remove rt_kprintf if RT_USING_CONSOLE is not defined.
- * 2013-09-24     aozima       make sure the device is in STREAM mode when used by rt_kprintf.
- * 2015-07-06     Bernard      Add rt_assert_handler routine.
- * 2021-02-28     Meco Man     add RT_KSERVICE_USING_STDLIB
- * 2021-12-20     Meco Man     implement rt_strcpy()
- * 2022-01-07     Gabriel      add __on_rt_assert_hook
- * 2022-06-04     Meco Man     remove strnlen
+ * 2013-06-24     Bernard      remove rt_kprintf if RT_USING_CONSOLE is not
+ * defined. 2013-09-24     aozima       make sure the device is in STREAM mode
+ * when used by rt_kprintf. 2015-07-06     Bernard      Add rt_assert_handler
+ * routine. 2021-02-28     Meco Man     add RT_KSERVICE_USING_STDLIB 2021-12-20
+ * Meco Man     implement rt_strcpy() 2022-01-07     Gabriel      add
+ * __on_rt_assert_hook 2022-06-04     Meco Man     remove strnlen
  */
 
+#include <printf.h>
+#include <rtdebug.h>
 #include <rthw.h>
 #include <rtthread.h>
-#include <rtdebug.h>
+#include <string.h>
 
 #ifdef RT_USING_MODULE
 #include <dlmodule.h>
@@ -49,26 +50,16 @@ static rt_device_t _console_device = NULL;
 
 WEAK void rt_hw_us_delay(uint32_t us)
 {
-    (void) us;
-    RT_DEBUG_LOG(RT_DEBUG_DEVICE, ("rt_hw_us_delay() doesn't support for this board."
-        "Please consider implementing rt_hw_us_delay() in another file.\n"));
+    (void)us;
+    RT_DEBUG_LOG(
+        RT_DEBUG_DEVICE,
+        ("rt_hw_us_delay() doesn't support for this board."
+         "Please consider implementing rt_hw_us_delay() in another file.\n"));
 }
 
-static const char* rt_errno_strs[] =
-{
-    "OK",
-    "ERROR",
-    "ETIMOUT",
-    "ERSFULL",
-    "ERSEPTY",
-    "ENOMEM",
-    "ENOSYS",
-    "EBUSY",
-    "EIO",
-    "EINTRPT",
-    "EINVAL",
-    "EUNKNOW"
-};
+static const char *rt_errno_strs[] = {
+    "OK",     "ERROR", "ETIMOUT", "ERSFULL", "ERSEPTY", "ENOMEM",
+    "ENOSYS", "EBUSY", "EIO",     "EINTRPT", "EINVAL",  "EUNKNOW"};
 
 /**
  * This function return a pointer to a string that contains the
@@ -82,9 +73,8 @@ const char *rt_strerror(rt_err_t error)
     if (error < 0)
         error = -error;
 
-    return (error > RT_EINVAL + 1) ?
-           rt_errno_strs[RT_EINVAL + 1] :
-           rt_errno_strs[error];
+    return (error > RT_EINVAL + 1) ? rt_errno_strs[RT_EINVAL + 1]
+                                   : rt_errno_strs[error];
 }
 RTM_EXPORT(rt_strerror);
 
@@ -154,7 +144,7 @@ int *_rt_errno(void)
 
     tid = rt_thread_self();
     if (tid != NULL)
-        return (int *) & (tid->error);
+        return (int *)&(tid->error);
 
     return (int *)&__rt_errno;
 }
@@ -166,7 +156,8 @@ RTM_EXPORT(_rt_errno);
 void rt_show_version(void)
 {
     rt_kprintf(" \\ | /  Thread Operating System\n");
-    rt_kprintf("- R T - %d.%d.%d build %s %s\n", RT_VERSION, RT_SUBVERSION, RT_REVISION, __DATE__, __TIME__);
+    rt_kprintf("- R T - %d.%d.%d build %s %s\n", RT_VERSION, RT_SUBVERSION,
+               RT_REVISION, __DATE__, __TIME__);
     rt_kprintf(" / | \\  2006-2022 Copyright by RT-Thread team\n");
 }
 RTM_EXPORT(rt_show_version);
@@ -247,7 +238,8 @@ rt_device_t rt_console_set_device(const char *name)
     new_device = rt_device_find(name);
 
     /* check whether it's a same device */
-    if (new_device == old_device) return NULL;
+    if (new_device == old_device)
+        return NULL;
 
     if (new_device != NULL)
     {
@@ -258,7 +250,8 @@ rt_device_t rt_console_set_device(const char *name)
         }
 
         /* set new console device */
-        rt_device_open(new_device, RT_DEVICE_OFLAG_RDWR | RT_DEVICE_FLAG_STREAM);
+        rt_device_open(new_device,
+                       RT_DEVICE_OFLAG_RDWR | RT_DEVICE_FLAG_STREAM);
         _console_device = new_device;
     }
 
@@ -274,7 +267,8 @@ typedef struct rt_log_msg
 } rt_log_msg_t;
 
 static struct rt_messagequeue log_mq;
-static uint8_t mq_pool[(sizeof(rt_log_msg_t) + sizeof(void*)) * ASYNC_LOG_MSG_COUNT];
+static uint8_t
+    mq_pool[(sizeof(rt_log_msg_t) + sizeof(void *)) * ASYNC_LOG_MSG_COUNT];
 static struct rt_thread log_thread;
 static uint8_t log_stack[ASYNC_LOG_THREAD_STK];
 static bool is_async_ready = false;
@@ -282,10 +276,14 @@ static bool is_async_ready = false;
 /**
  * 消费线程：负责把队列里的日志真正打印出来
  */
-static void log_thread_entry(void *parameter) {
+static void log_thread_entry(void *parameter)
+{
     rt_log_msg_t msg;
-    while (1) {
-        if (rt_mq_recv(&log_mq, &msg, sizeof(rt_log_msg_t), RT_WAITING_FOREVER) == RT_EOK) {
+    while (1)
+    {
+        if (rt_mq_recv(&log_mq, &msg, sizeof(rt_log_msg_t),
+                       RT_WAITING_FOREVER) == RT_EOK)
+        {
             rt_hw_console_output(msg.data);
         }
     }
@@ -294,15 +292,17 @@ static void log_thread_entry(void *parameter) {
 /**
  * 初始化异步打印系统
  */
-int log_thread_init(void) {
-    if (is_async_ready) return 0;
+int log_thread_init(void)
+{
+    if (is_async_ready)
+        return 0;
 
-    rt_mq_init(&log_mq, "log_mq", &mq_pool[0], 
-               sizeof(rt_log_msg_t), sizeof(mq_pool), RT_IPC_FLAG_FIFO);
+    rt_mq_init(&log_mq, "log_mq", &mq_pool[0], sizeof(rt_log_msg_t),
+               sizeof(mq_pool), RT_IPC_FLAG_FIFO);
 
-    rt_thread_init(&log_thread, "log", log_thread_entry, NULL,
-                   &log_stack[0], sizeof(log_stack), ASYNC_LOG_THREAD_PRIO, 0);
-    
+    rt_thread_init(&log_thread, "log", log_thread_entry, NULL, &log_stack[0],
+                   sizeof(log_stack), ASYNC_LOG_THREAD_PRIO, 0);
+
     rt_thread_startup(&log_thread);
     is_async_ready = true;
     return 0;
@@ -320,9 +320,9 @@ int rt_kprintf(const char *fmt, ...)
 {
     va_list args;
     size_t length;
-    
+
     /* 使用局部变量替代static，确保线程安全 */
-    char local_buf[ASYNC_LOG_BUF_SIZE]; 
+    char local_buf[ASYNC_LOG_BUF_SIZE];
 
     va_start(args, fmt);
     length = vsnprintf(local_buf, sizeof(local_buf) - 1, fmt, args);
@@ -333,15 +333,20 @@ int rt_kprintf(const char *fmt, ...)
 
     /* 判断当前环境是否支持异步 */
     /* 如果OS已启动、不在中断中、且队列已初始化 */
-    if (is_async_ready && rt_thread_self() != NULL && rt_interrupt_get_nest() == 0) {
+    if (is_async_ready && rt_thread_self() != NULL &&
+        rt_interrupt_get_nest() == 0)
+    {
         rt_log_msg_t msg;
         memcpy(msg.data, local_buf, length + 1);
-        
+
         // 发送给异步线程，如果不满则立即发送，满了则丢弃（避免阻塞业务线程）
-        if (rt_mq_send(&log_mq, &msg, sizeof(rt_log_msg_t)) != RT_EOK) {
+        if (rt_mq_send(&log_mq, &msg, sizeof(rt_log_msg_t)) != RT_EOK)
+        {
             // 可选：如果队列满了，为了不丢失重要日志，可以尝试同步输出
         }
-    } else {
+    }
+    else
+    {
         /* 同步模式：直接输出 (用于中断、系统启动前、异常状态) */
         rt_hw_console_output(local_buf);
     }
@@ -363,8 +368,8 @@ static void (*rt_free_hook)(void *ptr);
 /**@{*/
 
 /**
- * @brief This function will set a hook function, which will be invoked when a memory
- *        block is allocated from heap memory.
+ * @brief This function will set a hook function, which will be invoked when a
+ * memory block is allocated from heap memory.
  *
  * @param hook the hook function.
  */
@@ -374,8 +379,8 @@ void rt_malloc_sethook(void (*hook)(void *ptr, size_t size))
 }
 
 /**
- * @brief This function will set a hook function, which will be invoked when a memory
- *        block is released to heap memory.
+ * @brief This function will set a hook function, which will be invoked when a
+ * memory block is released to heap memory.
  *
  * @param hook the hook function
  */
@@ -431,8 +436,8 @@ INLINE static inline void _heap_unlock(rt_base_t level)
 
 #if defined(RT_USING_SMALL_MEM_AS_HEAP)
 static rt_smem_t system_heap;
-INLINE static inline void _smem_info(size_t *total,
-    size_t *used, size_t *max_used)
+INLINE static inline void _smem_info(size_t *total, size_t *used,
+                                     size_t *max_used)
 {
     if (total)
         *total = system_heap->total;
@@ -441,35 +446,30 @@ INLINE static inline void _smem_info(size_t *total,
     if (max_used)
         *max_used = system_heap->max;
 }
-#define _MEM_INIT(_name, _start, _size) \
+#define _MEM_INIT(_name, _start, _size)                                        \
     system_heap = rt_smem_init(_name, _start, _size)
-#define _MEM_MALLOC(_size)  \
-    rt_smem_alloc(system_heap, _size)
-#define _MEM_REALLOC(_ptr, _newsize)\
+#define _MEM_MALLOC(_size) rt_smem_alloc(system_heap, _size)
+#define _MEM_REALLOC(_ptr, _newsize)                                           \
     rt_smem_realloc(system_heap, _ptr, _newsize)
-#define _MEM_FREE(_ptr) \
-    rt_smem_free(_ptr)
-#define _MEM_INFO(_total, _used, _max)  \
-    _smem_info(_total, _used, _max)
+#define _MEM_FREE(_ptr) rt_smem_free(_ptr)
+#define _MEM_INFO(_total, _used, _max) _smem_info(_total, _used, _max)
 #elif defined(RT_USING_MEMHEAP_AS_HEAP)
 static struct rt_memheap system_heap;
 void *_memheap_alloc(struct rt_memheap *heap, size_t size);
 void _memheap_free(void *rmem);
 void *_memheap_realloc(struct rt_memheap *heap, void *rmem, size_t newsize);
-#define _MEM_INIT(_name, _start, _size) \
+#define _MEM_INIT(_name, _start, _size)                                        \
     rt_memheap_init(&system_heap, _name, _start, _size)
-#define _MEM_MALLOC(_size)  \
-    _memheap_alloc(&system_heap, _size)
-#define _MEM_REALLOC(_ptr, _newsize)    \
+#define _MEM_MALLOC(_size) _memheap_alloc(&system_heap, _size)
+#define _MEM_REALLOC(_ptr, _newsize)                                           \
     _memheap_realloc(&system_heap, _ptr, _newsize)
-#define _MEM_FREE(_ptr)   \
-    _memheap_free(_ptr)
-#define _MEM_INFO(_total, _used, _max)   \
+#define _MEM_FREE(_ptr) _memheap_free(_ptr)
+#define _MEM_INFO(_total, _used, _max)                                         \
     rt_memheap_info(&system_heap, _total, _used, _max)
 #elif defined(RT_USING_SLAB_AS_HEAP)
 static rt_slab_t system_heap;
-INLINE static inline void _slab_info(size_t *total,
-    size_t *used, size_t *max_used)
+INLINE static inline void _slab_info(size_t *total, size_t *used,
+                                     size_t *max_used)
 {
     if (total)
         *total = system_heap->total;
@@ -478,19 +478,17 @@ INLINE static inline void _slab_info(size_t *total,
     if (max_used)
         *max_used = system_heap->max;
 }
-#define _MEM_INIT(_name, _start, _size) \
+#define _MEM_INIT(_name, _start, _size)                                        \
     system_heap = rt_slab_init(_name, _start, _size)
-#define _MEM_MALLOC(_size)  \
-    rt_slab_alloc(system_heap, _size)
-#define _MEM_REALLOC(_ptr, _newsize)    \
+#define _MEM_MALLOC(_size) rt_slab_alloc(system_heap, _size)
+#define _MEM_REALLOC(_ptr, _newsize)                                           \
     rt_slab_realloc(system_heap, _ptr, _newsize)
-#define _MEM_FREE(_ptr) \
-    rt_slab_free(system_heap, _ptr)
-#define _MEM_INFO       _slab_info
+#define _MEM_FREE(_ptr) rt_slab_free(system_heap, _ptr)
+#define _MEM_INFO _slab_info
 #else
 #define _MEM_INIT(...)
-#define _MEM_MALLOC(...)     NULL
-#define _MEM_REALLOC(...)    NULL
+#define _MEM_MALLOC(...) NULL
+#define _MEM_REALLOC(...) NULL
 #define _MEM_FREE(...)
 #define _MEM_INFO(...)
 #endif
@@ -505,7 +503,7 @@ INLINE static inline void _slab_info(size_t *total,
 WEAK void rt_system_heap_init(void *begin_addr, void *end_addr)
 {
     rt_ubase_t begin_align = RT_ALIGN((rt_ubase_t)begin_addr, RT_ALIGN_SIZE);
-    rt_ubase_t end_align   = RT_ALIGN_DOWN((rt_ubase_t)end_addr, RT_ALIGN_SIZE);
+    rt_ubase_t end_align = RT_ALIGN_DOWN((rt_ubase_t)end_addr, RT_ALIGN_SIZE);
 
     RT_ASSERT(end_align > begin_align);
 
@@ -540,7 +538,8 @@ WEAK void *rt_malloc(size_t size)
 RTM_EXPORT(rt_malloc);
 
 /**
- * @brief This function will change the size of previously allocated memory block.
+ * @brief This function will change the size of previously allocated memory
+ * block.
  *
  * @param rmem is the pointer to memory allocated by rt_malloc.
  *
@@ -564,9 +563,9 @@ WEAK void *rt_realloc(void *rmem, size_t newsize)
 RTM_EXPORT(rt_realloc);
 
 /**
- * @brief  This function will contiguously allocate enough space for count objects
- *         that are size bytes of memory each and returns a pointer to the allocated
- *         memory.
+ * @brief  This function will contiguously allocate enough space for count
+ * objects that are size bytes of memory each and returns a pointer to the
+ * allocated memory.
  *
  * @note   The allocated memory is filled with bytes of value zero.
  *
@@ -585,7 +584,7 @@ WEAK void *rt_calloc(size_t count, size_t size)
     /* zero the memory */
     if (p)
     {
-        rt_memset(p, 0, count * size);
+        memset(p, 0, count * size);
     }
     return p;
 }
@@ -604,7 +603,8 @@ WEAK void rt_free(void *rmem)
     /* call 'rt_free' hook */
     RT_OBJECT_HOOK_CALL(rt_free_hook, (rmem));
     /* NULL check */
-    if (rmem == NULL) return;
+    if (rmem == NULL)
+        return;
     /* Enter critical zone */
     level = _heap_lock();
     _MEM_FREE(rmem);
@@ -614,18 +614,16 @@ WEAK void rt_free(void *rmem)
 RTM_EXPORT(rt_free);
 
 /**
-* @brief This function will caculate the total memory, the used memory, and
-*        the max used memory.
-*
-* @param total is a pointer to get the total size of the memory.
-*
-* @param used is a pointer to get the size of memory used.
-*
-* @param max_used is a pointer to get the maximum memory used.
-*/
-WEAK void rt_memory_info(size_t *total,
-                            size_t *used,
-                            size_t *max_used)
+ * @brief This function will caculate the total memory, the used memory, and
+ *        the max used memory.
+ *
+ * @param total is a pointer to get the total size of the memory.
+ *
+ * @param used is a pointer to get the size of memory used.
+ *
+ * @param max_used is a pointer to get the maximum memory used.
+ */
+WEAK void rt_memory_info(size_t *total, size_t *used, size_t *max_used)
 {
     rt_base_t level;
 
@@ -684,7 +682,7 @@ WEAK void *rt_malloc_align(size_t size, size_t align)
     size_t align_size;
 
     /* sizeof pointer */
-    uintptr_size = sizeof(void*);
+    uintptr_size = sizeof(void *);
     uintptr_size -= 1;
 
     /* align the alignment size to uintptr size byte */
@@ -703,11 +701,13 @@ WEAK void *rt_malloc_align(size_t size, size_t align)
         }
         else
         {
-            align_ptr = (void *)(((rt_ubase_t)ptr + (align - 1)) & ~(align - 1));
+            align_ptr =
+                (void *)(((rt_ubase_t)ptr + (align - 1)) & ~(align - 1));
         }
 
         /* set the pointer before alignment pointer to the real pointer */
-        *((rt_ubase_t *)((rt_ubase_t)align_ptr - sizeof(void *))) = (rt_ubase_t)ptr;
+        *((rt_ubase_t *)((rt_ubase_t)align_ptr - sizeof(void *))) =
+            (rt_ubase_t)ptr;
 
         ptr = align_ptr;
     }
@@ -727,8 +727,9 @@ WEAK void rt_free_align(void *ptr)
     void *real_ptr;
 
     /* NULL check */
-    if (ptr == NULL) return;
-    real_ptr = (void *) * (rt_ubase_t *)((rt_ubase_t)ptr - sizeof(void *));
+    if (ptr == NULL)
+        return;
+    real_ptr = (void *)*(rt_ubase_t *)((rt_ubase_t)ptr - sizeof(void *));
     rt_free(real_ptr);
 }
 RTM_EXPORT(rt_free_align);
@@ -736,32 +737,29 @@ RTM_EXPORT(rt_free_align);
 
 #ifndef RT_USING_CPU_FFS
 #ifdef RT_USING_TINY_FFS
-const uint8_t __lowest_bit_bitmap[] =
-{
-    /*  0 - 7  */  0,  1,  2, 27,  3, 24, 28, 32,
-    /*  8 - 15 */  4, 17, 25, 31, 29, 12, 32, 14,
-    /* 16 - 23 */  5,  8, 18, 32, 26, 23, 32, 16,
-    /* 24 - 31 */ 30, 11, 13,  7, 32, 22, 15, 10,
-    /* 32 - 36 */  6, 21,  9, 20, 19
-};
+const uint8_t __lowest_bit_bitmap[] = {
+    /*  0 - 7  */ 0,  1,  2,  27, 3,  24, 28, 32,
+    /*  8 - 15 */ 4,  17, 25, 31, 29, 12, 32, 14,
+    /* 16 - 23 */ 5,  8,  18, 32, 26, 23, 32, 16,
+    /* 24 - 31 */ 30, 11, 13, 7,  32, 22, 15, 10,
+    /* 32 - 36 */ 6,  21, 9,  20, 19};
 
 /**
- * This function finds the first bit set (beginning with the least significant bit)
- * in value and return the index of that bit.
+ * This function finds the first bit set (beginning with the least significant
+ * bit) in value and return the index of that bit.
  *
- * Bits are numbered starting at 1 (the least significant bit).  A return value of
- * zero from any of these functions means that the argument was zero.
+ * Bits are numbered starting at 1 (the least significant bit).  A return value
+ * of zero from any of these functions means that the argument was zero.
  *
- * @return return the index of the first bit set. If value is 0, then this function
- * shall return 0.
+ * @return return the index of the first bit set. If value is 0, then this
+ * function shall return 0.
  */
 int __rt_ffs(int value)
 {
     return __lowest_bit_bitmap[(uint32_t)(value & (value - 1) ^ value) % 37];
 }
 #else
-const uint8_t __lowest_bit_bitmap[] =
-{
+const uint8_t __lowest_bit_bitmap[] = {
     /* 00 */ 0, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
     /* 10 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
     /* 20 */ 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
@@ -777,22 +775,22 @@ const uint8_t __lowest_bit_bitmap[] =
     /* C0 */ 6, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
     /* D0 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
     /* E0 */ 5, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0,
-    /* F0 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0
-};
+    /* F0 */ 4, 0, 1, 0, 2, 0, 1, 0, 3, 0, 1, 0, 2, 0, 1, 0};
 
 /**
- * This function finds the first bit set (beginning with the least significant bit)
- * in value and return the index of that bit.
+ * This function finds the first bit set (beginning with the least significant
+ * bit) in value and return the index of that bit.
  *
- * Bits are numbered starting at 1 (the least significant bit).  A return value of
- * zero from any of these functions means that the argument was zero.
+ * Bits are numbered starting at 1 (the least significant bit).  A return value
+ * of zero from any of these functions means that the argument was zero.
  *
- * @return Return the index of the first bit set. If value is 0, then this function
- *         shall return 0.
+ * @return Return the index of the first bit set. If value is 0, then this
+ * function shall return 0.
  */
 int __rt_ffs(int value)
 {
-    if (value == 0) return 0;
+    if (value == 0)
+        return 0;
 
     if (value & 0xff)
         return __lowest_bit_bitmap[value & 0xff] + 1;
@@ -809,7 +807,8 @@ int __rt_ffs(int value)
 #endif /* RT_USING_CPU_FFS */
 
 #ifndef __on_rt_assert_hook
-    #define __on_rt_assert_hook(ex, func, line)         __ON_HOOK_ARGS(rt_assert_hook, (ex, func, line))
+#define __on_rt_assert_hook(ex, func, line)                                    \
+    __ON_HOOK_ARGS(rt_assert_hook, (ex, func, line))
 #endif
 
 #ifdef RT_DEBUG
@@ -818,11 +817,13 @@ int __rt_ffs(int value)
 void (*rt_assert_hook)(const char *ex, const char *func, size_t line);
 
 /**
- * This function will set a hook function to RT_ASSERT(EX). It will run when the expression is false.
+ * This function will set a hook function to RT_ASSERT(EX). It will run when the
+ * expression is false.
  *
  * @param hook is the hook function.
  */
-void rt_assert_set_hook(void (*hook)(const char *ex, const char *func, size_t line))
+void rt_assert_set_hook(void (*hook)(const char *ex, const char *func,
+                                     size_t line))
 {
     rt_assert_hook = hook;
 }
@@ -851,8 +852,11 @@ void rt_assert_handler(const char *ex_string, const char *func, size_t line)
         else
 #endif /*RT_USING_MODULE*/
         {
-            rt_kprintf("(%s) assertion failed at function:%s, line number:%d \n", ex_string, func, line);
-            while (dummy == 0);
+            rt_kprintf(
+                "(%s) assertion failed at function:%s, line number:%d \n",
+                ex_string, func, line);
+            while (dummy == 0)
+                ;
         }
     }
     else

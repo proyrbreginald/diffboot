@@ -47,6 +47,7 @@
  *
  */
 
+#include <string.h>
 #include <rthw.h>
 #include <rtthread.h>
 #include <rtdebug.h>
@@ -204,7 +205,7 @@ rt_smem_t rt_smem_init(const char    *name,
         return NULL;
     }
 
-    rt_memset(small_mem, 0, sizeof(*small_mem));
+    memset(small_mem, 0, sizeof(*small_mem));
     /* initialize small memory object */
     rt_object_init(&(small_mem->parent.parent), RT_OBJ_TYPE_MEM, name);
     small_mem->parent.algorithm = "small";
@@ -500,7 +501,7 @@ void *rt_smem_realloc(rt_smem_t m, void *rmem, size_t newsize)
     nmem = rt_smem_alloc(&small_mem->parent, newsize);
     if (nmem != NULL) /* check memory */
     {
-        rt_memcpy(nmem, rmem, size < newsize ? size : newsize);
+        memcpy(nmem, rmem, size < newsize ? size : newsize);
         rt_smem_free(rmem);
     }
 
@@ -586,7 +587,7 @@ int memcheck(int argc, char *argv[])
     {
         object = rt_list_entry(node, struct rt_object, list);
         /* find the specified object */
-        if (name != NULL && rt_strncmp(name, object->name, RT_NAME_MAX) != 0)
+        if (name != NULL && strncmp(name, object->name, RT_NAME_MAX) != 0)
             continue;
         /* mem object */
         m = (struct rt_small_mem *)object;
@@ -632,7 +633,7 @@ int memtrace(int argc, char **argv)
     {
         object = rt_list_entry(node, struct rt_object, list);
         /* find the specified object */
-        if (name != NULL && rt_strncmp(name, object->name, RT_NAME_MAX) != 0)
+        if (name != NULL && strncmp(name, object->name, RT_NAME_MAX) != 0)
             continue;
         /* mem object */
         m = (struct rt_small_mem *)object;

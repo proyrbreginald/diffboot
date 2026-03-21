@@ -16,6 +16,7 @@
  * 2022-01-07     Gabriel      Moving __on_rt_xxxxx_hook to object.c
  */
 
+#include <string.h>
 #include <rthw.h>
 #include <rtthread.h>
 #include <rtdebug.h>
@@ -366,7 +367,7 @@ void rt_object_init(struct rt_object         *object,
     /* set object type to static */
     object->type = type | RT_OBJ_TYPE_STATIC;
     /* copy name */
-    rt_strncpy(object->name, name, RT_NAME_MAX);
+    strncpy(object->name, name, RT_NAME_MAX);
 
     RT_OBJECT_HOOK_CALL(rt_object_attach_hook, (object));
 
@@ -451,7 +452,7 @@ rt_object_t rt_object_allocate(enum rt_object_type type, const char *name)
     }
 
     /* clean memory data of object */
-    rt_memset(object, 0x0, information->object_size);
+    memset(object, 0x0, information->object_size);
 
     /* initialize object's parameters */
 
@@ -462,7 +463,7 @@ rt_object_t rt_object_allocate(enum rt_object_type type, const char *name)
     object->flag = 0;
 
     /* copy name */
-    rt_strncpy(object->name, name, RT_NAME_MAX);
+    strncpy(object->name, name, RT_NAME_MAX);
 
     RT_OBJECT_HOOK_CALL(rt_object_attach_hook, (object));
 
@@ -592,7 +593,7 @@ rt_object_t rt_object_find(const char *name, uint8_t type)
     rt_list_for_each(node, &(information->object_list))
     {
         object = rt_list_entry(node, struct rt_object, list);
-        if (rt_strncmp(object->name, name, RT_NAME_MAX) == 0)
+        if (strncmp(object->name, name, RT_NAME_MAX) == 0)
         {
             /* leave critical */
             rt_exit_critical();

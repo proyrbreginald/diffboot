@@ -12,8 +12,6 @@
 
 #define RT_USING_CPU_FFS                   //!< 使用快速位运算
 #define RT_USING_LIBC                      //!< 使用libc
-#define RT_KSERVICE_USING_STDLIB           //!< 使用标准库
-#define RT_KSERVICE_USING_STDLIB_MEMORY    //!< 使用标准库内存操作接口
 #define RT_ALIGN_SIZE                   4  //!< 内存对齐
 #define RT_NAME_MAX                     16 //!< object字符串名称长度
 

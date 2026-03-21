@@ -2,7 +2,6 @@
 #define _RTTHREAD_H_
 
 #include "rtconfig.h"
-// #include "rtdebug.h"
 #include "rtdef.h"
 #include "rtservice.h"
 
@@ -15,14 +14,13 @@
 struct rt_object_information *rt_object_get_information(
     enum rt_object_type type);
 int rt_object_get_length(enum rt_object_type type);
-int rt_object_get_pointers(enum rt_object_type type,
-                           rt_object_t *pointers, int maxlen);
+int rt_object_get_pointers(enum rt_object_type type, rt_object_t *pointers,
+                           int maxlen);
 void rt_object_init(struct rt_object *object, enum rt_object_type type,
                     const char *name);
 void rt_object_detach(rt_object_t object);
 #ifdef RT_USING_HEAP
-rt_object_t rt_object_allocate(enum rt_object_type type,
-                               const char *name);
+rt_object_t rt_object_allocate(enum rt_object_type type, const char *name);
 void rt_object_delete(rt_object_t object);
 #endif
 bool rt_object_is_systemobject(rt_object_t object);
@@ -151,8 +149,7 @@ void rt_scheduler_ipi_handler(int vector, void *param);
 void rt_signal_mask(int signo);
 void rt_signal_unmask(int signo);
 rt_sighandler_t rt_signal_install(int signo, rt_sighandler_t handler);
-int rt_signal_wait(const rt_sigset_t *set, rt_siginfo_t *si,
-                   int32_t timeout);
+int rt_signal_wait(const rt_sigset_t *set, rt_siginfo_t *si, int32_t timeout);
 int rt_system_signal_init(void);
 #endif
 
@@ -169,8 +166,7 @@ rt_err_t rt_mp_init(struct rt_mempool *mp, const char *name, void *start,
                     size_t size, size_t block_size);
 rt_err_t rt_mp_detach(struct rt_mempool *mp);
 #ifdef RT_USING_HEAP
-rt_mp_t rt_mp_create(const char *name, size_t block_count,
-                     size_t block_size);
+rt_mp_t rt_mp_create(const char *name, size_t block_count, size_t block_size);
 rt_err_t rt_mp_delete(rt_mp_t mp);
 #endif
 void *rt_mp_alloc(rt_mp_t mp, int32_t time);
@@ -303,8 +299,7 @@ rt_err_t rt_mq_send(rt_mq_t mq, const void *buffer, size_t size);
 rt_err_t rt_mq_send_wait(rt_mq_t mq, const void *buffer, size_t size,
                          int32_t timeout);
 rt_err_t rt_mq_urgent(rt_mq_t mq, const void *buffer, size_t size);
-rt_err_t rt_mq_recv(rt_mq_t mq, void *buffer, size_t size,
-                    int32_t timeout);
+rt_err_t rt_mq_recv(rt_mq_t mq, void *buffer, size_t size, int32_t timeout);
 rt_err_t rt_mq_control(rt_mq_t mq, int cmd, void *arg);
 #endif
 
@@ -337,8 +332,7 @@ void rt_spin_unlock_irqrestore(struct rt_spinlock *lock, rt_base_t level);
 #ifdef RT_USING_DEVICE
 rt_device_t rt_device_find(const char *name);
 
-rt_err_t rt_device_register(rt_device_t dev, const char *name,
-                            uint16_t flags);
+rt_err_t rt_device_register(rt_device_t dev, const char *name, uint16_t flags);
 rt_err_t rt_device_unregister(rt_device_t dev);
 #ifdef RT_USING_HEAP
 rt_device_t rt_device_create(int type, int attach_size);
@@ -353,10 +347,9 @@ rt_err_t rt_device_set_tx_complete(rt_device_t dev,
 rt_err_t rt_device_init(rt_device_t dev);
 rt_err_t rt_device_open(rt_device_t dev, uint16_t oflag);
 rt_err_t rt_device_close(rt_device_t dev);
-size_t rt_device_read(rt_device_t dev, rt_off_t pos, void *buffer,
-                         size_t size);
+size_t rt_device_read(rt_device_t dev, rt_off_t pos, void *buffer, size_t size);
 size_t rt_device_write(rt_device_t dev, rt_off_t pos, const void *buffer,
-                          size_t size);
+                       size_t size);
 rt_err_t rt_device_control(rt_device_t dev, int cmd, void *arg);
 
 #endif
@@ -399,7 +392,6 @@ void rt_components_init(void);
 
 /**@{*/
 
-#include <printf.h>
 int rt_kprintf(const char *fmt, ...);
 #if defined(RT_USING_DEVICE) && defined(RT_USING_CONSOLE)
 rt_device_t rt_console_set_device(const char *name);
@@ -417,36 +409,6 @@ const char *rt_strerror(rt_err_t error);
 #endif
 
 int __rt_ffs(int value);
-
-#ifndef RT_KSERVICE_USING_STDLIB
-char *rt_strstr(const char *str1, const char *str2);
-int32_t rt_strcasecmp(const char *a, const char *b);
-char *rt_strcpy(char *dst, const char *src);
-char *rt_strncpy(char *dest, const char *src, size_t n);
-int32_t rt_strncmp(const char *cs, const char *ct, size_t count);
-int32_t rt_strcmp(const char *cs, const char *ct);
-size_t rt_strlen(const char *src);
-#else
-#include <string.h>
-#define rt_strstr(str1, str2)     strstr(str1, str2)
-#define rt_strcasecmp(a, b)       strcasecmp(a, b)
-#define rt_strcpy(dest, src)      strcpy(dest, src)
-#define rt_strncpy(dest, src, n)  strncpy(dest, src, n)
-#define rt_strncmp(cs, ct, count) strncmp(cs, ct, count)
-#define rt_strcmp(cs, ct)         strcmp(cs, ct)
-#define rt_strlen(src)            strlen(src)
-#ifdef RT_KSERVICE_USING_STDLIB_MEMORY
-#define rt_memset(s, c, count)     memset(s, c, count)
-#define rt_memcpy(dst, src, count) memcpy(dst, src, count)
-#define rt_memmove(dest, src, n)   memmove(dest, src, n)
-#define rt_memcmp(cs, ct, count)   memcmp(cs, ct, count)
-#else
-void *rt_memset(void *src, int c, rt_ubase_t n);
-void *rt_memcpy(void *dest, const void *src, rt_ubase_t n);
-void *rt_memmove(void *dest, const void *src, size_t n);
-int32_t rt_memcmp(const void *cs, const void *ct, size_t count);
-#endif
-#endif
 
 void rt_show_version(void);
 
