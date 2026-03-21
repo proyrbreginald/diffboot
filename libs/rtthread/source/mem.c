@@ -49,6 +49,7 @@
 
 #include <rthw.h>
 #include <rtthread.h>
+#include <rtdebug.h>
 
 #if defined (RT_USING_SMALL_MEM)
  /**

@@ -1,7 +1,7 @@
 #ifndef _RTHW_H_
 #define _RTHW_H_
 
-#include "rtthread.h"
+#include "rtdef.h"
 
 enum RT_HW_CACHE_OPS {
     RT_HW_CACHE_FLUSH      = 0x01,

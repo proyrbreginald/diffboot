@@ -44,8 +44,9 @@
  * 2022-04-08     Stanley      Correct descriptions
  */
 
-#include <rtthread.h>
 #include <rthw.h>
+#include <rtthread.h>
+#include <rtdebug.h>
 
 #ifndef __on_rt_object_trytake_hook
     #define __on_rt_object_trytake_hook(parent)     __ON_HOOK_ARGS(rt_object_trytake_hook, (parent))

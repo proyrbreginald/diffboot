@@ -1,7 +1,7 @@
 #ifndef _RINGBUFFER_H_
 #define _RINGBUFFER_H_
 
-#include <rtthread.h>
+#include <stddef.h>
 
 /* 环形缓冲区结构体 */
 struct rt_ringbuffer {
@@ -13,12 +13,11 @@ struct rt_ringbuffer {
     uint16_t buffer_size;
 };
 
-void rt_ringbuffer_init(struct rt_ringbuffer *rb, uint8_t *pool,
-                        uint16_t size);
+void rt_ringbuffer_init(struct rt_ringbuffer *rb, uint8_t *pool, uint16_t size);
 size_t rt_ringbuffer_put(struct rt_ringbuffer *rb, const uint8_t *ptr,
-                            uint16_t length);
+                         uint16_t length);
 size_t rt_ringbuffer_get(struct rt_ringbuffer *rb, uint8_t *ptr,
-                            uint16_t length);
+                         uint16_t length);
 size_t rt_ringbuffer_data_len(struct rt_ringbuffer *rb);
 void rt_ringbuffer_reset(struct rt_ringbuffer *rb);
 

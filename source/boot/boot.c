@@ -1,14 +1,14 @@
 #include <load/load.h>
 #include <main.h>
 #include <mcu.h>
+#include <ymodem.h>
 #include <rthw.h>
 #include <rtthread.h>
-#include <ymodem.h>
 
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__
-#define DBG_LVL DBG_DEBUG
-#include <rtdbg.h>
+#define DBG_LVL DBG_VERBOSE
+#include <rtdebug.h>
 
 #undef THREAD_NAME
 #define THREAD_NAME "count"
@@ -295,7 +295,8 @@ ITCM static void ymodem_on_end(int status)
 
         // 设置加载app标志位
         // *(volatile uint32_t *)MCU_BKPRAM_START =
-        //     ((iap_zone == IAP_USER) ? LOAD_USER_CHECKSUM : LOAD_OEM_CHECKSUM);
+        //     ((iap_zone == IAP_USER) ? LOAD_USER_CHECKSUM :
+        //     LOAD_OEM_CHECKSUM);
 
         LOG_I("stack: 0x%08x, reset: 0x%08x, checksum: 0x%08x", stack, reset,
               *(volatile uint32_t *)MCU_BKPRAM_START);
@@ -370,8 +371,8 @@ static void boot_thread_entry(void *parameter)
 static int boot_thread_init(void)
 {
     rt_err_t result = RT_EOK;
-    rt_thread_t tid = rt_thread_create(THREAD_NAME, boot_thread_entry, NULL,
-                                       1024 * 2, 1, 0);
+    rt_thread_t tid =
+        rt_thread_create(THREAD_NAME, boot_thread_entry, NULL, 1024 * 2, 1, 0);
     if (tid != NULL)
     {
         LOG_I(THREAD_NAME " thread create success");

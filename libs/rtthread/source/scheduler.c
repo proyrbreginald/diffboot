@@ -30,8 +30,9 @@
  * 2022-01-07     Gabriel      Moving __on_rt_xxxxx_hook to scheduler.c
  */
 
-#include <rtthread.h>
 #include <rthw.h>
+#include <rtthread.h>
+#include <rtdebug.h>
 
 rt_dlist_t rt_thread_priority_table[RT_THREAD_PRIORITY_MAX];
 uint32_t rt_thread_ready_priority_group;

@@ -21,8 +21,9 @@
  * 2022-04-19     Stanley      Correct descriptions
  */
 
-#include <rtthread.h>
 #include <rthw.h>
+#include <rtthread.h>
+#include <rtdebug.h>
 
 /* hard timer list */
 static rt_dlist_t _timer_list[RT_TIMER_SKIP_LIST_LEVEL];

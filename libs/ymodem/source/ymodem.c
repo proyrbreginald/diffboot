@@ -1,12 +1,15 @@
-#include <mcu.h>
 #include <main.h>
+#include <mcu.h>
 #include <ringbuffer.h>
 #include <stdlib.h>
 #include <ymodem.h>
+#include <rthw.h>
+#include <rtthread.h>
 
+// 配置调试日志
 #define DBG_TAG __FILE_NAME__
-#define DBG_LVL DBG_INFO
-#include <rtdbg.h>
+#define DBG_LVL DBG_VERBOSE
+#include <rtdebug.h>
 
 #define UART_RX_BUF_SIZE (1024 * 2)
 #define YMODEM_RB_SIZE (1024 * 4)
@@ -94,8 +97,7 @@ static void ymodem_dma_process(void)
  * @param timeout_ms 超时时间。
  * @return size_t
  */
-static size_t rb_read_wait(uint8_t *dest, size_t len,
-                              uint32_t timeout_ms)
+static size_t rb_read_wait(uint8_t *dest, size_t len, uint32_t timeout_ms)
 {
     rt_tick_t start = rt_tick_get();
     size_t total = 0;
@@ -315,8 +317,8 @@ static void ymodem_thread_entry(void *parameter)
 static int ymodem_thread_init(void)
 {
     rt_err_t result = RT_EOK;
-    rt_thread_t tid = rt_thread_create(THREAD_NAME, ymodem_thread_entry,
-                                       NULL, 1024 * 2, 2, 0);
+    rt_thread_t tid = rt_thread_create(THREAD_NAME, ymodem_thread_entry, NULL,
+                                       1024 * 2, 2, 0);
     if (tid != NULL)
     {
         LOG_I(THREAD_NAME " thread create success");

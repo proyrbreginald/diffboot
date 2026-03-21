@@ -19,6 +19,7 @@
 
 #include <rthw.h>
 #include <rtthread.h>
+#include <rtdebug.h>
 
 #ifdef RT_USING_MEMPOOL
 

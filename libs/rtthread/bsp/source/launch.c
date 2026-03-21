@@ -1,11 +1,12 @@
 #include <board.h>
 #include <boot/boot.h>
 #include <rthw.h>
+#include <rtthread.h>
 
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__
-#define DBG_LVL DBG_DEBUG
-#include <rtdbg.h>
+#define DBG_LVL DBG_VERBOSE
+#include <rtdebug.h>
 
 static int rti_start(void)
 {
@@ -39,8 +40,7 @@ RT_LAUNCH_RUN_EXPORT(rti_end, "6.end");
 void rt_hw_board_init(void)
 {
     volatile const int_fn_void_t *fn_ptr;
-    for (fn_ptr = &rt_init_rti_start; fn_ptr < &rt_init_rti_board_end;
-         fn_ptr++)
+    for (fn_ptr = &rt_init_rti_start; fn_ptr < &rt_init_rti_board_end; fn_ptr++)
     {
         (*fn_ptr)();
     }
@@ -51,8 +51,7 @@ void rt_hw_board_init(void)
 void rt_components_init(void)
 {
     volatile const int_fn_void_t *fn_ptr;
-    for (fn_ptr = &rt_init_rti_board_end; fn_ptr <= &rt_init_rti_end;
-         fn_ptr++)
+    for (fn_ptr = &rt_init_rti_board_end; fn_ptr <= &rt_init_rti_end; fn_ptr++)
     {
         (*fn_ptr)();
     }

@@ -1,10 +1,18 @@
+/**
+ * @file rtdef.h
+ * @author reginald.yang (proyrb@yeah.net)
+ * @version 0.1
+ * @date 2026-03-21
+ * @copyright Copyright (c) 2026
+ * @brief 提供rtthread类型定义。
+ */
+
 #ifndef _RT_DEF_H_
 #define _RT_DEF_H_
 
 #include <stdint.h>
 #include <stddef.h>
 #include <stdarg.h>
-#include <mcu.h>
 #include <rtconfig.h>
 
 /**
@@ -335,8 +343,8 @@ struct rt_thread {
     uint8_t type;           //!< type of object */
     uint8_t flags;          //!< thread's flags */
 #ifdef RT_USING_MODULE
-    void *module_id;     //!< id of application module */
-#endif                   /* RT_USING_MODULE */
+    void *module_id; //!< id of application module */
+#endif
     rt_dlist_t list;     //!< the object list */
     rt_dlist_t tlist;    //!< the thread list */
     void *sp;            //!< stack point */
@@ -775,13 +783,12 @@ enum rt_graphic_pixel_format_t {
 /**
  * @brief 定义如何根据(x, y)坐标构建像素位置。
  */
-*/
 #define RTGRAPHIC_PIXEL_POSITION(x, y) ((x << 16) | y)
 
-    /**
-     * @brief 定义图形设备信息结构体。
-     */
-    struct rt_device_graphic_info {
+/**
+ * @brief 定义图形设备信息结构体。
+ */
+struct rt_device_graphic_info {
     uint8_t pixel_format;   //!< graphic format */
     uint8_t bits_per_pixel; //!< bits per pixel */
     uint16_t pitch;         //!< bytes per line */
@@ -815,6 +822,19 @@ struct rt_device_graphic_ops {
 #define RT_GRAPHIC_OPS(device)                                                 \
     ((struct rt_device_graphic_ops *)(device->user_data))
 
+#endif
+
+#ifdef RT_USING_MODULE
+struct rt_module_symtab {
+    void *addr;
+    const char *name;
+};
+#define RTM_EXPORT(symbol)                                                     \
+    const char __rtmsym_##symbol##_name[] SECTION(".rodata.name") = #symbol;   \
+    const struct rt_module_symtab __rtmsym_##symbol SECTION(                   \
+        ".rt_module_symbol") = {(void *)&symbol, __rtmsym_##symbol##_name};
+#else
+#define RTM_EXPORT(symbol)
 #endif
 
 #endif

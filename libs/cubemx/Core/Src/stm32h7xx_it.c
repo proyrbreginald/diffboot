@@ -34,8 +34,8 @@
 /* USER CODE BEGIN PD */
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__
-#define DBG_LVL DBG_WARN
-#include <rtdbg.h>
+#define DBG_LVL DBG_VERBOSE
+#include <rtdebug.h>
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/

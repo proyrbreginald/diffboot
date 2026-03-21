@@ -12,19 +12,21 @@
 
 #include <stdint.h>
 #include <string.h>
-
 #include <rthw.h>
 #include <rtthread.h>
+#include <rtdebug.h>
 
 #ifdef RT_USING_SIGNALS
 
 #ifndef RT_SIG_INFO_MAX
 #define RT_SIG_INFO_MAX 32
-#endif /* RT_SIG_INFO_MAX */
+#endif
 
+#undef DBG_TAG
 #define DBG_TAG     "SIGN"
+
+#undef DBG_LVL
 #define DBG_LVL     DBG_WARN
-#include <rtdbg.h>
 
 #define sig_mask(sig_no)    (1u << sig_no)
 #define sig_valid(sig_no)   (sig_no >= 0 && sig_no < RT_SIG_MAX)

@@ -35,7 +35,7 @@
 
 #include <rthw.h>
 #include <rtthread.h>
-#include <stddef.h>
+#include <rtdebug.h>
 
 #ifndef __on_rt_thread_inited_hook
     #define __on_rt_thread_inited_hook(thread)      __ON_HOOK_ARGS(rt_thread_inited_hook, (thread))

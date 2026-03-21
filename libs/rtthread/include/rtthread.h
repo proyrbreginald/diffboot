@@ -2,10 +2,9 @@
 #define _RTTHREAD_H_
 
 #include "rtconfig.h"
-#include "rtdebug.h"
+// #include "rtdebug.h"
 #include "rtdef.h"
 #include "rtservice.h"
-#include "rtm.h"
 
 /**
  * @addtogroup KernelObject
@@ -450,13 +449,6 @@ int32_t rt_memcmp(const void *cs, const void *ct, size_t count);
 #endif
 
 void rt_show_version(void);
-
-#ifdef RT_DEBUG
-extern void (*rt_assert_hook)(const char *ex, const char *func, size_t line);
-void rt_assert_set_hook(void (*hook)(const char *ex, const char *func,
-                                     size_t line));
-void rt_assert_handler(const char *ex, const char *func, size_t line);
-#endif
 
 #ifdef RT_USING_FINSH
 #include <finsh.h>

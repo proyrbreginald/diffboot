@@ -1,9 +1,10 @@
 #include <mcu.h>
 #include <ringbuffer.h>
+#include <rtthread.h>
+#include <stdint.h>
 #include <string.h>
 
-void rt_ringbuffer_init(struct rt_ringbuffer *rb, uint8_t *pool,
-                        uint16_t size)
+void rt_ringbuffer_init(struct rt_ringbuffer *rb, uint8_t *pool, uint16_t size)
 {
     rb->buffer_ptr = pool;
     rb->buffer_size = size;
@@ -30,8 +31,8 @@ ITCM size_t rt_ringbuffer_data_len(struct rt_ringbuffer *rb)
         return rb->buffer_size - (rb->read_index - rb->write_index);
 }
 
-ITCM size_t rt_ringbuffer_put(struct rt_ringbuffer *rb,
-                                 const uint8_t *ptr, uint16_t length)
+ITCM size_t rt_ringbuffer_put(struct rt_ringbuffer *rb, const uint8_t *ptr,
+                              uint16_t length)
 {
     uint16_t size;
     uint16_t free_len = rb->buffer_size - rt_ringbuffer_data_len(rb);
@@ -58,7 +59,7 @@ ITCM size_t rt_ringbuffer_put(struct rt_ringbuffer *rb,
 }
 
 ITCM size_t rt_ringbuffer_get(struct rt_ringbuffer *rb, uint8_t *ptr,
-                                 uint16_t length)
+                              uint16_t length)
 {
     uint16_t size;
     uint16_t data_len = rt_ringbuffer_data_len(rb);

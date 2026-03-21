@@ -9,12 +9,12 @@
  * 2019-04-27     misonyo      update to cortex-m7 series
  */
 
-#include <rthw.h>
-#include <rtdef.h>
 #include <board.h>
+#include <rtdebug.h>
+#include <rthw.h>
 
 /* The L1-caches on all CortexÂ®-M7s are divided into lines of 32 bytes. */
-#define L1CACHE_LINESIZE_BYTE       (32)
+#define L1CACHE_LINESIZE_BYTE (32)
 
 void rt_hw_cpu_icache_enable(void)
 {
@@ -31,9 +31,9 @@ rt_base_t rt_hw_cpu_icache_status(void)
     return 0;
 }
 
-void rt_hw_cpu_icache_ops(int ops, void* addr, int size)
+void rt_hw_cpu_icache_ops(int ops, void *addr, int size)
 {
-    uint32_t address = (uint32_t)addr & (uint32_t) ~(L1CACHE_LINESIZE_BYTE - 1);
+    uint32_t address = (uint32_t)addr & (uint32_t)~(L1CACHE_LINESIZE_BYTE - 1);
     int32_t size_byte = size + address - (uint32_t)addr;
     uint32_t linesize = 32U;
     if (ops & RT_HW_CACHE_INVALIDATE)
@@ -65,9 +65,10 @@ rt_base_t rt_hw_cpu_dcache_status(void)
     return 0;
 }
 
-void rt_hw_cpu_dcache_ops(int ops, void* addr, int size)
+void rt_hw_cpu_dcache_ops(int ops, void *addr, int size)
 {
-    uint32_t startAddr = (uint32_t)addr & (uint32_t)~(L1CACHE_LINESIZE_BYTE - 1);
+    uint32_t startAddr =
+        (uint32_t)addr & (uint32_t)~(L1CACHE_LINESIZE_BYTE - 1);
     uint32_t size_byte = size + (uint32_t)addr - startAddr;
     uint32_t clean_invalid = RT_HW_CACHE_FLUSH | RT_HW_CACHE_INVALIDATE;
 

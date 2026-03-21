@@ -16,6 +16,7 @@
  */
 
 #include <rtthread.h>
+#include <rtdebug.h>
 #ifdef RT_USING_POSIX_DEVIO
 #include <rtdevice.h> /* for wqueue_init */
 #endif /* RT_USING_POSIX_DEVIO */

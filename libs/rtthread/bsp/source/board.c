@@ -1,12 +1,13 @@
 #include <board.h>
-#include <mcu.h>
 #include <lptim.h>
+#include <mcu.h>
 #include <rthw.h>
+#include <rtthread.h>
 
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__
 #define DBG_LVL DBG_VERBOSE
-#include <rtdbg.h>
+#include <rtdebug.h>
 
 static uint32_t ticks_per_us;
 
@@ -129,7 +130,7 @@ ITCM void rt_hw_us_delay(uint32_t us)
 
 /**
  * @brief 控制台内容输出。
- * 
+ *
  * @param str 输出内容指针。
  */
 ITCM void rt_hw_console_output(const char *str)
@@ -148,7 +149,7 @@ ITCM void rt_hw_console_output(const char *str)
 
 /**
  * @brief 执行操作系统启动前的配置。
- * 
+ *
  */
 void rt_hw_mcu_init(void)
 {

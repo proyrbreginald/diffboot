@@ -23,8 +23,9 @@
  * 2022-06-04     Meco Man     remove strnlen
  */
 
-#include <rtthread.h>
 #include <rthw.h>
+#include <rtthread.h>
+#include <rtdebug.h>
 
 #ifdef RT_USING_MODULE
 #include <dlmodule.h>

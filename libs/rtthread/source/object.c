@@ -16,8 +16,9 @@
  * 2022-01-07     Gabriel      Moving __on_rt_xxxxx_hook to object.c
  */
 
-#include <rtthread.h>
 #include <rthw.h>
+#include <rtthread.h>
+#include <rtdebug.h>
 
 #ifdef RT_USING_MODULE
 #include <dlmodule.h>
