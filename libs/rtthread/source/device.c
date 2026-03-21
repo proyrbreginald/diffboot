@@ -59,7 +59,7 @@ rt_err_t rt_device_register(rt_device_t dev,
     if (rt_device_find(name) != NULL)
         return -RT_ERROR;
 
-    rt_object_init(&(dev->parent), RT_Object_Class_Device, name);
+    rt_object_init(&(dev->parent), RT_OBJ_TYPE_DEVICE, name);
     dev->flag = flags;
     dev->ref_count = 0;
     dev->open_flag = 0;
@@ -84,7 +84,7 @@ rt_err_t rt_device_unregister(rt_device_t dev)
 {
     /* parameter check */
     RT_ASSERT(dev != NULL);
-    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_Object_Class_Device);
+    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_OBJ_TYPE_DEVICE);
     RT_ASSERT(rt_object_is_systemobject(&dev->parent));
 
     rt_object_detach(&(dev->parent));
@@ -102,7 +102,7 @@ RTM_EXPORT(rt_device_unregister);
  */
 rt_device_t rt_device_find(const char *name)
 {
-    return (rt_device_t)rt_object_find(name, RT_Object_Class_Device);
+    return (rt_device_t)rt_object_find(name, RT_OBJ_TYPE_DEVICE);
 }
 RTM_EXPORT(rt_device_find);
 
@@ -130,7 +130,7 @@ rt_device_t rt_device_create(int type, int attach_size)
     if (device)
     {
         rt_memset(device, 0x0, sizeof(struct rt_device));
-        device->type = (enum rt_device_class_type)type;
+        device->type = (enum rt_device_type)type;
     }
 
     return device;
@@ -146,7 +146,7 @@ void rt_device_destroy(rt_device_t dev)
 {
     /* parameter check */
     RT_ASSERT(dev != NULL);
-    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_Object_Class_Device);
+    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_OBJ_TYPE_DEVICE);
     RT_ASSERT(rt_object_is_systemobject(&dev->parent) == false);
 
     rt_object_detach(&(dev->parent));
@@ -206,7 +206,7 @@ rt_err_t rt_device_open(rt_device_t dev, uint16_t oflag)
 
     /* parameter check */
     RT_ASSERT(dev != NULL);
-    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_Object_Class_Device);
+    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_OBJ_TYPE_DEVICE);
 
     /* if device is not initialized, initialize it. */
     if (!(dev->flag & RT_DEVICE_FLAG_ACTIVATED))
@@ -272,7 +272,7 @@ rt_err_t rt_device_close(rt_device_t dev)
 
     /* parameter check */
     RT_ASSERT(dev != NULL);
-    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_Object_Class_Device);
+    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_OBJ_TYPE_DEVICE);
 
     if (dev->ref_count == 0)
         return -RT_ERROR;
@@ -318,7 +318,7 @@ size_t rt_device_read(rt_device_t dev,
 {
     /* parameter check */
     RT_ASSERT(dev != NULL);
-    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_Object_Class_Device);
+    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_OBJ_TYPE_DEVICE);
 
     if (dev->ref_count == 0)
     {
@@ -361,7 +361,7 @@ size_t rt_device_write(rt_device_t dev,
 {
     /* parameter check */
     RT_ASSERT(dev != NULL);
-    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_Object_Class_Device);
+    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_OBJ_TYPE_DEVICE);
 
     if (dev->ref_count == 0)
     {
@@ -397,7 +397,7 @@ rt_err_t rt_device_control(rt_device_t dev, int cmd, void *arg)
 {
     /* parameter check */
     RT_ASSERT(dev != NULL);
-    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_Object_Class_Device);
+    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_OBJ_TYPE_DEVICE);
 
     /* call device_write interface */
     if (device_control != NULL)
@@ -425,7 +425,7 @@ rt_err_t rt_device_set_rx_indicate(rt_device_t dev,
 {
     /* parameter check */
     RT_ASSERT(dev != NULL);
-    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_Object_Class_Device);
+    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_OBJ_TYPE_DEVICE);
 
     dev->rx_indicate = rx_ind;
 
@@ -449,7 +449,7 @@ rt_err_t rt_device_set_tx_complete(rt_device_t dev,
 {
     /* parameter check */
     RT_ASSERT(dev != NULL);
-    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_Object_Class_Device);
+    RT_ASSERT(rt_object_get_type(&dev->parent) == RT_OBJ_TYPE_DEVICE);
 
     dev->tx_complete = tx_done;
 

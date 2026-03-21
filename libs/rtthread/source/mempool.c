@@ -102,7 +102,7 @@ rt_err_t rt_mp_init(struct rt_mempool *mp,
     RT_ASSERT(size > 0 && block_size > 0);
 
     /* initialize object */
-    rt_object_init(&(mp->parent), RT_Object_Class_MemPool, name);
+    rt_object_init(&(mp->parent), RT_OBJ_TYPE_POOL, name);
 
     /* initialize memory pool */
     mp->start_address = start;
@@ -150,7 +150,7 @@ rt_err_t rt_mp_detach(struct rt_mempool *mp)
 
     /* parameter check */
     RT_ASSERT(mp != NULL);
-    RT_ASSERT(rt_object_get_type(&mp->parent) == RT_Object_Class_MemPool);
+    RT_ASSERT(rt_object_get_type(&mp->parent) == RT_OBJ_TYPE_POOL);
     RT_ASSERT(rt_object_is_systemobject(&mp->parent));
 
     /* wake up all suspended threads */
@@ -210,7 +210,7 @@ rt_mp_t rt_mp_create(const char *name,
     RT_ASSERT(block_count > 0 && block_size > 0);
 
     /* allocate object */
-    mp = (struct rt_mempool *)rt_object_allocate(RT_Object_Class_MemPool, name);
+    mp = (struct rt_mempool *)rt_object_allocate(RT_OBJ_TYPE_POOL, name);
     /* allocate object failed */
     if (mp == NULL)
         return NULL;
@@ -270,7 +270,7 @@ rt_err_t rt_mp_delete(rt_mp_t mp)
 
     /* parameter check */
     RT_ASSERT(mp != NULL);
-    RT_ASSERT(rt_object_get_type(&mp->parent) == RT_Object_Class_MemPool);
+    RT_ASSERT(rt_object_get_type(&mp->parent) == RT_OBJ_TYPE_POOL);
     RT_ASSERT(rt_object_is_systemobject(&mp->parent) == false);
 
     /* wake up all suspended threads */

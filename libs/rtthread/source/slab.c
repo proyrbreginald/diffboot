@@ -343,7 +343,7 @@ rt_slab_t rt_slab_init(const char *name, void *begin_addr, size_t size)
 
     rt_memset(slab, 0, sizeof(*slab));
     /* initialize slab memory object */
-    rt_object_init(&(slab->parent.parent), RT_Object_Class_Memory, name);
+    rt_object_init(&(slab->parent.parent), RT_OBJ_TYPE_MEM, name);
     slab->parent.algorithm = "slab";
     slab->parent.address = begin_align;
     slab->parent.total = limsize;
@@ -392,7 +392,7 @@ rt_err_t rt_slab_detach(rt_slab_t m)
     struct rt_slab *slab = (struct rt_slab *)m;
 
     RT_ASSERT(slab != NULL);
-    RT_ASSERT(rt_object_get_type(&slab->parent.parent) == RT_Object_Class_Memory);
+    RT_ASSERT(rt_object_get_type(&slab->parent.parent) == RT_OBJ_TYPE_MEM);
     RT_ASSERT(rt_object_is_systemobject(&slab->parent.parent));
 
     rt_object_detach(&(slab->parent.parent));

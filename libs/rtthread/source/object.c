@@ -9,7 +9,7 @@
  * 2006-04-21     Bernard      change the scheduler lock to interrupt lock
  * 2006-05-18     Bernard      fix the object init bug
  * 2006-08-03     Bernard      add hook support
- * 2007-01-28     Bernard      rename RT_OBJECT_Class_Static to RT_Object_Class_Static
+ * 2007-01-28     Bernard      rename RT_OBJECT_Class_Static to RT_OBJ_TYPE_STATIC
  * 2010-10-26     yi.qiu       add module support in rt_object_allocate and rt_object_free
  * 2017-12-10     Bernard      Add object_info enum.
  * 2018-01-25     Bernard      Fix the object find issue when enable MODULE.
@@ -69,14 +69,14 @@ enum rt_object_info_type
 static struct rt_object_information _object_container[RT_Object_Info_Unknown] =
 {
     /* initialize object container - thread */
-    {RT_Object_Class_Thread, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_Thread), sizeof(struct rt_thread)},
+    {RT_OBJ_TYPE_THREAD, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_Thread), sizeof(struct rt_thread)},
 #ifdef RT_USING_SEMAPHORE
     /* initialize object container - semaphore */
-    {RT_Object_Class_Semaphore, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_Semaphore), sizeof(struct rt_semaphore)},
+    {RT_OBJ_TYPE_SEM, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_Semaphore), sizeof(struct rt_semaphore)},
 #endif
 #ifdef RT_USING_MUTEX
     /* initialize object container - mutex */
-    {RT_Object_Class_Mutex, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_Mutex), sizeof(struct rt_mutex)},
+    {RT_OBJ_TYPE_MUTEX, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_Mutex), sizeof(struct rt_mutex)},
 #endif
 #ifdef RT_USING_EVENT
     /* initialize object container - event */
@@ -84,33 +84,33 @@ static struct rt_object_information _object_container[RT_Object_Info_Unknown] =
 #endif
 #ifdef RT_USING_MAILBOX
     /* initialize object container - mailbox */
-    {RT_Object_Class_MailBox, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_MailBox), sizeof(struct rt_mailbox)},
+    {RT_OBJ_TYPE_MAIL, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_MailBox), sizeof(struct rt_mailbox)},
 #endif
 #ifdef RT_USING_MESSAGEQUEUE
     /* initialize object container - message queue */
-    {RT_Object_Class_MessageQueue, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_MessageQueue), sizeof(struct rt_messagequeue)},
+    {RT_OBJ_TYPE_QUEUE, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_MessageQueue), sizeof(struct rt_messagequeue)},
 #endif
 #ifdef RT_USING_MEMHEAP
     /* initialize object container - memory heap */
-    {RT_Object_Class_MemHeap, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_MemHeap), sizeof(struct rt_memheap)},
+    {RT_OBJ_TYPE_HEAP, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_MemHeap), sizeof(struct rt_memheap)},
 #endif
 #ifdef RT_USING_MEMPOOL
     /* initialize object container - memory pool */
-    {RT_Object_Class_MemPool, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_MemPool), sizeof(struct rt_mempool)},
+    {RT_OBJ_TYPE_POOL, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_MemPool), sizeof(struct rt_mempool)},
 #endif
 #ifdef RT_USING_DEVICE
     /* initialize object container - device */
-    {RT_Object_Class_Device, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_Device), sizeof(struct rt_device)},
+    {RT_OBJ_TYPE_DEVICE, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_Device), sizeof(struct rt_device)},
 #endif
     /* initialize object container - timer */
-    {RT_Object_Class_Timer, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_Timer), sizeof(struct rt_timer)},
+    {RT_OBJ_TYPE_TIMER, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_Timer), sizeof(struct rt_timer)},
 #ifdef RT_USING_MODULE
     /* initialize object container - module */
-    {RT_Object_Class_Module, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_Module), sizeof(struct rt_dlmodule)},
+    {RT_OBJ_TYPE_MODULE, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_Module), sizeof(struct rt_dlmodule)},
 #endif
 #ifdef RT_USING_HEAP
     /* initialize object container - small memory */
-    {RT_Object_Class_Memory, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_Memory), sizeof(struct rt_memory)},
+    {RT_OBJ_TYPE_MEM, _OBJ_CONTAINER_LIST_INIT(RT_Object_Info_Memory), sizeof(struct rt_memory)},
 #endif
 };
 
@@ -226,12 +226,12 @@ void rt_object_put_sethook(void (*hook)(struct rt_object *object))
  * @brief This function will return the specified type of object information.
  *
  * @param type is the type of object, which can be
- *             RT_Object_Class_Thread/Semaphore/Mutex... etc
+ *             RT_OBJ_TYPE_THREAD/Semaphore/Mutex... etc
  *
  * @return the object type information or NULL
  */
 struct rt_object_information *
-rt_object_get_information(enum rt_object_class_type type)
+rt_object_get_information(enum rt_object_type type)
 {
     int index;
 
@@ -246,18 +246,18 @@ RTM_EXPORT(rt_object_get_information);
  * @brief This function will return the length of object list in object container.
  *
  * @param type is the type of object, which can be
- *             RT_Object_Class_Thread/Semaphore/Mutex... etc
+ *             RT_OBJ_TYPE_THREAD/Semaphore/Mutex... etc
  *
  * @return the length of object list
  */
-int rt_object_get_length(enum rt_object_class_type type)
+int rt_object_get_length(enum rt_object_type type)
 {
     int count = 0;
     rt_base_t level;
     struct rt_list_node *node = NULL;
     struct rt_object_information *information = NULL;
 
-    information = rt_object_get_information((enum rt_object_class_type)type);
+    information = rt_object_get_information((enum rt_object_type)type);
     if (information == NULL) return 0;
 
     level = rt_hw_interrupt_disable();
@@ -277,7 +277,7 @@ RTM_EXPORT(rt_object_get_length);
  *        with the maximum size specified by maxlen.
  *
  * @param type is the type of object, which can be
- *             RT_Object_Class_Thread/Semaphore/Mutex... etc
+ *             RT_OBJ_TYPE_THREAD/Semaphore/Mutex... etc
  *
  * @param pointers is the pointer will be saved to.
  *
@@ -285,7 +285,7 @@ RTM_EXPORT(rt_object_get_length);
  *
  * @return the copied number of object pointers.
  */
-int rt_object_get_pointers(enum rt_object_class_type type, rt_object_t *pointers, int maxlen)
+int rt_object_get_pointers(enum rt_object_type type, rt_object_t *pointers, int maxlen)
 {
     int index = 0;
     rt_base_t level;
@@ -296,7 +296,7 @@ int rt_object_get_pointers(enum rt_object_class_type type, rt_object_t *pointers
 
     if (maxlen <= 0) return 0;
 
-    information = rt_object_get_information((enum rt_object_class_type)type);
+    information = rt_object_get_information((enum rt_object_type)type);
     if (information == NULL) return 0;
 
     level = rt_hw_interrupt_disable();
@@ -327,7 +327,7 @@ RTM_EXPORT(rt_object_get_pointers);
  * @param name is the object name. In system, the object's name must be unique.
  */
 void rt_object_init(struct rt_object         *object,
-                    enum rt_object_class_type type,
+                    enum rt_object_type type,
                     const char               *name)
 {
     rt_base_t level;
@@ -363,7 +363,7 @@ void rt_object_init(struct rt_object         *object,
 
     /* initialize object's parameters */
     /* set object type to static */
-    object->type = type | RT_Object_Class_Static;
+    object->type = type | RT_OBJ_TYPE_STATIC;
     /* copy name */
     rt_strncpy(object->name, name, RT_NAME_MAX);
 
@@ -427,7 +427,7 @@ void rt_object_detach(rt_object_t object)
  *
  * @return object
  */
-rt_object_t rt_object_allocate(enum rt_object_class_type type, const char *name)
+rt_object_t rt_object_allocate(enum rt_object_type type, const char *name)
 {
     struct rt_object *object;
     rt_base_t level;
@@ -499,12 +499,12 @@ void rt_object_delete(rt_object_t object)
 
     /* object check */
     RT_ASSERT(object != NULL);
-    RT_ASSERT(!(object->type & RT_Object_Class_Static));
+    RT_ASSERT(!(object->type & RT_OBJ_TYPE_STATIC));
 
     RT_OBJECT_HOOK_CALL(rt_object_detach_hook, (object));
 
     /* reset object type */
-    object->type = RT_Object_Class_Null;
+    object->type = RT_OBJ_TYPE_NULL;
 
     /* lock interrupt */
     level = rt_hw_interrupt_disable();
@@ -524,7 +524,7 @@ void rt_object_delete(rt_object_t object)
  * @brief This function will judge the object is system object or not.
  *
  * @note  Normally, the system object is a static object and the type
- *        of object set to RT_Object_Class_Static.
+ *        of object set to RT_OBJ_TYPE_STATIC.
  *
  * @param object is the specified object to be judged.
  *
@@ -535,7 +535,7 @@ bool rt_object_is_systemobject(rt_object_t object)
     /* object check */
     RT_ASSERT(object != NULL);
 
-    if (object->type & RT_Object_Class_Static)
+    if (object->type & RT_OBJ_TYPE_STATIC)
         return true;
 
     return false;
@@ -543,7 +543,7 @@ bool rt_object_is_systemobject(rt_object_t object)
 
 /**
  * @brief This function will return the type of object without
- *        RT_Object_Class_Static flag.
+ *        RT_OBJ_TYPE_STATIC flag.
  *
  * @param object is the specified object to be get type.
  *
@@ -554,7 +554,7 @@ uint8_t rt_object_get_type(rt_object_t object)
     /* object check */
     RT_ASSERT(object != NULL);
 
-    return object->type & ~RT_Object_Class_Static;
+    return object->type & ~RT_OBJ_TYPE_STATIC;
 }
 
 /**
@@ -576,7 +576,7 @@ rt_object_t rt_object_find(const char *name, uint8_t type)
     struct rt_list_node *node = NULL;
     struct rt_object_information *information = NULL;
 
-    information = rt_object_get_information((enum rt_object_class_type)type);
+    information = rt_object_get_information((enum rt_object_type)type);
 
     /* parameter check */
     if ((name == NULL) || (information == NULL)) return NULL;

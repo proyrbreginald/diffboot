@@ -33,7 +33,7 @@
 #include <rtthread.h>
 #include <rthw.h>
 
-rt_list_t rt_thread_priority_table[RT_THREAD_PRIORITY_MAX];
+rt_dlist_t rt_thread_priority_table[RT_THREAD_PRIORITY_MAX];
 uint32_t rt_thread_ready_priority_group;
 #if RT_THREAD_PRIORITY_MAX > 32
 /* Maximum priority level, 256 */

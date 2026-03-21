@@ -81,7 +81,7 @@ rt_err_t rt_memheap_init(struct rt_memheap *memheap,
     RT_ASSERT(memheap != NULL);
 
     /* initialize pool object */
-    rt_object_init(&(memheap->parent), RT_Object_Class_MemHeap, name);
+    rt_object_init(&(memheap->parent), RT_OBJ_TYPE_HEAP, name);
 
     memheap->start_addr     = start_addr;
     memheap->pool_size      = RT_ALIGN_DOWN(size, RT_ALIGN_SIZE);
@@ -160,7 +160,7 @@ RTM_EXPORT(rt_memheap_init);
 rt_err_t rt_memheap_detach(struct rt_memheap *heap)
 {
     RT_ASSERT(heap);
-    RT_ASSERT(rt_object_get_type(&heap->parent) == RT_Object_Class_MemHeap);
+    RT_ASSERT(rt_object_get_type(&heap->parent) == RT_OBJ_TYPE_HEAP);
     RT_ASSERT(rt_object_is_systemobject(&heap->parent));
 
     rt_sem_detach(&heap->lock);
@@ -187,7 +187,7 @@ void *rt_memheap_alloc(struct rt_memheap *heap, size_t size)
     struct rt_memheap_item *header_ptr;
 
     RT_ASSERT(heap != NULL);
-    RT_ASSERT(rt_object_get_type(&heap->parent) == RT_Object_Class_MemHeap);
+    RT_ASSERT(rt_object_get_type(&heap->parent) == RT_OBJ_TYPE_HEAP);
 
     /* align allocated size */
     size = RT_ALIGN(size, RT_ALIGN_SIZE);
@@ -366,7 +366,7 @@ void *rt_memheap_realloc(struct rt_memheap *heap, void *ptr, size_t newsize)
     struct rt_memheap_item *new_ptr;
 
     RT_ASSERT(heap);
-    RT_ASSERT(rt_object_get_type(&heap->parent) == RT_Object_Class_MemHeap);
+    RT_ASSERT(rt_object_get_type(&heap->parent) == RT_OBJ_TYPE_HEAP);
 
     if (newsize == 0)
     {
@@ -628,7 +628,7 @@ void rt_memheap_free(void *ptr)
     heap = header_ptr->pool_ptr;
 
     RT_ASSERT(heap);
-    RT_ASSERT(rt_object_get_type(&heap->parent) == RT_Object_Class_MemHeap);
+    RT_ASSERT(rt_object_get_type(&heap->parent) == RT_OBJ_TYPE_HEAP);
 
     if (heap->locked == false)
     {
@@ -790,7 +790,7 @@ void *_memheap_alloc(struct rt_memheap *heap, size_t size)
         struct rt_object_information *information;
 
         /* try to allocate on other memory heap */
-        information = rt_object_get_information(RT_Object_Class_MemHeap);
+        information = rt_object_get_information(RT_OBJ_TYPE_HEAP);
         RT_ASSERT(information != NULL);
         for (node  = information->object_list.next;
              node != &(information->object_list);
@@ -879,7 +879,7 @@ int memheapcheck(int argc, char *argv[])
 
     name = argc > 1 ? argv[1] : NULL;
     level = rt_hw_interrupt_disable();
-    info = rt_object_get_information(RT_Object_Class_MemHeap);
+    info = rt_object_get_information(RT_OBJ_TYPE_HEAP);
     list = &info->object_list;
     for (node = list->next; node != list; node = node->next)
     {
@@ -940,7 +940,7 @@ int memheaptrace(int argc, char *argv[])
     char *name;
 
     name = argc > 1 ? argv[1] : NULL;
-    info = rt_object_get_information(RT_Object_Class_MemHeap);
+    info = rt_object_get_information(RT_OBJ_TYPE_HEAP);
     list = &info->object_list;
     for (node = list->next; node != list; node = node->next)
     {

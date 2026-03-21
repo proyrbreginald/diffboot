@@ -14,15 +14,15 @@
 /**@{*/
 
 struct rt_object_information *rt_object_get_information(
-    enum rt_object_class_type type);
-int rt_object_get_length(enum rt_object_class_type type);
-int rt_object_get_pointers(enum rt_object_class_type type,
+    enum rt_object_type type);
+int rt_object_get_length(enum rt_object_type type);
+int rt_object_get_pointers(enum rt_object_type type,
                            rt_object_t *pointers, int maxlen);
-void rt_object_init(struct rt_object *object, enum rt_object_class_type type,
+void rt_object_init(struct rt_object *object, enum rt_object_type type,
                     const char *name);
 void rt_object_detach(rt_object_t object);
 #ifdef RT_USING_HEAP
-rt_object_t rt_object_allocate(enum rt_object_class_type type,
+rt_object_t rt_object_allocate(enum rt_object_type type,
                                const char *name);
 void rt_object_delete(rt_object_t object);
 #endif

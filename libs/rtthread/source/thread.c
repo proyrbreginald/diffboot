@@ -133,7 +133,7 @@ static void _thread_timeout(void *parameter)
     /* parameter check */
     RT_ASSERT(thread != NULL);
     RT_ASSERT((thread->stat & RT_THREAD_STAT_MASK) == RT_THREAD_SUSPEND);
-    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_OBJ_TYPE_THREAD);
 
     /* disable interrupt */
     level = rt_hw_interrupt_disable();
@@ -308,7 +308,7 @@ rt_err_t rt_thread_init(struct rt_thread *thread,
     RT_ASSERT(stack_start != NULL);
 
     /* initialize thread object */
-    rt_object_init((rt_object_t)thread, RT_Object_Class_Thread, name);
+    rt_object_init((rt_object_t)thread, RT_OBJ_TYPE_THREAD, name);
 
     return _thread_init(thread,
                         name,
@@ -357,7 +357,7 @@ rt_err_t rt_thread_startup(rt_thread_t thread)
     /* parameter check */
     RT_ASSERT(thread != NULL);
     RT_ASSERT((thread->stat & RT_THREAD_STAT_MASK) == RT_THREAD_INIT);
-    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_OBJ_TYPE_THREAD);
 
     /* calculate priority attribute */
 #if RT_THREAD_PRIORITY_MAX > 32
@@ -399,7 +399,7 @@ rt_err_t rt_thread_detach(rt_thread_t thread)
 
     /* parameter check */
     RT_ASSERT(thread != NULL);
-    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_OBJ_TYPE_THREAD);
     RT_ASSERT(rt_object_is_systemobject((rt_object_t)thread));
 
     if ((thread->stat & RT_THREAD_STAT_MASK) == RT_THREAD_CLOSE)
@@ -460,7 +460,7 @@ rt_thread_t rt_thread_create(const char *name,
     struct rt_thread *thread;
     void *stack_start;
 
-    thread = (struct rt_thread *)rt_object_allocate(RT_Object_Class_Thread,
+    thread = (struct rt_thread *)rt_object_allocate(RT_OBJ_TYPE_THREAD,
                                                     name);
     if (thread == NULL)
         return NULL;
@@ -502,7 +502,7 @@ rt_err_t rt_thread_delete(rt_thread_t thread)
 
     /* parameter check */
     RT_ASSERT(thread != NULL);
-    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_OBJ_TYPE_THREAD);
     RT_ASSERT(rt_object_is_systemobject((rt_object_t)thread) == false);
 
     if ((thread->stat & RT_THREAD_STAT_MASK) == RT_THREAD_CLOSE)
@@ -575,7 +575,7 @@ rt_err_t rt_thread_sleep(rt_tick_t tick)
     /* set to current thread */
     thread = rt_thread_self();
     RT_ASSERT(thread != NULL);
-    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_OBJ_TYPE_THREAD);
 
     /* disable interrupt */
     level = rt_hw_interrupt_disable();
@@ -637,7 +637,7 @@ rt_err_t rt_thread_delay_until(rt_tick_t *tick, rt_tick_t inc_tick)
     /* set to current thread */
     thread = rt_thread_self();
     RT_ASSERT(thread != NULL);
-    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_OBJ_TYPE_THREAD);
 
     /* disable interrupt */
     level = rt_hw_interrupt_disable();
@@ -725,7 +725,7 @@ rt_err_t rt_thread_control(rt_thread_t thread, int cmd, void *arg)
 
     /* parameter check */
     RT_ASSERT(thread != NULL);
-    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_OBJ_TYPE_THREAD);
 
     switch (cmd)
     {
@@ -844,7 +844,7 @@ rt_err_t rt_thread_suspend(rt_thread_t thread)
 
     /* parameter check */
     RT_ASSERT(thread != NULL);
-    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_OBJ_TYPE_THREAD);
     RT_ASSERT(thread == rt_thread_self());
 
     RT_DEBUG_LOG(RT_DEBUG_THREAD, ("thread suspend:  %s\n", thread->name));
@@ -888,7 +888,7 @@ rt_err_t rt_thread_resume(rt_thread_t thread)
 
     /* parameter check */
     RT_ASSERT(thread != NULL);
-    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_OBJ_TYPE_THREAD);
 
     RT_DEBUG_LOG(RT_DEBUG_THREAD, ("thread resume:  %s\n", thread->name));
 
@@ -931,7 +931,7 @@ RTM_EXPORT(rt_thread_resume);
  */
 rt_thread_t rt_thread_find(char *name)
 {
-    return (rt_thread_t)rt_object_find(name, RT_Object_Class_Thread);
+    return (rt_thread_t)rt_object_find(name, RT_OBJ_TYPE_THREAD);
 }
 
 RTM_EXPORT(rt_thread_find);

@@ -46,7 +46,7 @@
 #define _CPUS_NR                1
 #endif /* RT_USING_SMP */
 
-static rt_list_t _rt_thread_defunct = RT_LIST_OBJECT_INIT(_rt_thread_defunct);
+static rt_dlist_t _rt_thread_defunct = RT_LIST_OBJECT_INIT(_rt_thread_defunct);
 
 static struct rt_thread idle[_CPUS_NR];
 ALIGN(RT_ALIGN_SIZE)
@@ -158,7 +158,7 @@ rt_thread_t rt_thread_defunct_dequeue(void)
 {
     rt_base_t level;
     rt_thread_t thread = NULL;
-    rt_list_t *l = &_rt_thread_defunct;
+    rt_dlist_t *l = &_rt_thread_defunct;
 
 #ifdef RT_USING_SMP
     /* disable interrupt */

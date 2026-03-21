@@ -205,7 +205,7 @@ rt_smem_t rt_smem_init(const char    *name,
 
     rt_memset(small_mem, 0, sizeof(*small_mem));
     /* initialize small memory object */
-    rt_object_init(&(small_mem->parent.parent), RT_Object_Class_Memory, name);
+    rt_object_init(&(small_mem->parent.parent), RT_OBJ_TYPE_MEM, name);
     small_mem->parent.algorithm = "small";
     small_mem->parent.address = begin_align;
     small_mem->parent.total = mem_size;
@@ -252,7 +252,7 @@ RTM_EXPORT(rt_smem_init);
 rt_err_t rt_smem_detach(rt_smem_t m)
 {
     RT_ASSERT(m != NULL);
-    RT_ASSERT(rt_object_get_type(&m->parent) == RT_Object_Class_Memory);
+    RT_ASSERT(rt_object_get_type(&m->parent) == RT_OBJ_TYPE_MEM);
     RT_ASSERT(rt_object_is_systemobject(&m->parent));
 
     rt_object_detach(&(m->parent));
@@ -286,7 +286,7 @@ void *rt_smem_alloc(rt_smem_t m, size_t size)
         return NULL;
 
     RT_ASSERT(m != NULL);
-    RT_ASSERT(rt_object_get_type(&m->parent) == RT_Object_Class_Memory);
+    RT_ASSERT(rt_object_get_type(&m->parent) == RT_OBJ_TYPE_MEM);
     RT_ASSERT(rt_object_is_systemobject(&m->parent));
 
     if (size != RT_ALIGN(size, RT_ALIGN_SIZE))
@@ -428,7 +428,7 @@ void *rt_smem_realloc(rt_smem_t m, void *rmem, size_t newsize)
     void *nmem;
 
     RT_ASSERT(m != NULL);
-    RT_ASSERT(rt_object_get_type(&m->parent) == RT_Object_Class_Memory);
+    RT_ASSERT(rt_object_get_type(&m->parent) == RT_OBJ_TYPE_MEM);
     RT_ASSERT(rt_object_is_systemobject(&m->parent));
 
     small_mem = (struct rt_small_mem *)m;
@@ -535,7 +535,7 @@ void rt_smem_free(void *rmem)
     small_mem = MEM_POOL(mem);
     RT_ASSERT(small_mem != NULL);
     RT_ASSERT(MEM_ISUSED(mem));
-    RT_ASSERT(rt_object_get_type(&small_mem->parent.parent) == RT_Object_Class_Memory);
+    RT_ASSERT(rt_object_get_type(&small_mem->parent.parent) == RT_OBJ_TYPE_MEM);
     RT_ASSERT(rt_object_is_systemobject(&small_mem->parent.parent));
     RT_ASSERT((uint8_t *)rmem >= (uint8_t *)small_mem->heap_ptr &&
               (uint8_t *)rmem < (uint8_t *)small_mem->heap_end);
@@ -578,7 +578,7 @@ int memcheck(int argc, char *argv[])
     name = argc > 1 ? argv[1] : NULL;
     level = rt_hw_interrupt_disable();
     /* get mem object */
-    information = rt_object_get_information(RT_Object_Class_Memory);
+    information = rt_object_get_information(RT_OBJ_TYPE_MEM);
     for (node = information->object_list.next;
          node != &(information->object_list);
          node  = node->next)
@@ -624,7 +624,7 @@ int memtrace(int argc, char **argv)
 
     name = argc > 1 ? argv[1] : NULL;
     /* get mem object */
-    information = rt_object_get_information(RT_Object_Class_Memory);
+    information = rt_object_get_information(RT_OBJ_TYPE_MEM);
     for (node = information->object_list.next;
          node != &(information->object_list);
          node  = node->next)

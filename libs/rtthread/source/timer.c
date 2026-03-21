@@ -25,7 +25,7 @@
 #include <rthw.h>
 
 /* hard timer list */
-static rt_list_t _timer_list[RT_TIMER_SKIP_LIST_LEVEL];
+static rt_dlist_t _timer_list[RT_TIMER_SKIP_LIST_LEVEL];
 
 #ifdef RT_USING_TIMER_SOFT
 
@@ -43,7 +43,7 @@ static rt_list_t _timer_list[RT_TIMER_SKIP_LIST_LEVEL];
 /* soft timer status */
 static uint8_t _soft_timer_status = RT_SOFT_TIMER_IDLE;
 /* soft timer list */
-static rt_list_t _soft_timer_list[RT_TIMER_SKIP_LIST_LEVEL];
+static rt_dlist_t _soft_timer_list[RT_TIMER_SKIP_LIST_LEVEL];
 static struct rt_thread _timer_thread;
 ALIGN(RT_ALIGN_SIZE)
 static uint8_t _timer_thread_stack[RT_TIMER_THREAD_STACK_SIZE];
@@ -154,7 +154,7 @@ static void _timer_init(rt_timer_t timer,
  * @return  Return the operation status. If the return value is RT_EOK, the function is successfully executed.
  *          If the return value is any other values, it means this operation failed.
  */
-static rt_err_t _timer_list_next_timeout(rt_list_t timer_list[], rt_tick_t *timeout_tick)
+static rt_err_t _timer_list_next_timeout(rt_dlist_t timer_list[], rt_tick_t *timeout_tick)
 {
     struct rt_timer *timer;
     rt_base_t level;
@@ -219,9 +219,9 @@ static int _timer_count_height(struct rt_timer *timer)
  *
  * @param timer_heads the head of timer
  */
-void rt_timer_dump(rt_list_t timer_heads[])
+void rt_timer_dump(rt_dlist_t timer_heads[])
 {
-    rt_list_t *list;
+    rt_dlist_t *list;
 
     for (list = timer_heads[RT_TIMER_SKIP_LIST_LEVEL - 1].next;
          list != &timer_heads[RT_TIMER_SKIP_LIST_LEVEL - 1];
@@ -274,7 +274,7 @@ void rt_timer_init(rt_timer_t  timer,
     RT_ASSERT(time < RT_TICK_MAX / 2);
 
     /* timer object initialization */
-    rt_object_init(&(timer->parent), RT_Object_Class_Timer, name);
+    rt_object_init(&(timer->parent), RT_OBJ_TYPE_TIMER, name);
 
     _timer_init(timer, timeout, parameter, time, flag);
 }
@@ -293,7 +293,7 @@ rt_err_t rt_timer_detach(rt_timer_t timer)
 
     /* parameter check */
     RT_ASSERT(timer != NULL);
-    RT_ASSERT(rt_object_get_type(&timer->parent) == RT_Object_Class_Timer);
+    RT_ASSERT(rt_object_get_type(&timer->parent) == RT_OBJ_TYPE_TIMER);
     RT_ASSERT(rt_object_is_systemobject(&timer->parent));
 
     /* disable interrupt */
@@ -352,7 +352,7 @@ rt_timer_t rt_timer_create(const char *name,
     RT_ASSERT(time < RT_TICK_MAX / 2);
 
     /* allocate a object */
-    timer = (struct rt_timer *)rt_object_allocate(RT_Object_Class_Timer, name);
+    timer = (struct rt_timer *)rt_object_allocate(RT_OBJ_TYPE_TIMER, name);
     if (timer == NULL)
     {
         return NULL;
@@ -377,7 +377,7 @@ rt_err_t rt_timer_delete(rt_timer_t timer)
 
     /* parameter check */
     RT_ASSERT(timer != NULL);
-    RT_ASSERT(rt_object_get_type(&timer->parent) == RT_Object_Class_Timer);
+    RT_ASSERT(rt_object_get_type(&timer->parent) == RT_OBJ_TYPE_TIMER);
     RT_ASSERT(rt_object_is_systemobject(&timer->parent) == false);
 
     /* disable interrupt */
@@ -407,16 +407,16 @@ RTM_EXPORT(rt_timer_delete);
 rt_err_t rt_timer_start(rt_timer_t timer)
 {
     unsigned int row_lvl;
-    rt_list_t *timer_list;
+    rt_dlist_t *timer_list;
     rt_base_t level;
     bool need_schedule;
-    rt_list_t *row_head[RT_TIMER_SKIP_LIST_LEVEL];
+    rt_dlist_t *row_head[RT_TIMER_SKIP_LIST_LEVEL];
     unsigned int tst_nr;
     static unsigned int random_nr;
 
     /* parameter check */
     RT_ASSERT(timer != NULL);
-    RT_ASSERT(rt_object_get_type(&timer->parent) == RT_Object_Class_Timer);
+    RT_ASSERT(rt_object_get_type(&timer->parent) == RT_OBJ_TYPE_TIMER);
 
     need_schedule = false;
 
@@ -451,7 +451,7 @@ rt_err_t rt_timer_start(rt_timer_t timer)
              row_head[row_lvl]  = row_head[row_lvl]->next)
         {
             struct rt_timer *t;
-            rt_list_t *p = row_head[row_lvl]->next;
+            rt_dlist_t *p = row_head[row_lvl]->next;
 
             /* fix up the entry pointer */
             t = rt_list_entry(p, struct rt_timer, row[row_lvl]);
@@ -536,7 +536,7 @@ rt_err_t rt_timer_stop(rt_timer_t timer)
 
     /* parameter check */
     RT_ASSERT(timer != NULL);
-    RT_ASSERT(rt_object_get_type(&timer->parent) == RT_Object_Class_Timer);
+    RT_ASSERT(rt_object_get_type(&timer->parent) == RT_OBJ_TYPE_TIMER);
 
     if (!(timer->parent.flag & RT_TIMER_FLAG_ACTIVATED))
         return -RT_ERROR;
@@ -572,7 +572,7 @@ rt_err_t rt_timer_control(rt_timer_t timer, int cmd, void *arg)
 
     /* parameter check */
     RT_ASSERT(timer != NULL);
-    RT_ASSERT(rt_object_get_type(&timer->parent) == RT_Object_Class_Timer);
+    RT_ASSERT(rt_object_get_type(&timer->parent) == RT_OBJ_TYPE_TIMER);
 
     level = rt_hw_interrupt_disable();
     switch (cmd)
@@ -631,7 +631,7 @@ void rt_timer_check(void)
     struct rt_timer *t;
     rt_tick_t current_tick;
     rt_base_t level;
-    rt_list_t list;
+    rt_dlist_t list;
 
     rt_list_init(&list);
 
@@ -717,7 +717,7 @@ void rt_soft_timer_check(void)
     rt_tick_t current_tick;
     struct rt_timer *t;
     rt_base_t level;
-    rt_list_t list;
+    rt_dlist_t list;
 
     rt_list_init(&list);
 
