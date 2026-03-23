@@ -4,31 +4,31 @@
  * @version 0.1
  * @date 2026-03-21
  * @copyright Copyright (c) 2026
- * @brief 配置rtthread。
+ * @brief 提供rtthread配置选项。
  */
 
 #ifndef _RT_CONFIG_H_
 #define _RT_CONFIG_H_
 
-#define RT_USING_CPU_FFS                   //!< 使用快速位运算
-#define RT_USING_LIBC                      //!< 使用libc
-#define RT_ALIGN_SIZE                   4  //!< 内存对齐
-#define RT_NAME_MAX                     16 //!< object字符串名称长度
+#define RT_USING_CPU_FFS              //!< 使用快速位运算
+#define RT_USING_LIBC                 //!< 使用libc
+#define RT_ALIGN_SIZE              4  //!< 内存对齐
+#define RT_NAME_MAX                16 //!< object字符串名称长度
 
-#define RT_TICK_PER_SECOND              1000 //!< systick每秒触发频率
-#define RT_THREAD_PRIORITY_MAX          8    //!< 优先级数量
+#define RT_TICK_PER_SECOND         1000 //!< systick每秒触发频率
+#define RT_THREAD_PRIORITY_MAX     8    //!< 优先级数量
 
-#define RT_USING_COMPONENTS_INIT            //!< 使用组件形式自动初始化
-#define RT_USING_SIGNALS                    //!< 使用异步信号
-#define RT_USING_HOOK                       //!< 使用钩子
-#define RT_USING_IDLE_HOOK                  //!< 使用空闲下线程钩子
-#define RT_IDLE_HOOK_LIST_SIZE          1   //!< 空闲线程的钩子数量
-#define IDLE_THREAD_STACK_SIZE          512 //!< 定义空闲钩子栈大小
+#define RT_USING_COMPONENTS_INIT       //!< 使用组件形式自动初始化
+#define RT_USING_SIGNALS               //!< 使用异步信号
+#define RT_USING_HOOK                  //!< 使用钩子
+#define RT_USING_IDLE_HOOK             //!< 使用空闲下线程钩子
+#define RT_IDLE_HOOK_LIST_SIZE     1   //!< 空闲线程的钩子数量
+#define IDLE_THREAD_STACK_SIZE     512 //!< 定义空闲钩子栈大小
 
-#define RT_USING_MEMPOOL                //!< 使用内存池
-#define RT_USING_HEAP                   //!< 使用堆内存
-#define RT_USING_SMALL_MEM              //!< 开启小内存算法
-#define RT_USING_SMALL_MEM_AS_HEAP      //!< 用小内存算法实现堆
+#define RT_USING_MEMPOOL           //!< 使用内存池
+#define RT_USING_HEAP              //!< 使用堆内存
+#define RT_USING_SMALL_MEM         //!< 开启小内存算法
+#define RT_USING_SMALL_MEM_AS_HEAP //!< 用小内存算法实现堆
 //!< #define RT_USING_SLAB                   //!< 开启SLAB算法
 //!< #define RT_USING_SLAB_AS_HEAP           //!< 用SLAB算法实现堆
 //!< #define RT_USING_MEMHEAP                //!< 使用不连续内存堆
@@ -78,6 +78,9 @@
 #define ASYNC_LOG_THREAD_STK  512                          //!< 消费线程栈
 #define ASYNC_LOG_THREAD_PRIO (RT_THREAD_PRIORITY_MAX - 2) //!< 极低优先级
 
+/**
+ * @brief 导入特定mcu配置。
+ */
 #include <mcu.h>
 
 #endif

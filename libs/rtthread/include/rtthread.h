@@ -1,7 +1,7 @@
 #ifndef _RTTHREAD_H_
 #define _RTTHREAD_H_
 
-#include "rtconfig.h"
+#include <rtconfig.h>
 #include "rtdef.h"
 #include "rtservice.h"
 

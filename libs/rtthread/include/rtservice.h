@@ -1,3 +1,12 @@
+/**
+ * @file rtservice.h
+ * @author reginald.yang (proyrb@yeah.net)
+ * @version 0.1
+ * @date 2026-03-23
+ * @copyright Copyright (c) 2026
+ * @brief 提供rtthread相关宏定义。
+ */
+
 #ifndef _RT_SERVICE_H_
 #define _RT_SERVICE_H_
 
