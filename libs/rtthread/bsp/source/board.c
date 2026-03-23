@@ -51,7 +51,6 @@ ITCM static void idle_hook_wfi(void)
 
 /**
  * @brief 初始化并启动CPU计数器。
- *
  * @return true 启动成功。
  * @return false 启动失败。
  */
@@ -83,7 +82,6 @@ static bool rt_hw_dwt_init(void)
 
 /**
  * @brief 返回空闲任务睡眠了多少tick。
- *
  * @return uint64_t 空闲任务睡眠了多少tick。
  */
 ITCM uint64_t rt_idle_total_sleep_get(void)
@@ -114,7 +112,6 @@ ITCM void SysTick_Handler(void)
 
 /**
  * @brief 精确微秒延时实现。
- *
  * @param us 延时长度(微秒)。
  */
 ITCM void rt_hw_us_delay(uint32_t us)
@@ -130,7 +127,6 @@ ITCM void rt_hw_us_delay(uint32_t us)
 
 /**
  * @brief 控制台内容输出。
- *
  * @param str 输出内容指针。
  */
 ITCM void rt_hw_console_output(const char *str)

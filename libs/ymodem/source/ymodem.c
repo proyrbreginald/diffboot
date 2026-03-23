@@ -29,7 +29,6 @@ void ymodem_set_ops(ymodem_ops_t *const ops)
 
 /**
  * @brief CRC16-CCITT软件实现。
- *
  * @param buf 原始数据。
  * @param len 数据长度。
  * @return uint16_t 计算结果。
@@ -53,7 +52,6 @@ ITCM static uint16_t crc16_ccitt(const uint8_t *buf, uint32_t len)
 
 /**
  * @brief 串口底层发送。
- *
  * @param ch 发送的字符。
  */
 static void ymodem_putchar(const uint8_t ch)
@@ -92,7 +90,6 @@ static void ymodem_dma_process(void)
 
 /**
  * @brief 阻塞式读取。
- *
  * @param dest 数据去向。
  * @param len 读取指定长度数据。
  * @param timeout_ms 超时时间。
@@ -296,7 +293,6 @@ static void ymodem_init(void)
 
 /**
  * @brief ymodem线程。
- *
  * @param parameter
  */
 static void ymodem_thread_entry(void *parameter)

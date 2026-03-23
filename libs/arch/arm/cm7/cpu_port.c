@@ -178,7 +178,6 @@ uint8_t *rt_hw_stack_init(void       *tentry,
 
 /**
  * This function set the hook, which is invoked on fault exception handling.
- *
  * @param exception_handle the exception handling hook function.
  */
 void rt_hw_exception_install(rt_err_t (*exception_handle)(void *context))
@@ -453,7 +452,6 @@ WEAK void rt_hw_cpu_reset(void)
  *
  * Bits are numbered starting at 1 (the least significant bit).  A return value of
  * zero from any of these functions means that the argument was zero.
- *
  * @return return the index of the first bit set. If value is 0, then this function
  * shall return 0.
  */

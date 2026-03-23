@@ -64,7 +64,6 @@ static const char *rt_errno_strs[] = {
 /**
  * This function return a pointer to a string that contains the
  * message of error.
- *
  * @param error the errorno code
  * @return a point to error message string
  */
@@ -80,7 +79,6 @@ RTM_EXPORT(rt_strerror);
 
 /**
  * This function gets the global errno for the current thread.
- *
  * @return errno
  */
 rt_err_t rt_get_errno(void)
@@ -103,7 +101,6 @@ RTM_EXPORT(rt_get_errno);
 
 /**
  * This function sets the global errno for the current thread.
- *
  * @param error is the errno shall be set.
  */
 void rt_set_errno(rt_err_t error)
@@ -132,7 +129,6 @@ RTM_EXPORT(rt_set_errno);
 
 /**
  * This function returns the address of the current thread errno.
- *
  * @return The errno address.
  */
 int *_rt_errno(void)
@@ -164,11 +160,8 @@ RTM_EXPORT(rt_show_version);
 
 /**
  * This function will duplicate a string.
- *
  * @param  n is the string to be duplicated.
- *
  * @param  base is support divide instructions value.
- *
  * @return the duplicated string pointer.
  */
 #ifdef RT_KPRINTF_USING_LONGLONG
@@ -209,7 +202,6 @@ INLINE static inline int divide(long *n, int base)
 #ifdef RT_USING_DEVICE
 /**
  * This function returns the device using in console.
- *
  * @return Returns the console device pointer or NULL.
  */
 rt_device_t rt_console_get_device(void)
@@ -222,9 +214,7 @@ RTM_EXPORT(rt_console_get_device);
  * This function will set a device as console device.
  * After set a device to console, all output of rt_kprintf will be
  * redirected to this new device.
- *
  * @param  name is the name of new console device.
- *
  * @return the old console device handler on successful, or NULL on failure.
  */
 rt_device_t rt_console_set_device(const char *name)
@@ -311,9 +301,7 @@ RUN_APP_EXPORT(log_thread_init); // 自动初始化
 
 /**
  * This function will print a formatted string on system console.
- *
  * @param fmt is the format parameters.
- *
  * @return The number of characters actually written to buffer.
  */
 int rt_kprintf(const char *fmt, ...)
@@ -370,7 +358,6 @@ static void (*rt_free_hook)(void *ptr);
 /**
  * @brief This function will set a hook function, which will be invoked when a
  * memory block is allocated from heap memory.
- *
  * @param hook the hook function.
  */
 void rt_malloc_sethook(void (*hook)(void *ptr, size_t size))
@@ -381,7 +368,6 @@ void rt_malloc_sethook(void (*hook)(void *ptr, size_t size))
 /**
  * @brief This function will set a hook function, which will be invoked when a
  * memory block is released to heap memory.
- *
  * @param hook the hook function
  */
 void rt_free_sethook(void (*hook)(void *ptr))
@@ -495,9 +481,7 @@ INLINE static inline void _slab_info(size_t *total, size_t *used,
 
 /**
  * @brief This function will init system heap.
- *
  * @param begin_addr the beginning address of system page.
- *
  * @param end_addr the end address of system page.
  */
 WEAK void rt_system_heap_init(void *begin_addr, void *end_addr)
@@ -515,9 +499,7 @@ WEAK void rt_system_heap_init(void *begin_addr, void *end_addr)
 
 /**
  * @brief Allocate a block of memory with a minimum of 'size' bytes.
- *
  * @param size is the minimum size of the requested block in bytes.
- *
  * @return the pointer to allocated memory or NULL if no free memory was found.
  */
 WEAK void *rt_malloc(size_t size)
@@ -540,11 +522,8 @@ RTM_EXPORT(rt_malloc);
 /**
  * @brief This function will change the size of previously allocated memory
  * block.
- *
  * @param rmem is the pointer to memory allocated by rt_malloc.
- *
  * @param newsize is the required new size.
- *
  * @return the changed memory block address.
  */
 WEAK void *rt_realloc(void *rmem, size_t newsize)
@@ -568,11 +547,8 @@ RTM_EXPORT(rt_realloc);
  * allocated memory.
  *
  * @note   The allocated memory is filled with bytes of value zero.
- *
  * @param  count is the number of objects to allocate.
- *
  * @param  size is the size of one object to allocate.
- *
  * @return pointer to allocated memory / NULL pointer if there is an error.
  */
 WEAK void *rt_calloc(size_t count, size_t size)
@@ -593,7 +569,6 @@ RTM_EXPORT(rt_calloc);
 /**
  * @brief This function will release the previously allocated memory block by
  *        rt_malloc. The released memory block is taken back to system heap.
- *
  * @param rmem the address of memory which will be released.
  */
 WEAK void rt_free(void *rmem)
@@ -616,11 +591,8 @@ RTM_EXPORT(rt_free);
 /**
  * @brief This function will caculate the total memory, the used memory, and
  *        the max used memory.
- *
  * @param total is a pointer to get the total size of the memory.
- *
  * @param used is a pointer to get the size of memory used.
- *
  * @param max_used is a pointer to get the maximum memory used.
  */
 WEAK void rt_memory_info(size_t *total, size_t *used, size_t *max_used)
@@ -666,11 +638,8 @@ void rt_page_free(void *addr, size_t npages)
 /**
  * This function allocates a memory block, which address is aligned to the
  * specified alignment size.
- *
  * @param  size is the allocated memory block size.
- *
  * @param  align is the alignment size.
- *
  * @return The memory block address was returned successfully, otherwise it was
  *         returned empty NULL.
  */
@@ -719,7 +688,6 @@ RTM_EXPORT(rt_malloc_align);
 /**
  * This function release the memory block, which is allocated by
  * rt_malloc_align function and address is aligned.
- *
  * @param ptr is the memory block pointer.
  */
 WEAK void rt_free_align(void *ptr)
@@ -750,7 +718,6 @@ const uint8_t __lowest_bit_bitmap[] = {
  *
  * Bits are numbered starting at 1 (the least significant bit).  A return value
  * of zero from any of these functions means that the argument was zero.
- *
  * @return return the index of the first bit set. If value is 0, then this
  * function shall return 0.
  */
@@ -783,7 +750,6 @@ const uint8_t __lowest_bit_bitmap[] = {
  *
  * Bits are numbered starting at 1 (the least significant bit).  A return value
  * of zero from any of these functions means that the argument was zero.
- *
  * @return Return the index of the first bit set. If value is 0, then this
  * function shall return 0.
  */
@@ -819,7 +785,6 @@ void (*rt_assert_hook)(const char *ex, const char *func, size_t line);
 /**
  * This function will set a hook function to RT_ASSERT(EX). It will run when the
  * expression is false.
- *
  * @param hook is the hook function.
  */
 void rt_assert_set_hook(void (*hook)(const char *ex, const char *func,
@@ -830,11 +795,8 @@ void rt_assert_set_hook(void (*hook)(const char *ex, const char *func,
 
 /**
  * The RT_ASSERT function.
- *
  * @param ex_string is the assertion condition string.
- *
  * @param func is the function name when assertion.
- *
  * @param line is the file line number when assertion.
  */
 void rt_assert_handler(const char *ex_string, const char *func, size_t line)

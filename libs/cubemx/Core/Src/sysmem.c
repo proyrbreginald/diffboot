@@ -47,7 +47,6 @@ static uint8_t *__sbrk_heap_end = NULL;
  * The implementation considers '_estack' linker symbol to be RAM end
  * NOTE: If the MSP stack, at any point during execution, grows larger than the
  * reserved size, please increase the '_Min_Stack_Size'.
- *
  * @param incr Memory size
  * @return Pointer to allocated memory
  */

@@ -42,7 +42,6 @@ static void (*rt_tick_hook)(void);
 /**
  * This function will set a hook function, which will be invoked when tick increase
  *
- *
  * @param hook the hook function
  */
 void rt_tick_sethook(void (*hook)(void))
@@ -60,7 +59,6 @@ void rt_tick_sethook(void (*hook)(void))
 
 /**
  * @brief    This function will return current tick from operating system startup.
- *
  * @return   Return current tick.
  */
 rt_tick_t rt_tick_get(void)
@@ -72,7 +70,6 @@ RTM_EXPORT(rt_tick_get);
 
 /**
  * @brief    This function will set current tick.
- *
  * @param    tick is the value that you will set.
  */
 void rt_tick_set(rt_tick_t tick)
@@ -128,12 +125,10 @@ void rt_tick_increase(void)
 
 /**
  * @brief    This function will calculate the tick from millisecond.
- *
  * @param    ms is the specified millisecond.
  *              - Negative Number wait forever
  *              - Zero not wait
  *              - Max 0x7fffffff
- *
  * @return   Return the calculated tick.
  */
 rt_tick_t rt_tick_from_millisecond(int32_t ms)
@@ -161,7 +156,6 @@ RTM_EXPORT(rt_tick_from_millisecond);
  * @note     if the value of RT_TICK_PER_SECOND is lower than 1000 or
  *           is not an integral multiple of 1000, this function will not
  *           provide the correct 1ms-based tick.
- *
  * @return   Return passed millisecond from boot.
  */
 WEAK rt_tick_t rt_tick_get_millisecond(void)

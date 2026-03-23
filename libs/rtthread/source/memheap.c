@@ -61,15 +61,10 @@ static void _remove_next_ptr(struct rt_memheap_item *next_ptr)
  *
  *          The length of Used Memory Block Tailer is 0,
  *          which is prevents block merging across list
- *
  * @param   memheap is a pointer of the memheap object.
- *
  * @param   name is the name of the memheap.
- *
  * @param   start_addr is the start address of the memheap.
- *
  * @param   size is the size of the memheap.
- *
  * @return  RT_EOK
  */
 rt_err_t rt_memheap_init(struct rt_memheap *memheap,
@@ -153,9 +148,7 @@ RTM_EXPORT(rt_memheap_init);
 
 /**
  * @brief   This function will remove a memheap from the system.
- *
  * @param   heap is a pointer of memheap object.
- *
  * @return  RT_EOK
  */
 rt_err_t rt_memheap_detach(struct rt_memheap *heap)
@@ -174,11 +167,8 @@ RTM_EXPORT(rt_memheap_detach);
 
 /**
  * @brief  Allocate a block of memory with a minimum of 'size' bytes on memheap.
- *
  * @param   heap is a pointer for memheap object.
- *
  * @param   size is the minimum size of the requested block in bytes.
- *
  * @return  the pointer to allocated memory or NULL if no free memory was found.
  */
 void *rt_memheap_alloc(struct rt_memheap *heap, size_t size)
@@ -349,14 +339,10 @@ RTM_EXPORT(rt_memheap_alloc);
 
 /**
  * @brief This function will change the size of previously allocated memory block.
- *
  * @param heap is a pointer to the memheap object, which will reallocate
  *             memory from the block
- *
  * @param ptr is a pointer to start address of memory.
- *
  * @param newsize is the required new size.
- *
  * @return the changed memory block address.
  */
 void *rt_memheap_realloc(struct rt_memheap *heap, void *ptr, size_t newsize)
@@ -592,7 +578,6 @@ RTM_EXPORT(rt_memheap_realloc);
 /**
  * @brief This function will release the allocated memory block by
  *        rt_malloc. The released memory block is taken back to system heap.
- *
  * @param ptr the address of memory which will be released.
  */
 void rt_memheap_free(void *ptr)

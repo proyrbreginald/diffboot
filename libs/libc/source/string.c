@@ -166,7 +166,6 @@ ITCM void *memmove(void *dest, const void *src, size_t n)
  *
  * Sets the first 'n' bytes of the memory block pointed to by 's' to the
  * specified value 'v'. Each byte in the memory block is set to the same value.
- *
  * @param s Pointer to the memory block to be filled
  * @param v Value to be set (converted to unsigned char)
  * @param n Number of bytes to be set to the value

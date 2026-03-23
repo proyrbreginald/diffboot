@@ -74,9 +74,7 @@ static void (*idle_hook_list[RT_IDLE_HOOK_LIST_SIZE])(void);
 /**
  * @brief This function sets a hook function to idle thread loop. When the
  * system performs idle loop, this hook function should be invoked.
- *
  * @param hook the specified hook function.
- *
  * @return RT_EOK: set OK.
  *         -RT_EFULL: hook list is full.
  *
@@ -108,9 +106,7 @@ rt_err_t rt_thread_idle_sethook(void (*hook)(void))
 
 /**
  * @brief delete the idle hook on hook list.
- *
  * @param hook the specified hook function.
- *
  * @return RT_EOK: delete OK.
  *         -RT_ENOSYS: hook was not found.
  */

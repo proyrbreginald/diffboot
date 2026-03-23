@@ -21,7 +21,6 @@ static void (*rt_interrupt_leave_hook)(void);
  * @brief This function set a hook function when the system enter a interrupt
  *
  * @note The hook function must be simple and never be blocked or suspend.
- *
  * @param hook the function point to be called
  */
 void rt_interrupt_enter_sethook(void (*hook)(void))
@@ -35,7 +34,6 @@ void rt_interrupt_enter_sethook(void (*hook)(void))
  * @brief This function set a hook function when the system exit a interrupt.
  *
  * @note The hook function must be simple and never be blocked or suspend.
- *
  * @param hook the function point to be called
  */
 void rt_interrupt_leave_sethook(void (*hook)(void))
@@ -95,7 +93,6 @@ RTM_EXPORT(rt_interrupt_leave);
  *
  * User application can invoke this function to get whether current
  * context is interrupt context.
- *
  * @return the number of nested interrupts.
  */
 WEAK uint8_t rt_interrupt_get_nest(void)

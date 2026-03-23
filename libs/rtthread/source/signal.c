@@ -216,11 +216,8 @@ void *rt_signal_check(void* context)
  *           rt_signal_unmask() function to make the signal effective.
  *
  * @see      rt_signal_unmask()
- *
  * @param    signo is a specific signal value (range: 0 ~ RT_SIG_MAX).
- *
  * @param    handler is sets the processing of signal value.
- *
  * @return   Return the old processing function of this signal. ONLY When the
  *           return value is SIG_ERR, the operation is failed.
  */
@@ -259,7 +256,6 @@ rt_sighandler_t rt_signal_install(int signo, rt_sighandler_t handler)
  *           the current thread, it will no longer take effect.
  *
  * @see      rt_thread_kill()
- *
  * @param    signo is a specific signal value (range: 0 ~ RT_SIG_MAX).
  */
 void rt_signal_mask(int signo)
@@ -282,7 +278,6 @@ void rt_signal_mask(int signo)
  *           thread, it will take effect.
  *
  * @see      rt_thread_kill()
- *
  * @param    signo is a specific signal value (range: 0 ~ RT_SIG_MAX).
  */
 void rt_signal_unmask(int signo)
@@ -309,14 +304,10 @@ void rt_signal_unmask(int signo)
 /**
  * @brief    This function will wait for the arrival of the set signal. If it does not wait for this signal, the thread will be
  *           suspended until it waits for this signal or the waiting time exceeds the specified timeout: timeout.
- *
  * @param    set is the set of signal values to be waited for. Use the function
  *           sigaddset() to add the signal.
- *
  * @param    si is a pointer to the received signal info. If you don't care about this value, you can use NULL to set.
- *
  * @param    timeout is a timeout period (unit: an OS tick).
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the signal wait failed.
  */
@@ -553,11 +544,8 @@ void rt_thread_free_sig(rt_thread_t tid)
 
 /**
  * @brief    This function can be used to send any signal to any thread.
- *
  * @param    tid is a pointer to the thread that receives the signal.
- *
  * @param    sig is a specific signal value (range: 0 ~ RT_SIG_MAX).
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the signal send failed.
  */

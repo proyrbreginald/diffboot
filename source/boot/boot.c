@@ -93,7 +93,6 @@ static iap_zone_t iap_zone = IAP_USER;
 
 /**
  * @brief ymodem接收到文件头时执行的回调。
- *
  * @param name 接收到的文件名字符串。
  * @param size 文件内容的字节大小。
  * @return int 返回0表示继续接收此文件，否则拒绝接收。
@@ -173,7 +172,6 @@ exit:
 
 /**
  * @brief ymodem接收到文件数据包时执行的回调。
- *
  * @param data 数据指针。
  * @param len 数据长度。
  * @param offset 当前文件偏移量。
@@ -271,7 +269,6 @@ exit:
 
 /**
  * @brief 传输结束。
- *
  * @param status 0: 成功; 非0: 异常终止 (超时、校验失败、被取消等)
  */
 ITCM static void ymodem_on_end(int status)

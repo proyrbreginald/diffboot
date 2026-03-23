@@ -204,9 +204,7 @@ struct rt_slab
 
 /**
  * @brief Alloc memory size by page.
- *
  * @param slab the slab memory management object.
- *
  * @param npages the number of pages.
  */
 void *rt_slab_page_alloc(rt_slab_t m, size_t npages)
@@ -243,11 +241,8 @@ void *rt_slab_page_alloc(rt_slab_t m, size_t npages)
 
 /**
  * @brief Free memory by page.
- *
  * @param slab the slab memory management object.
- *
  * @param addr is the head address of first page.
- *
  * @param npages is the number of pages.
  */
 void rt_slab_page_free(rt_slab_t m, void *addr, size_t npages)
@@ -308,15 +303,10 @@ static void rt_slab_page_init(struct rt_slab *slab, void *addr, size_t npages)
 
 /**
  * @brief This function will init slab memory management algorithm
- *
  * @param slab the slab memory management object.
- *
  * @param name is the name of the slab memory management object.
- *
  * @param begin_addr the beginning address of system page.
- *
  * @param size is the size of the memory.
- *
  * @return Return a pointer to the slab memory object.
  */
 rt_slab_t rt_slab_init(const char *name, void *begin_addr, size_t size)
@@ -383,9 +373,7 @@ RTM_EXPORT(rt_slab_init);
 
 /**
  * @brief This function will remove a slab object from the system.
- *
  * @param m the slab memory management object.
- *
  * @return RT_EOK
  */
 rt_err_t rt_slab_detach(rt_slab_t m)
@@ -478,11 +466,8 @@ INLINE static inline int zoneindex(size_t *bytes)
  * @note the NULL is returned if
  *         - the nbytes is less than zero.
  *         - there is no nbytes sized memory valid in system.
- *
  * @param m the slab memory management object.
- *
  * @param size is the size of memory to be allocated.
- *
  * @return the allocated memory.
  */
 void *rt_slab_alloc(rt_slab_t m, size_t size)
@@ -656,13 +641,9 @@ RTM_EXPORT(rt_slab_alloc);
 
 /**
  * @brief This function will change the size of previously allocated memory block.
- *
  * @param m the slab memory management object.
- *
  * @param ptr is the previously allocated memory block.
- *
  * @param size is the new size of memory block.
- *
  * @return the allocated memory.
  */
 void *rt_slab_realloc(rt_slab_t m, void *ptr, size_t size)
@@ -730,7 +711,6 @@ RTM_EXPORT(rt_slab_realloc);
  * @brief This function will release the previous allocated memory block by rt_slab_alloc.
  *
  * @note The released memory block is taken back to system heap.
- *
  * @param m the slab memory management object.
  * @param ptr is the address of memory which will be released
  */

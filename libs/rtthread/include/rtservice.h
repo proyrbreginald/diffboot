@@ -17,7 +17,6 @@
 
 /**
  * @brief initialize a list
- *
  * @param l list to be initialized
  */
 INLINE static inline void rt_list_init(rt_dlist_t *l)
@@ -25,7 +24,6 @@ INLINE static inline void rt_list_init(rt_dlist_t *l)
 
 /**
  * @brief insert a node after a list
- *
  * @param l list to insert it
  * @param n new node to be inserted
  */
@@ -39,7 +37,6 @@ INLINE static inline void rt_list_insert_after(rt_dlist_t *l, rt_dlist_t *n)
 
 /**
  * @brief insert a node before a list
- *
  * @param n new node to be inserted
  * @param l list to insert it
  */
@@ -151,7 +148,6 @@ INLINE static inline unsigned int rt_list_len(const rt_dlist_t *l)
 
 /**
  * @brief initialize a single list
- *
  * @param l the single list to be initialized
  */
 INLINE static inline void rt_slist_init(rt_slist_t *l)

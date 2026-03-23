@@ -69,7 +69,6 @@ static void (*rt_scheduler_switch_hook)(struct rt_thread *tid);
 /**
  * @brief This function will set a hook function, which will be invoked when thread
  *        switch happens.
- *
  * @param hook is the hook function.
  */
 void rt_scheduler_sethook(void (*hook)(struct rt_thread *from, struct rt_thread *to))
@@ -80,7 +79,6 @@ void rt_scheduler_sethook(void (*hook)(struct rt_thread *from, struct rt_thread 
 /**
  * @brief This function will set a hook function, which will be invoked when context
  *        switch happens.
- *
  * @param hook is the hook function.
  */
 void rt_scheduler_switch_sethook(void (*hook)(struct rt_thread *tid))
@@ -283,9 +281,7 @@ void rt_system_scheduler_start(void)
 #ifdef RT_USING_SMP
 /**
  * @brief This function will handle IPI interrupt and do a scheduling in system.
- *
  * @param vector is the number of IPI interrupt for system scheduling.
- *
  * @param param is not used, and can be set to NULL.
  *
  * @note this function should be invoke or register as ISR in BSP.
@@ -646,7 +642,6 @@ void rt_scheduler_do_irq_switch(void *context)
 /**
  * @brief This function will insert a thread to the system ready queue. The state of
  *        thread will be set as READY and the thread will be removed from suspend queue.
- *
  * @param thread is the thread to be inserted.
  *
  * @note  Please do not invoke this function in user application.
@@ -786,7 +781,6 @@ __exit:
 
 /**
  * @brief This function will remove a thread from system ready queue.
- *
  * @param thread is the thread to be removed.
  *
  * @note  Please do not invoke this function in user application.
@@ -1015,7 +1009,6 @@ RTM_EXPORT(rt_exit_critical);
 
 /**
  * @brief Get the scheduler lock level.
- *
  * @return the level of the scheduler lock. 0 means unlocked.
  */
 uint16_t rt_critical_level(void)

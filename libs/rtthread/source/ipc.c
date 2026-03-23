@@ -75,9 +75,7 @@ extern void (*rt_object_put_hook)(struct rt_object *object);
  * @brief    This function will initialize an IPC object, such as semaphore, mutex, messagequeue and mailbox.
  *
  * @note     Executing this function will complete an initialization of the suspend thread list of the ipc object.
- *
  * @param    ipc is a pointer to the IPC object.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the initialization is successful.
  *           When the return value is any other values, it means the initialization failed.
  *
@@ -94,11 +92,8 @@ INLINE static inline rt_err_t _ipc_object_init(struct rt_ipc_object *ipc)
 
 /**
  * @brief    This function will suspend a thread to a IPC object list.
- *
  * @param    list is a pointer to a suspended thread list of the IPC object.
- *
  * @param    thread is a pointer to the thread object to be suspended.
- *
  * @param    flag is a flag for the thread object to be suspended. It determines how the thread is suspended.
  *           The flag can be ONE of the following values:
  *
@@ -111,7 +106,6 @@ INLINE static inline rt_err_t _ipc_object_init(struct rt_ipc_object *ipc)
  *               RT_IPC_FLAG_PRIO to ensure the thread is real-time UNLESS your applications concern about
  *               the first-in-first-out principle, and you clearly understand that all threads involved in
  *               this semaphore will become non-real-time threads.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the function is successfully executed.
  *           When the return value is any other values, it means the initialization failed.
  *
@@ -180,9 +174,7 @@ INLINE static inline rt_err_t _ipc_list_suspend(rt_dlist_t        *list,
  *
  *           By contrast, the rt_ipc_list_resume_all() function will resume all suspended threads
  *           in the list of a IPC object.
- *
  * @param    list is a pointer to a suspended thread list of the IPC object.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the function is successfully executed.
  *           When the return value is any other values, it means this operation failed.
  *
@@ -212,9 +204,7 @@ INLINE static inline rt_err_t _ipc_list_resume(rt_dlist_t *list)
  *
  * @note    This function will resume all threads in the IPC object list.
  *          By contrast, the rt_ipc_list_resume() function will resume a suspended thread in the list of a IPC object.
- *
  * @param   list is a pointer to a suspended thread list of the IPC object.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the function is successfully executed.
  *           When the return value is any other values, it means this operation failed.
  *
@@ -266,16 +256,12 @@ INLINE static inline rt_err_t _ipc_list_resume_all(rt_dlist_t *list)
  *           the semaphore.
  *
  * @see      rt_sem_create()
- *
  * @param    sem is a pointer to the semaphore to initialize. It is assumed that storage for the semaphore will be
  *           allocated in your application.
- *
  * @param    name is a pointer to the name you would like to give the semaphore.
- *
  * @param    value is the initial value for the semaphore.
  *           If used to share resources, you should initialize the value as the number of available resources.
  *           If used to signal the occurrence of an event, you should initialize the value as 0.
- *
  * @param    flag is the semaphore flag, which determines the queuing way of how multiple threads wait
  *           when the semaphore is not available.
  *           The semaphore flag can be ONE of the following values:
@@ -289,7 +275,6 @@ INLINE static inline rt_err_t _ipc_list_resume_all(rt_dlist_t *list)
  *               use RT_IPC_FLAG_PRIO to ensure the thread is real-time UNLESS your applications concern about
  *               the first-in-first-out principle, and you clearly understand that all threads involved in
  *               this semaphore will become non-real-time threads.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the initialization is successful.
  *           If the return value is any other values, it represents the initialization failed.
  *
@@ -329,9 +314,7 @@ RTM_EXPORT(rt_sem_init);
  *           When the semaphore is successfully detached, it will resume all suspended threads in the semaphore list.
  *
  * @see      rt_sem_delete()
- *
  * @param    sem is a pointer to a semaphore object to be detached.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the initialization is successful.
  *           If the return value is any other values, it means that the semaphore detach failed.
  *
@@ -364,13 +347,10 @@ RTM_EXPORT(rt_sem_detach);
  *           By contrast, the rt_sem_init() function will initialize a static semaphore object.
  *
  * @see      rt_sem_init()
- *
  * @param    name is a pointer to the name you would like to give the semaphore.
- *
  * @param    value is the initial value for the semaphore.
  *           If used to share resources, you should initialize the value as the number of available resources.
  *           If used to signal the occurrence of an event, you should initialize the value as 0.
- *
  * @param    flag is the semaphore flag, which determines the queuing way of how multiple threads wait
  *           when the semaphore is not available.
  *           The semaphore flag can be ONE of the following values:
@@ -384,7 +364,6 @@ RTM_EXPORT(rt_sem_detach);
  *               use RT_IPC_FLAG_PRIO to ensure the thread is real-time UNLESS your applications concern about
  *               the first-in-first-out principle, and you clearly understand that all threads involved in
  *               this semaphore will become non-real-time threads.
- *
  * @return   Return a pointer to the semaphore object. When the return value is NULL, it means the creation failed.
  *
  * @warning  This function can NOT be called in interrupt context. You can use macor RT_DEBUG_NOT_IN_INTERRUPT to check it.
@@ -425,9 +404,7 @@ RTM_EXPORT(rt_sem_create);
  *           When the semaphore is successfully deleted, it will resume all suspended threads in the semaphore list.
  *
  * @see      rt_sem_detach()
- *
  * @param    sem is a pointer to a semaphore object to be deleted.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the semaphore detach failed.
  *
@@ -466,9 +443,7 @@ RTM_EXPORT(rt_sem_delete);
  *           On the contrary, the rt_sem_release() function will increase the count value of sem->value by 1 each time.
  *
  * @see      rt_sem_trytake()
- *
  * @param    sem is a pointer to a semaphore object.
- *
  * @param    timeout is a timeout period (unit: an OS tick). If the semaphore is unavailable, the thread will wait for
  *           the semaphore up to the amount of time specified by this parameter.
  *
@@ -477,7 +452,6 @@ RTM_EXPORT(rt_sem_delete);
  *           message is unavailable in the queue, the thread will be waiting forever.
  *           If use macro RT_WAITING_NO to set this parameter, which means that this
  *           function is non-blocking and will return immediately.
- *
  * @return   Return the operation status. ONLY When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the semaphore take failed.
  *
@@ -580,9 +554,7 @@ RTM_EXPORT(rt_sem_take);
  *           In other words, rt_sem_trytake(sem) has the same effect as rt_sem_take(sem, 0).
  *
  * @see      rt_sem_take()
- *
  * @param    sem is a pointer to a semaphore object.
- *
  * @return   Return the operation status. ONLY When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the semaphore take failed.
  */
@@ -599,9 +571,7 @@ RTM_EXPORT(rt_sem_trytake);
  * @note     If there are threads suspended on this semaphore, the first thread in the list of this semaphore object
  *           will be resumed, and a thread scheduling (rt_schedule) will be executed.
  *           If no threads are suspended on this semaphore, the count value sem->value of this semaphore will increase by 1.
- *
  * @param    sem is a pointer to a semaphore object.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the semaphore release failed.
  */
@@ -661,13 +631,9 @@ RTM_EXPORT(rt_sem_release);
  * @brief    This function will set some extra attributions of a semaphore object.
  *
  * @note     Currently this function only supports the RT_IPC_CMD_RESET command to reset the semaphore.
- *
  * @param    sem is a pointer to a semaphore object.
- *
  * @param    cmd is a command word used to configure some attributions of the semaphore.
- *
  * @param    arg is the argument of the function to execute the command.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that this function failed to execute.
  */
@@ -725,16 +691,12 @@ RTM_EXPORT(rt_sem_control);
  *           and initialize the mutex.
  *
  * @see      rt_mutex_create()
- *
  * @param    mutex is a pointer to the mutex to initialize. It is assumed that storage for the mutex will be
  *           allocated in your application.
- *
  * @param    name is a pointer to the name that given to the mutex.
- *
  * @param    flag is the mutex flag, which determines the queuing way of how multiple threads wait
  *           when the mutex is not available.
  *           NOTE: This parameter has been obsoleted. It can be RT_IPC_FLAG_PRIO, RT_IPC_FLAG_FIFO or NULL.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the initialization is successful.
  *           If the return value is any other values, it represents the initialization failed.
  *
@@ -775,9 +737,7 @@ RTM_EXPORT(rt_mutex_init);
  *           When the mutex is successfully detached, it will resume all suspended threads in the mutex list.
  *
  * @see      rt_mutex_delete()
- *
  * @param    mutex is a pointer to a mutex object to be detached.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the initialization is successful.
  *           If the return value is any other values, it means that the mutex detach failed.
  *
@@ -810,13 +770,10 @@ RTM_EXPORT(rt_mutex_detach);
  *           By contrast, the rt_mutex_init() function will initialize a static mutex object.
  *
  * @see      rt_mutex_init()
- *
  * @param    name is a pointer to the name that given to the mutex.
- *
  * @param    flag is the mutex flag, which determines the queuing way of how multiple threads wait
  *           when the mutex is not available.
  *           NOTE: This parameter has been obsoleted. It can be RT_IPC_FLAG_PRIO, RT_IPC_FLAG_FIFO or NULL.
- *
  * @return   Return a pointer to the mutex object. When the return value is NULL, it means the creation failed.
  *
  * @warning  This function can ONLY be called from threads.
@@ -859,9 +816,7 @@ RTM_EXPORT(rt_mutex_create);
  *           When the mutex is successfully deleted, it will resume all suspended threads in the mutex list.
  *
  * @see      rt_mutex_detach()
- *
  * @param    mutex is a pointer to a mutex object to be deleted.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the mutex detach failed.
  *
@@ -900,14 +855,11 @@ RTM_EXPORT(rt_mutex_delete);
  *           On the contrary, the rt_mutex_release() function will increase the count value of mutex->value by 1 each time.
  *
  * @see      rt_mutex_trytake()
- *
  * @param    mutex is a pointer to a mutex object.
- *
  * @param    timeout is a timeout period (unit: an OS tick). If the mutex is unavailable, the thread will wait for
  *           the mutex up to the amount of time specified by the argument.
  *           NOTE: Generally, we set this parameter to RT_WAITING_FOREVER, which means that when the mutex is unavailable,
  *           the thread will be waitting forever.
- *
  * @return   Return the operation status. ONLY When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the mutex take failed.
  *
@@ -1064,9 +1016,7 @@ RTM_EXPORT(rt_mutex_take);
  *           In other words, rt_mutex_trytake(mutex) has the same effect as rt_mutex_take(mutex, 0).
  *
  * @see      rt_mutex_take()
- *
  * @param    mutex is a pointer to a mutex object.
- *
  * @return   Return the operation status. ONLY When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the mutex take failed.
  */
@@ -1083,9 +1033,7 @@ RTM_EXPORT(rt_mutex_trytake);
  * @note     If there are threads suspended on this mutex, the first thread in the list of this mutex object
  *           will be resumed, and a thread scheduling (rt_schedule) will be executed.
  *           If no threads are suspended on this mutex, the count value mutex->value of this mutex will increase by 1.
- *
  * @param    mutex is a pointer to a mutex object.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the mutex release failed.
  */
@@ -1205,13 +1153,9 @@ RTM_EXPORT(rt_mutex_release);
  * @brief    This function will set some extra attributions of a mutex object.
  *
  * @note     Currently this function does not implement the control function.
- *
  * @param    mutex is a pointer to a mutex object.
- *
  * @param    cmd is a command word used to configure some attributions of the mutex.
- *
  * @param    arg is the argument of the function to execute the command.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that this function failed to execute.
  */
@@ -1244,12 +1188,9 @@ RTM_EXPORT(rt_mutex_control);
  *           and initialize the event.
  *
  * @see      rt_event_create()
- *
  * @param    event is a pointer to the event to initialize. It is assumed that storage for the event
  *           will be allocated in your application.
- *
  * @param    name is a pointer to the name that given to the event.
- *
  * @param    flag is the event flag, which determines the queuing way of how multiple threads wait
  *           when the event is not available.
  *           The event flag can be ONE of the following values:
@@ -1263,7 +1204,6 @@ RTM_EXPORT(rt_mutex_control);
  *               use RT_IPC_FLAG_PRIO to ensure the thread is real-time UNLESS your applications concern about
  *               the first-in-first-out principle, and you clearly understand that all threads involved in
  *               this event will become non-real-time threads.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the initialization is successful.
  *           If the return value is any other values, it represents the initialization failed.
  *
@@ -1300,9 +1240,7 @@ RTM_EXPORT(rt_event_init);
  *           When the event is successfully detached, it will resume all suspended threads in the event list.
  *
  * @see      rt_event_delete()
- *
  * @param    event is a pointer to an event object to be detached.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the initialization is successful.
  *           If the return value is any other values, it means that the event detach failed.
  *
@@ -1335,9 +1273,7 @@ RTM_EXPORT(rt_event_detach);
  *           By contrast, the rt_event_init() function will initialize a static event object.
  *
  * @see      rt_event_init()
- *
  * @param    name is a pointer to the name that given to the event.
- *
  * @param    flag is the event flag, which determines the queuing way of how multiple threads wait when the event
  *           is not available.
  *           The event flag can be ONE of the following values:
@@ -1351,7 +1287,6 @@ RTM_EXPORT(rt_event_detach);
  *               use RT_IPC_FLAG_PRIO to ensure the thread is real-time UNLESS your applications concern about
  *               the first-in-first-out principle, and you clearly understand that all threads involved in
  *               this event will become non-real-time threads.
- *
  * @return   Return a pointer to the event object. When the return value is NULL, it means the creation failed.
  *
  * @warning  This function can ONLY be called from threads.
@@ -1391,9 +1326,7 @@ RTM_EXPORT(rt_event_create);
  *           When the event is successfully deleted, it will resume all suspended threads in the event list.
  *
  * @see      rt_event_detach()
- *
  * @param    event is a pointer to an event object to be deleted.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the event detach failed.
  *
@@ -1430,12 +1363,9 @@ RTM_EXPORT(rt_event_delete);
  *           then the function will traverse the list of suspended threads waiting on the event object.
  *           If there is a thread suspended on the event, and the thread's event_info and the event flag of
  *           the current event object matches, the thread will be resumed.
- *
  * @param    event is a pointer to the event object to be sent.
- *
  * @param    set is a flag that you will set for this event's flag.
  *           You can set an event flag, or you can set multiple flags through OR logic operation.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the event detach failed.
  */
@@ -1539,12 +1469,9 @@ RTM_EXPORT(rt_event_send);
  * @note   If there are threads suspended on this semaphore, the first thread in the list of this semaphore object
  *         will be resumed, and a thread scheduling (rt_schedule) will be executed.
  *         If no threads are suspended on this semaphore, the count value sem->value of this semaphore will increase by 1.
- *
  * @param    event is a pointer to the event object to be received.
- *
  * @param    set is a flag that you will set for this event's flag.
  *           You can set an event flag, or you can set multiple flags through OR logic operation.
- *
  * @param    option is the option of this receiving event, it indicates how the receiving event is operated.
  *           The option can be one or more of the following values, When selecting multiple values,use logical OR to operate.
  *           (NOTE: RT_EVENT_FLAG_OR and RT_EVENT_FLAG_AND can only select one):
@@ -1556,11 +1483,8 @@ RTM_EXPORT(rt_event_send);
  *
  *               RT_EVENT_FLAG_CLEAR        When the thread receives the corresponding event, the function
  *                                          determines whether to clear the event flag.
- *
  * @param    timeout is a timeout period (unit: an OS tick).
- *
  * @param    recved is a pointer to the received event. If you don't care about this value, you can use NULL to set.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the semaphore release failed.
  */
@@ -1692,13 +1616,9 @@ RTM_EXPORT(rt_event_recv);
  * @brief    This function will set some extra attributions of an event object.
  *
  * @note     Currently this function only supports the RT_IPC_CMD_RESET command to reset the event.
- *
  * @param    event is a pointer to an event object.
- *
  * @param    cmd is a command word used to configure some attributions of the event.
- *
  * @param    arg is the argument of the function to execute the command.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that this function failed to execute.
  */
@@ -1751,15 +1671,11 @@ RTM_EXPORT(rt_event_control);
  *           By contrast, the rt_mb_create() function will allocate memory space automatically and initialize the mailbox.
  *
  * @see      rt_mb_create()
- *
  * @param    mb is a pointer to the mailbox to initialize.
  *           It is assumed that storage for the mailbox will be allocated in your application.
- *
  * @param    name is a pointer to the name that given to the mailbox.
- *
  * @param    size is the maximum number of mails in the mailbox.
  *           For example, when the mailbox buffer capacity is N, size is N/4.
- *
  * @param    flag is the mailbox flag, which determines the queuing way of how multiple threads wait
  *           when the mailbox is not available.
  *           The mailbox flag can be ONE of the following values:
@@ -1773,7 +1689,6 @@ RTM_EXPORT(rt_event_control);
  *               use RT_IPC_FLAG_PRIO to ensure the thread is real-time UNLESS your applications concern about
  *               the first-in-first-out principle, and you clearly understand that all threads involved in
  *               this mailbox will become non-real-time threads.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the initialization is successful.
  *           If the return value is any other values, it represents the initialization failed.
  *
@@ -1820,9 +1735,7 @@ RTM_EXPORT(rt_mb_init);
  *           When the mailbox is successfully detached, it will resume all suspended threads in the mailbox list.
  *
  * @see      rt_mb_delete()
- *
  * @param    mb is a pointer to a mailbox object to be detached.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the initialization is successful.
  *           If the return value is any other values, it means that the mailbox detach failed.
  *
@@ -1857,12 +1770,9 @@ RTM_EXPORT(rt_mb_detach);
  *         By contrast, the rt_mb_init() function will initialize a static mailbox object.
  *
  * @see    rt_mb_init()
- *
  * @param  name is a pointer that given to the mailbox.
- *
  * @param    size is the maximum number of mails in the mailbox.
  *           For example, when mailbox buffer capacity is N, size is N/4.
- *
  * @param    flag is the mailbox flag, which determines the queuing way of how multiple threads wait
  *           when the mailbox is not available.
  *           The mailbox flag can be ONE of the following values:
@@ -1876,7 +1786,6 @@ RTM_EXPORT(rt_mb_detach);
  *               use RT_IPC_FLAG_PRIO to ensure the thread is real-time UNLESS your applications concern about
  *               the first-in-first-out principle, and you clearly understand that all threads involved in
  *               this mailbox will become non-real-time threads.
- *
  * @return   Return a pointer to the mailbox object. When the return value is NULL, it means the creation failed.
  *
  * @warning  This function can ONLY be called from threads.
@@ -1930,9 +1839,7 @@ RTM_EXPORT(rt_mb_create);
  *           When the mailbox is successfully deleted, it will resume all suspended threads in the mailbox list.
  *
  * @see      rt_mb_detach()
- *
  * @param    mb is a pointer to a mailbox object to be deleted.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the mailbox detach failed.
  *
@@ -1978,13 +1885,9 @@ RTM_EXPORT(rt_mb_delete);
  *           when the mailbox if fully used.
  *
  * @see      rt_mb_send()
- *
  * @param    mb is a pointer to the mailbox object to be sent.
- *
  * @param    value is a value to the content of the mail you want to send.
- *
  * @param    timeout is a timeout period (unit: an OS tick).
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the mailbox detach failed.
  *
@@ -2132,11 +2035,8 @@ RTM_EXPORT(rt_mb_send_wait);
  *           By contrast, the rt_mb_send_wait() function is set a timeout to wait for the mail to be sent.
  *
  * @see      rt_mb_send_wait()
- *
  * @param    mb is a pointer to the mailbox object to be sent.
- *
  * @param    value is a value to the content of the mail you want to send.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the mailbox detach failed.
  */
@@ -2155,11 +2055,8 @@ RTM_EXPORT(rt_mb_send);
  *           the recipient can receive the urgent mail first.
  *
  * @see      rt_mb_send()
- *
  * @param    mb is a pointer to the mailbox object to be sent.
- *
  * @param    value is the content of the mail you want to send.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the mailbox detach failed.
  */
@@ -2226,12 +2123,9 @@ RTM_EXPORT(rt_mb_urgent);
  * @note     Only when there is mail in the mailbox, the receiving thread can get the mail immediately and
  *           return RT_EOK, otherwise the receiving thread will be suspended until the set timeout. If the mail
  *           is still not received within the specified time, it will return-RT_ETIMEOUT.
- *
  * @param    mb is a pointer to the mailbox object to be received.
- *
  * @param    value is a flag that you will set for this mailbox's flag.
  *           You can set an mailbox flag, or you can set multiple flags through OR logic operations.
- *
  * @param    timeout is a timeout period (unit: an OS tick). If the mailbox object is not avaliable in the queue,
  *           the thread will wait for the object in the queue up to the amount of time specified by this parameter.
  *
@@ -2240,7 +2134,6 @@ RTM_EXPORT(rt_mb_urgent);
  *           mailbox object is unavailable in the queue, the thread will be waiting forever.
  *           If use macro RT_WAITING_NO to set this parameter, which means that this
  *           function is non-blocking and will return immediately.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the mailbox release failed.
  */
@@ -2382,13 +2275,9 @@ RTM_EXPORT(rt_mb_recv);
  * @brief    This function will set some extra attributions of a mailbox object.
  *
  * @note     Currently this function only supports the RT_IPC_CMD_RESET command to reset the mailbox.
- *
  * @param    mb is a pointer to a mailbox object.
- *
  * @param    cmd is a command used to configure some attributions of the mailbox.
- *
  * @param    arg is the argument of the function to execute the command.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that this function failed to execute.
  */
@@ -2452,20 +2341,14 @@ struct rt_mq_message
  *           and initialize the messagequeue.
  *
  * @see      rt_mq_create()
- *
  * @param    mq is a pointer to the messagequeue to initialize. It is assumed that storage for
  *           the messagequeue will be allocated in your application.
- *
  * @param    name is a pointer to the name that given to the messagequeue.
- *
  * @param    msgpool is a pointer to the starting address of the memory space you allocated for
  *           the messagequeue in advance.
  *           In other words, msgpool is a pointer to the messagequeue buffer of the starting address.
- *
  * @param    msg_size is the maximum length of a message in the messagequeue (Unit: Byte).
- *
  * @param    pool_size is the size of the memory space allocated for the messagequeue in advance.
- *
  * @param    flag is the messagequeue flag, which determines the queuing way of how multiple threads wait
  *           when the messagequeue is not available.
  *           The messagequeue flag can be ONE of the following values:
@@ -2479,7 +2362,6 @@ struct rt_mq_message
  *               use RT_IPC_FLAG_PRIO to ensure the thread is real-time UNLESS your applications concern about
  *               the first-in-first-out principle, and you clearly understand that all threads involved in
  *               this messagequeue will become non-real-time threads.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the initialization is successful.
  *           If the return value is any other values, it represents the initialization failed.
  *
@@ -2548,9 +2430,7 @@ RTM_EXPORT(rt_mq_init);
  *           When the messagequeue is successfully detached, it will resume all suspended threads in the messagequeue list.
  *
  * @see      rt_mq_delete()
- *
  * @param    mq is a pointer to a messagequeue object to be detached.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the initialization is successful.
  *           If the return value is any other values, it means that the messagequeue detach failed.
  *
@@ -2585,13 +2465,9 @@ RTM_EXPORT(rt_mq_detach);
  *           By contrast, the rt_mq_init() function will initialize a static messagequeue object.
  *
  * @see      rt_mq_init()
- *
  * @param    name is a pointer that given to the messagequeue.
- *
  * @param    msg_size is the maximum length of a message in the messagequeue (Unit: Byte).
- *
  * @param    max_msgs is the maximum number of messages in the messagequeue.
- *
  * @param    flag is the messagequeue flag, which determines the queuing way of how multiple threads wait
  *           when the messagequeue is not available.
  *           The messagequeue flag can be ONE of the following values:
@@ -2605,7 +2481,6 @@ RTM_EXPORT(rt_mq_detach);
  *               use RT_IPC_FLAG_PRIO to ensure the thread is real-time UNLESS your applications concern about
  *               the first-in-first-out principle, and you clearly understand that all threads involved in
  *               this messagequeue will become non-real-time threads.
- *
  * @return   Return a pointer to the messagequeue object. When the return value is NULL, it means the creation failed.
  *
  * @warning  This function can NOT be called in interrupt context. You can use macor RT_DEBUG_NOT_IN_INTERRUPT to check it.
@@ -2682,9 +2557,7 @@ RTM_EXPORT(rt_mq_create);
  *           When the messagequeue is successfully deleted, it will resume all suspended threads in the messagequeue list.
  *
  * @see      rt_mq_detach()
- *
  * @param    mq is a pointer to a messagequeue object to be deleted.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the messagequeue detach failed.
  *
@@ -2732,15 +2605,10 @@ RTM_EXPORT(rt_mq_delete);
  *           immediately without waiting when the messagequeue if fully used.
  *
  * @see      rt_mq_send()
- *
  * @param    mq is a pointer to the messagequeue object to be sent.
- *
  * @param    buffer is the content of the message.
- *
  * @param    size is the length of the message(Unit: Byte).
- *
  * @param    timeout is a timeout period (unit: an OS tick).
- *
  * @return   Return the operation status. When the return value is RT_EOK, the
  *           operation is successful. If the return value is any other values,
  *           it means that the messagequeue detach failed.
@@ -2922,13 +2790,9 @@ RTM_EXPORT(rt_mq_send_wait)
  *           return an error code immediately without waiting.
  *
  * @see      rt_mq_send_wait()
- *
  * @param    mq is a pointer to the messagequeue object to be sent.
- *
  * @param    buffer is the content of the message.
- *
  * @param    size is the length of the message(Unit: Byte).
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the messagequeue detach failed.
  *
@@ -2949,13 +2813,9 @@ RTM_EXPORT(rt_mq_send);
  *           the recipient can receive the urgent message first.
  *
  * @see      rt_mq_send()
- *
  * @param    mq is a pointer to the messagequeue object to be sent.
- *
  * @param    buffer is the content of the message.
- *
  * @param    size is the length of the message(Unit: Byte).
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the mailbox detach failed.
  */
@@ -3048,13 +2908,9 @@ RTM_EXPORT(rt_mq_urgent);
  * @note     Only when there is mail in the mailbox, the receiving thread can get the mail immediately and return RT_EOK,
  *           otherwise the receiving thread will be suspended until timeout.
  *           If the mail is not received within the specified time, it will return -RT_ETIMEOUT.
- *
  * @param    mq is a pointer to the messagequeue object to be received.
- *
  * @param    buffer is the content of the message.
- *
  * @param    size is the length of the message(Unit: Byte).
- *
  * @param    timeout is a timeout period (unit: an OS tick). If the message is unavailable, the thread will wait for
  *           the message in the queue up to the amount of time specified by this parameter.
  *
@@ -3063,7 +2919,6 @@ RTM_EXPORT(rt_mq_urgent);
  *           message is unavailable in the queue, the thread will be waiting forever.
  *           If use macro RT_WAITING_NO to set this parameter, which means that this
  *           function is non-blocking and will return immediately.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that the mailbox release failed.
  */
@@ -3223,13 +3078,9 @@ RTM_EXPORT(rt_mq_recv);
  * @brief    This function will set some extra attributions of a messagequeue object.
  *
  * @note     Currently this function only supports the RT_IPC_CMD_RESET command to reset the messagequeue.
- *
  * @param    mq is a pointer to a messagequeue object.
- *
  * @param    cmd is a command used to configure some attributions of the messagequeue.
- *
  * @param    arg is the argument of the function to execute the command.
- *
  * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
  *           If the return value is any other values, it means that this function failed to execute.
  */
