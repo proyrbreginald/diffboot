@@ -136,6 +136,16 @@ typedef enum rt_err_t {
  */
 #define RT_ALIGN_DOWN(size, align) ((size) & ~((align) - 1))
 
+/* 环形缓冲区结构体 */
+struct rt_ringbuffer {
+    uint8_t *buffer_ptr;
+    uint16_t read_mirror : 1;
+    uint16_t read_index : 15;
+    uint16_t write_mirror : 1;
+    uint16_t write_index : 15;
+    uint16_t buffer_size;
+};
+
 /**
  * @brief 双向链表。
  */

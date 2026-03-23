@@ -41,4 +41,6 @@ typedef struct {
 // 注册函数声明
 void ymodem_set_ops(ymodem_ops_t *const ops);
 
+void ymodem_init(void);
+
 #endif

@@ -1,6 +1,4 @@
 #include <main.h>
-#include <mcu.h>
-#include <ringbuffer.h>
 #include <rthw.h>
 #include <rtthread.h>
 #include <stdlib.h>
@@ -63,7 +61,6 @@ static void ymodem_putchar(const uint8_t ch)
 
 /**
  * @brief 搬运dma数据到环形缓冲区。
- *
  */
 static void ymodem_dma_process(void)
 {
@@ -116,7 +113,6 @@ static size_t rb_read_wait(uint8_t *dest, size_t len, uint32_t timeout_ms)
 
 /**
  * @brief ymodem协议主循环。
- *
  */
 static void ymodem_receive_loop(void)
 {
@@ -270,11 +266,55 @@ exit_session:
 
     rt_free(pkt);
 }
+
+/**
+ * @brief ymodem线程。
+ * @param parameter 线程名称参数。
+ */
+static void ymodem_thread_entry(void *parameter)
+{
+    while (1)
+    {
+        // 实际应用中，可在此处判断是否进入下载模式
+        ymodem_receive_loop();
+    }
+}
+
+/**
+ * @brief 创建ymodem线程。
+ */
+static int ymodem_thread_init(void)
+{
+    const char *const name = "ymodem";
+    rt_err_t result = RT_EOK;
+    rt_thread_t tid = rt_thread_create(name, ymodem_thread_entry, (void *)name,
+                                       1024 * 2, 2, 0);
+    if (tid != NULL)
+    {
+        LOG_I("<thread:%s> create success", name);
+        result = rt_thread_startup(tid);
+        if (result == RT_EOK)
+        {
+            LOG_I("<thread:%s> startup success", name);
+        }
+        else
+        {
+            LOG_I("<thread:%s> startup fail with %d", name, result);
+        }
+    }
+    else
+    {
+        result = RT_ENOMEM;
+        LOG_I("<thread:%s> create fail", name);
+    }
+    return result;
+}
+RUN_APP_EXPORT(ymodem_thread_init);
+
 /**
  * @brief 初始化ymodem。
- *
  */
-static void ymodem_init(void)
+void ymodem_init(void)
 {
     rt_sem_init(&uart_rx_sem, "uart_rx_sem", 0, RT_IPC_FLAG_FIFO);
     rt_ringbuffer_init(&ymodem_rb, rb_mem, YMODEM_RB_SIZE);
@@ -292,55 +332,7 @@ static void ymodem_init(void)
 }
 
 /**
- * @brief ymodem线程。
- * @param parameter
- */
-static void ymodem_thread_entry(void *parameter)
-{
-    ymodem_init();
-    while (1)
-    {
-        // 实际应用中，可在此处判断是否进入下载模式
-        ymodem_receive_loop();
-    }
-}
-
-/**
- * @brief ymodem线程创建。
- *
- */
-#undef THREAD_NAME
-#define THREAD_NAME "ymodem"
-static int ymodem_thread_init(void)
-{
-    rt_err_t result = RT_EOK;
-    rt_thread_t tid = rt_thread_create(THREAD_NAME, ymodem_thread_entry, NULL,
-                                       1024 * 2, 2, 0);
-    if (tid != NULL)
-    {
-        LOG_I(THREAD_NAME " thread create success");
-        result = rt_thread_startup(tid);
-        if (result == RT_EOK)
-        {
-            LOG_I(THREAD_NAME " thread startup success");
-        }
-        else
-        {
-            LOG_E(THREAD_NAME " thread startup fail with %d", result);
-        }
-    }
-    else
-    {
-        result = RT_ENOMEM;
-        LOG_E(THREAD_NAME " thread create fail");
-    }
-    return result;
-}
-RUN_APP_EXPORT(ymodem_thread_init);
-
-/**
  * @brief uart4中断处理函数。
- *
  */
 void UART4_IRQHandler(void)
 {
@@ -355,7 +347,6 @@ void UART4_IRQHandler(void)
 
 /**
  * @brief dma1中断处理函数。
- *
  */
 void DMA1_Stream0_IRQHandler(void)
 {

@@ -1,6 +1,5 @@
 #include <board.h>
 #include <lptim.h>
-#include <mcu.h>
 #include <rthw.h>
 #include <rtthread.h>
 
@@ -16,7 +15,6 @@ static volatile uint64_t total_sleep_ticks = 0;
 
 /**
  * @brief 空闲任务运行时的钩子函数。
- *
  */
 ITCM static void idle_hook_wfi(void)
 {
@@ -91,7 +89,6 @@ ITCM uint64_t rt_idle_total_sleep_get(void)
 
 /**
  * @brief 清除空闲任务睡眠的tick数。
- *
  */
 ITCM void rt_idle_total_sleep_clear(void)
 {
@@ -100,7 +97,6 @@ ITCM void rt_idle_total_sleep_clear(void)
 
 /**
  * @brief 系统滴答定时器中断处理。
- *
  */
 ITCM void SysTick_Handler(void)
 {
@@ -113,16 +109,22 @@ ITCM void SysTick_Handler(void)
 /**
  * @brief 精确微秒延时实现。
  * @param us 延时长度(微秒)。
+ * @warning 请勿执行过长延时！
+ * @note 关中断与阻塞式实现！
  */
 ITCM void rt_hw_us_delay(uint32_t us)
 {
-    uint32_t ticks = us * ticks_per_us;
-    uint32_t start = DWT->CYCCNT;
+    __disable_irq();
+
+    const uint32_t ticks = us * ticks_per_us;
+    const uint32_t start = DWT->CYCCNT;
 
     // 循环等待直到达到目标周期数
     // 无符号减法会自动处理0xFFFFFFFF到0的翻转
     while ((DWT->CYCCNT - start) < ticks)
         ;
+
+    __enable_irq();
 }
 
 /**
@@ -145,7 +147,6 @@ ITCM void rt_hw_console_output(const char *str)
 
 /**
  * @brief 执行操作系统启动前的配置。
- *
  */
 void rt_hw_mcu_init(void)
 {

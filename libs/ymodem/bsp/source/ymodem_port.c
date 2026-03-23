@@ -1,6 +1,5 @@
-#include <load/load.h>
+#include <ymodem_port.h>
 #include <main.h>
-#include <mcu.h>
 #include <rthw.h>
 #include <rtthread.h>
 #include <string.h>
@@ -10,78 +9,6 @@
 #define DBG_TAG __FILE_NAME__
 #define DBG_LVL DBG_VERBOSE
 #include <rtdebug.h>
-
-#undef THREAD_NAME
-#define THREAD_NAME "count"
-// cpu使用率统计线程
-
-static void count_thread_entry(void *parameter)
-{
-    // 将毫秒转换为系统的Tick数
-    const rt_tick_t period_tick = rt_tick_from_millisecond(1000);
-
-    // 获取进入循环前的当前Tick时间作为基准
-    rt_tick_t last_wakeup_tick = rt_tick_get();
-
-    while (1)
-    {
-        /* 取出数据并清零 */
-        rt_enter_critical();
-        uint64_t sleep_cnt = rt_idle_total_sleep_get();
-        rt_idle_total_sleep_clear();
-        rt_exit_critical();
-
-        /* 理论上1秒钟LPTIM应该走1000000个Tick */
-        if (sleep_cnt > 1000000)
-        {
-            sleep_cnt = 1000000; // 修正误差，防止出现负数
-        }
-
-        static uint8_t cnt = 0;
-        if (++cnt % 1 == 0)
-        {
-            /* 占用率 = 100 - (睡眠占比) */
-            LOG_I("cpu usage per s: %.2f%%",
-                  100.0f - ((float)sleep_cnt / 1000000) * 100.0f);
-            cnt = 0;
-        }
-
-        /*
-         * 阻塞延时至下一个绝对时间点
-         * 内核会自动计算：需要sleep多久 = (last_wakeup_tick + period_tick) -
-         * current_tick 并自动更新 last_wakeup_tick
-         */
-        rt_thread_delay_until(&last_wakeup_tick, period_tick);
-    }
-}
-
-// 启动计算线程
-static int count_thread_init(void)
-{
-    rt_err_t result = RT_EOK;
-    rt_thread_t tid = rt_thread_create(THREAD_NAME, count_thread_entry, NULL,
-                                       1024 * 2, RT_THREAD_PRIORITY_MAX - 2, 0);
-    if (tid != NULL)
-    {
-        LOG_I(THREAD_NAME " thread create success");
-        result = rt_thread_startup(tid);
-        if (result == RT_EOK)
-        {
-            LOG_I(THREAD_NAME " thread startup success");
-        }
-        else
-        {
-            LOG_E(THREAD_NAME " thread startup fail with %d", result);
-        }
-    }
-    else
-    {
-        result = RT_ENOMEM;
-        LOG_E(THREAD_NAME " thread create fail");
-    }
-    return result;
-}
-RUN_APP_EXPORT(count_thread_init);
 
 typedef enum
 {
@@ -312,89 +239,14 @@ static ymodem_ops_t ymodem_ops = {
     .on_end = ymodem_on_end,
 };
 
-// void detect_app(void)
-// {
-//     // 待加载的app程序地址
-//     uint32_t app_bin_addr;
-
-//     // 校验跳转标志位
-//     switch (*(volatile uint32_t *)MCU_BKPRAM_START)
-//     {
-//     case LOAD_USER_CHECKSUM:
-//         // 赋值user程序分区的地址作为app程序地址
-//         app_bin_addr = USER_START;
-//         LOG_I("LOAD_USER_CHECKSUM");
-//         break;
-//     case LOAD_OEM_CHECKSUM:
-//         // 赋值oem程序分区的地址作为app程序地址
-//         app_bin_addr = OEM_START;
-//         LOG_I("LOAD_OEM_CHECKSUM");
-//         break;
-//     default:
-//         // 无效参数时不加载app程序
-//         LOG_I("checksum invalid");
-//         return;
-//     }
-
-//     // 获取app的栈指针和复位处理函数
-//     // app程序的第一个4字节是栈地址，第二个是复位处理函数地址
-//     const uint32_t new_msp = *(volatile uint32_t *)app_bin_addr;
-//     const void_fn_void_t new_reset_handler =
-//         (void_fn_void_t)(*(volatile uint32_t *)(app_bin_addr + 4));
-//     LOG_I("VTOR: 0x%08x, new_msp: 0x%08x, new_reset_handler: 0x%08x",
-//           app_bin_addr, new_msp, new_reset_handler);
-
-//     // 执行mcu软件复位
-//     NVIC_SystemReset();
-// }
-
-#undef THREAD_NAME
-#define THREAD_NAME "boot"
-// 差分启动线程
-static void boot_thread_entry(void *parameter)
+static int ymodem_env_init(void)
 {
+    ymodem_init();
+
     // 在初始化时注册
     ymodem_set_ops(&ymodem_ops);
-    LOG_I("set ymodem ops");
+    LOG_I("ymodem env init finish");
 
-    while (1)
-    {
-        LOG_D(THREAD_NAME " thread running");
-        HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-        rt_thread_mdelay(500);
-    }
+    return 0;
 }
-
-// 启动差分启动线程
-static int boot_thread_init(void)
-{
-    rt_err_t result = RT_EOK;
-    rt_thread_t tid =
-        rt_thread_create(THREAD_NAME, boot_thread_entry, NULL, 1024 * 2, 1, 0);
-    if (tid != NULL)
-    {
-        LOG_I(THREAD_NAME " thread create success");
-        result = rt_thread_startup(tid);
-        if (result == RT_EOK)
-        {
-            LOG_I(THREAD_NAME " thread startup success");
-        }
-        else
-        {
-            LOG_E(THREAD_NAME " thread startup fail with %d", result);
-        }
-    }
-    else
-    {
-        result = RT_ENOMEM;
-        LOG_E(THREAD_NAME " thread create fail");
-    }
-    return result;
-}
-RUN_APP_EXPORT(boot_thread_init);
-
-// 创建业务层任务
-void rt_app_init(void)
-{
-    LOG_I("start to init app");
-}
+RUN_ENV_EXPORT(ymodem_env_init);

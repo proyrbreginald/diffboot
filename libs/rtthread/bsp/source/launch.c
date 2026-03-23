@@ -1,5 +1,4 @@
 #include <board.h>
-#include <boot/boot.h>
 #include <rthw.h>
 #include <rtthread.h>
 
@@ -96,9 +95,6 @@ void rtthread_launch(void)
     // 初始化rtos组件
     rt_components_init();
 #endif
-
-    // 初始化业务层
-    rt_app_init();
 
     // 开始执行调度
     LOG_I("scheduler start");

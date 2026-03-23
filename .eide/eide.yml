@@ -11,6 +11,7 @@ srcDirs:
   - libs/libstm32h743/hal/source
   - libs/ringbuffer/source
   - libs/rtthread
+  - libs/ymodem/bsp/source
   - libs/ymodem/source
   - source
 virtualFolder:
@@ -41,6 +42,7 @@ targets:
         - libs/ringbuffer/include
         - libs/rtthread/bsp/include
         - libs/rtthread/include
+        - libs/ymodem/bsp/include
         - libs/ymodem/include
       libList: []
     excludeList:

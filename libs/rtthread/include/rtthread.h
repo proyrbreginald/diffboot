@@ -6,6 +6,48 @@
 #include "rtservice.h"
 
 /**
+ * @brief 初始化环形缓冲区。
+ * @param rb   环形缓冲区对象指针。
+ * @param pool 用于存储数据的缓冲区地址。
+ * @param size 缓冲区的大小（字节）。
+ */
+void rt_ringbuffer_init(struct rt_ringbuffer *rb, uint8_t *pool, uint16_t size);
+
+/**
+ * @brief 向环形缓冲区中写入数据。
+ * @param rb     环形缓冲区对象指针。
+ * @param ptr    待写入数据的指针。
+ * @param length 待写入数据的长度。
+ * @return size_t 返回实际成功写入的字节数。
+ */
+size_t rt_ringbuffer_put(struct rt_ringbuffer *rb, const uint8_t *ptr,
+                         uint16_t length);
+
+/**
+ * @brief 从环形缓冲区中读取数据。
+ * @param rb     环形缓冲区对象指针。
+ * @param ptr    存放读取数据的目标缓冲区指针。
+ * @param length 期望读取数据的长度。
+ * @return size_t 返回实际读取到的字节数。
+ */
+size_t rt_ringbuffer_get(struct rt_ringbuffer *rb, uint8_t *ptr,
+                         uint16_t length);
+
+/**
+ * @brief 获取环形缓冲区内当前存放的数据长度。
+ * @param rb 环形缓冲区对象指针。
+ * @return size_t 当前缓冲区内的数据字节数。
+ */
+size_t rt_ringbuffer_data_len(struct rt_ringbuffer *rb);
+
+/**
+ * @brief 重置环形缓冲区。
+ * @note 此操作会清空缓冲区内已存的数据，重置读写指针。
+ * @param rb 环形缓冲区对象指针。
+ */
+void rt_ringbuffer_reset(struct rt_ringbuffer *rb);
+
+/**
  * @brief 获取指定类型对象的信息结构体。
  * @param type 对象类型枚举。
  * @return 返回指向该类型对象信息结构体的指针。
@@ -1546,7 +1588,7 @@ const char *rt_strerror(rt_err_t error);
 
 #if !defined(RT_USING_NEWLIB) && !defined(_WIN32)
 #ifndef errno
-/** 
+/**
  * @brief 宏定义 errno，方便通过全局变量访问当前线程错误码 。
  */
 #define errno *_rt_errno()
