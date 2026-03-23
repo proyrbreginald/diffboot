@@ -1,3 +1,4 @@
+#include <load/load.h>
 #include <main.h>
 #include <rthw.h>
 #include <rtthread.h>
@@ -6,7 +7,7 @@
 
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__
-#define DBG_LVL DBG_VERBOSE
+#define DBG_LVL DBG_WARN
 #include <rtdebug.h>
 
 // void detect_app(void)
@@ -51,10 +52,29 @@
  */
 static void boot_thread_entry(void *parameter)
 {
+    {
+        const load_error_t load_error = load_get_error();
+        if (load_error != LOAD_ERROR_NONE)
+        {
+            LOG_E("load error: %d, which: 0x%02x, r_crc: 0x%04x, c_crc: 0x%04x",
+                  load_error, load_read_config_which(), load_read_config_crc(),
+                  load_update_config_crc());
+        }
+    }
     while (1)
     {
         LOG_D("<thread:%s> running", parameter);
         HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+        if (load_verify_config())
+        {
+            if ((load_read_config_which() == LOAD_APP_USER) ||
+                (load_read_config_which() == LOAD_APP_OEM))
+            {
+                LOG_F("reset by software");
+                rt_thread_mdelay(500);
+                NVIC_SystemReset();
+            }
+        }
         rt_thread_mdelay(500);
     }
 }

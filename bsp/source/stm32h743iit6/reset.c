@@ -98,24 +98,27 @@ NAKED void reset_handler(void)
         (char *)_dtcm_ram_init_start, _dtcm_ram_section_addr,
         (size_t)_dtcm_ram_init_end -
             (size_t)_dtcm_ram_init_start); //!< 拷贝dtcm的有值数据
-    reset_clear_ram_uninit((char *)_dtcm_ram_uninit_start,
-                           (char *)_dtcm_ram_uninit_end); //!< 清空dtcm的无值数据
+    reset_clear_ram_uninit(
+        (char *)_dtcm_ram_uninit_start,
+        (char *)_dtcm_ram_uninit_end); //!< 清空dtcm的无值数据
 
     /* 加载axiram的数据 */
     reset_copy_ram_init(
         (char *)_axi_ram_init_start, _axi_ram_section_addr,
         (size_t)_axi_ram_init_end -
             (size_t)_axi_ram_init_start); //!< 拷贝axiram的有值数据
-    reset_clear_ram_uninit((char *)_axi_ram_uninit_start,
-                           (char *)_axi_ram_uninit_end); //!< 清空axiram的无值数据
+    reset_clear_ram_uninit(
+        (char *)_axi_ram_uninit_start,
+        (char *)_axi_ram_uninit_end); //!< 清空axiram的无值数据
 
     /* 加载ahbram的数据 */
     reset_copy_ram_init(
         (char *)_ahb_ram_init_start, _ahb_ram_section_addr,
         (size_t)_ahb_ram_init_end -
             (size_t)_ahb_ram_init_start); //!< 拷贝ahbram的有值数据
-    reset_clear_ram_uninit((char *)_ahb_ram_uninit_start,
-                           (char *)_ahb_ram_uninit_end); //!< 清空ahbram的无值数据
+    reset_clear_ram_uninit(
+        (char *)_ahb_ram_uninit_start,
+        (char *)_ahb_ram_uninit_end); //!< 清空ahbram的无值数据
 
     // 程序数据已经加载完成，开始启动boot程序
     load_boot();

@@ -18,6 +18,7 @@ uint16_t load_read_config_crc(void)
 void load_write_config_which(load_which_t which)
 {
     load_config.info.which = which;
+    load_update_config_crc();           //!< 更新校验值
 }
 
 uint16_t load_update_config_crc(void)
@@ -41,19 +42,35 @@ bool load_verify_config(void)
     }
 }
 
+void load_set_error(load_error_t error)
+{
+    load_config.info.error = error;
+    load_update_config_crc();           //!< 更新校验值
+}
+
+load_error_t load_get_error(void)
+{
+    return load_config.info.error;
+}
+
 void load_app(void)
 {
+    // 清除复位前的异常
+    load_set_error(LOAD_ERROR_NONE);
+
     // 启动配置数据无效
     if (!load_verify_config())
     {
-        return; //!< 无效数据无法直接启动app程序
+        load_set_error(LOAD_ERROR_VERIFY);
+        return;                   //!< 无效数据无法直接启动app程序
     }
 
     uint32_t app_bin_addr;            //!< 待启动的app程序地址
     switch (load_read_config_which()) //!< 读取应该启动哪个程序
     {
     case LOAD_BOOT:
-        return; //!< 从boot启动
+        load_set_error(LOAD_ERROR_NONE);
+        return;                   //!< 从boot启动
     case LOAD_APP_USER:
         app_bin_addr = USER_START; //!< 从用户程序启动
         break;
@@ -61,11 +78,11 @@ void load_app(void)
         app_bin_addr = OEM_START; //!< 从厂商程序启动
         break;
     default:
-        return; //!< 无效参数时不加载app程序
+        load_set_error(LOAD_ERROR_WHICH);
+        return;                   //!< 无效参数时不加载app程序
     }
 
     load_write_config_which(LOAD_BOOT); //!< 清除启动配置
-    load_update_config_crc();           //!< 更新校验值
 
     const uint32_t new_msp =
         *(volatile uint32_t *)app_bin_addr; //!< 获取app的栈指针

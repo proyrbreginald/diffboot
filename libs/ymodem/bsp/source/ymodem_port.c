@@ -1,9 +1,10 @@
-#include <ymodem_port.h>
+#include <load/load.h>
 #include <main.h>
 #include <rthw.h>
 #include <rtthread.h>
 #include <string.h>
 #include <ymodem.h>
+#include <ymodem_port.h>
 
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__
@@ -219,12 +220,11 @@ ITCM static void ymodem_on_end(int status)
         reset |= (uint32_t)buffer[4] << (0 * 8);
 
         // 设置加载app标志位
-        // *(volatile uint32_t *)MCU_BKPRAM_START =
-        //     ((iap_zone == IAP_USER) ? LOAD_USER_CHECKSUM :
-        //     LOAD_OEM_CHECKSUM);
-
-        LOG_I("stack: 0x%08x, reset: 0x%08x, checksum: 0x%08x", stack, reset,
-              *(volatile uint32_t *)MCU_BKPRAM_START);
+        load_write_config_which(LOAD_APP_USER);
+        LOG_I("stack: 0x%08x, reset: 0x%08x, which: 0x%02x, r_crc: 0x%04x, "
+              "c_crc: 0x%04x",
+              stack, reset, load_read_config_which(), load_read_config_crc(),
+              load_update_config_crc());
     }
     else
     {
@@ -232,15 +232,15 @@ ITCM static void ymodem_on_end(int status)
     }
 }
 
-// 组装接口对象
-static ymodem_ops_t ymodem_ops = {
-    .on_begin = ymodem_on_begin,
-    .on_data = ymodem_on_data,
-    .on_end = ymodem_on_end,
-};
-
 static int ymodem_env_init(void)
 {
+    // 组装接口对象
+    static ymodem_ops_t ymodem_ops = {
+        .on_begin = ymodem_on_begin,
+        .on_data = ymodem_on_data,
+        .on_end = ymodem_on_end,
+    };
+
     ymodem_init();
 
     // 在初始化时注册

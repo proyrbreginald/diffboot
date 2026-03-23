@@ -25,10 +25,21 @@ typedef enum load_which_t {
 } load_which_t;
 
 /**
+ * @brief 定义错误选项。
+ */
+typedef enum load_error_t {
+    LOAD_ERROR_NONE    = 0x00,
+    LOAD_ERROR_VERIFY  = 0x01,
+    LOAD_ERROR_WHICH   = 0x02,
+    LOAD_ERROR_INVALID = 0xff,
+} load_error_t;
+
+/**
  * @brief 定义如何启动程序。
  */
 typedef struct load_config_info_t {
     volatile load_which_t which; //!< 启动哪个程序
+    volatile load_error_t error; //!< 错误信息
 } load_config_info_t;
 
 /**
@@ -74,6 +85,18 @@ uint16_t load_update_config_crc(void);
  * @return false 数据无效。
  */
 bool load_verify_config(void);
+
+/**
+ * @brief 设置错误代码。
+ * @param error 新的错误代码。
+ */
+void load_set_error(load_error_t error);
+
+/**
+ * @brief 返回错误的代码。
+ * @return load_error_t 当前错误代码。
+ */
+load_error_t load_get_error(void);
 
 /**
  * @brief 尝试启动app程序。
