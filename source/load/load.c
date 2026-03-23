@@ -5,9 +5,19 @@
 
 SHARE static load_config_t load_config;
 
-uint8_t load_read_config_which(void)
+bool load_read_config_which(load_which_t *which)
 {
-    return load_config.info.which;
+    if (!which)
+    {
+        return false;
+    }
+
+    if (load_verify_config())
+    {
+        *which = load_config.info.which;
+    }
+
+    return true;
 }
 
 uint16_t load_read_config_crc(void)
@@ -18,7 +28,7 @@ uint16_t load_read_config_crc(void)
 void load_write_config_which(load_which_t which)
 {
     load_config.info.which = which;
-    load_update_config_crc();           //!< 更新校验值
+    load_update_config_crc(); //!< 更新校验值
 }
 
 uint16_t load_update_config_crc(void)
@@ -34,6 +44,7 @@ bool load_verify_config(void)
         algo_crc16((uint8_t *)&load_config, sizeof(load_config_info_t));
     if (c_crc != load_config.crc)
     {
+        load_set_error(LOAD_ERROR_VERIFY);
         return false;
     }
     else
@@ -45,7 +56,7 @@ bool load_verify_config(void)
 void load_set_error(load_error_t error)
 {
     load_config.info.error = error;
-    load_update_config_crc();           //!< 更新校验值
+    load_update_config_crc(); //!< 更新校验值
 }
 
 load_error_t load_get_error(void)
@@ -61,16 +72,20 @@ void load_app(void)
     // 启动配置数据无效
     if (!load_verify_config())
     {
-        load_set_error(LOAD_ERROR_VERIFY);
-        return;                   //!< 无效数据无法直接启动app程序
+        return; //!< 无效数据无法直接启动app程序
     }
 
-    uint32_t app_bin_addr;            //!< 待启动的app程序地址
-    switch (load_read_config_which()) //!< 读取应该启动哪个程序
+    uint32_t app_bin_addr; //!< 待启动的app程序地址
+    load_which_t which;
+    if (!load_read_config_which(&which))
+    {
+        return;
+    }
+    switch (which) //!< 读取应该启动哪个程序
     {
     case LOAD_BOOT:
         load_set_error(LOAD_ERROR_NONE);
-        return;                   //!< 从boot启动
+        return; //!< 从boot启动
     case LOAD_APP_USER:
         app_bin_addr = USER_START; //!< 从用户程序启动
         break;
@@ -79,7 +94,7 @@ void load_app(void)
         break;
     default:
         load_set_error(LOAD_ERROR_WHICH);
-        return;                   //!< 无效参数时不加载app程序
+        return; //!< 无效参数时不加载app程序
     }
 
     load_write_config_which(LOAD_BOOT); //!< 清除启动配置

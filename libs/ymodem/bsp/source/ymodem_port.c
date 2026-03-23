@@ -221,10 +221,7 @@ ITCM static void ymodem_on_end(int status)
 
         // 设置加载app标志位
         load_write_config_which(LOAD_APP_USER);
-        LOG_I("stack: 0x%08x, reset: 0x%08x, which: 0x%02x, r_crc: 0x%04x, "
-              "c_crc: 0x%04x",
-              stack, reset, load_read_config_which(), load_read_config_crc(),
-              load_update_config_crc());
+        LOG_I("stack: 0x%08x, reset: 0x%08x", stack, reset);
     }
     else
     {

@@ -10,41 +10,54 @@
 #define DBG_LVL DBG_WARN
 #include <rtdebug.h>
 
-// void detect_app(void)
-// {
-//     // 待加载的app程序地址
-//     uint32_t app_bin_addr;
+void detect_app(void)
+{
+    load_which_t which;
+    if (!load_read_config_which(&which))
+    {
+        return;
+    }
 
-//     // 校验跳转标志位
-//     switch (*(volatile uint32_t *)MCU_BKPRAM_START)
-//     {
-//     case LOAD_USER_CHECKSUM:
-//         // 赋值user程序分区的地址作为app程序地址
-//         app_bin_addr = USER_START;
-//         LOG_I("LOAD_USER_CHECKSUM");
-//         break;
-//     case LOAD_OEM_CHECKSUM:
-//         // 赋值oem程序分区的地址作为app程序地址
-//         app_bin_addr = OEM_START;
-//         LOG_I("LOAD_OEM_CHECKSUM");
-//         break;
-//     default:
-//         // 无效参数时不加载app程序
-//         LOG_I("checksum invalid");
-//         return;
-//     }
+    // 待加载的app程序地址
+    uint32_t app_bin_addr;
 
-//     // 获取app的栈指针和复位处理函数
-//     // app程序的第一个4字节是栈地址，第二个是复位处理函数地址
-//     const uint32_t new_msp = *(volatile uint32_t *)app_bin_addr;
-//     const void_fn_void_t new_reset_handler =
-//         (void_fn_void_t)(*(volatile uint32_t *)(app_bin_addr + 4));
-//     LOG_I("VTOR: 0x%08x, new_msp: 0x%08x, new_reset_handler: 0x%08x",
-//           app_bin_addr, new_msp, new_reset_handler);
+    // 校验跳转标志位
+    switch (which)
+    {
+    case LOAD_BOOT:
+        LOG_I("LOAD_BOOT");
+        return;
+    case LOAD_APP_USER:
+        // 赋值user程序分区的地址作为app程序地址
+        app_bin_addr = USER_START;
+        LOG_I("LOAD_APP_USER");
+        break;
+    case LOAD_APP_OEM:
+        // 赋值oem程序分区的地址作为app程序地址
+        app_bin_addr = OEM_START;
+        LOG_I("LOAD_APP_OEM");
+        break;
+    default:
+        // 无效参数时不加载app程序
+        LOG_I("LOAD_NULL");
+        return;
+    }
+    LOG_F("reset by software");
 
-//     // 执行mcu软件复位
-//     NVIC_SystemReset();
-// }
+    // 获取app的栈指针和复位处理函数
+    // app程序的第一个4字节是栈地址，第二个是复位处理函数地址
+    const uint32_t new_msp = *(volatile uint32_t *)app_bin_addr;
+    const void_fn_void_t new_reset_handler =
+        (void_fn_void_t)(*(volatile uint32_t *)(app_bin_addr + 4));
+    LOG_I("VTOR: 0x%08x, new_msp: 0x%08x, new_reset_handler: 0x%08x",
+          app_bin_addr, new_msp, new_reset_handler);
+    UNUSE_VAR(new_msp);
+    UNUSE_VAR(new_reset_handler);
+
+    // 执行mcu软件复位
+    rt_thread_mdelay(500);
+    NVIC_SystemReset();
+}
 
 /**
  * @brief bootloader线程。
@@ -52,29 +65,11 @@
  */
 static void boot_thread_entry(void *parameter)
 {
-    {
-        const load_error_t load_error = load_get_error();
-        if (load_error != LOAD_ERROR_NONE)
-        {
-            LOG_E("load error: %d, which: 0x%02x, r_crc: 0x%04x, c_crc: 0x%04x",
-                  load_error, load_read_config_which(), load_read_config_crc(),
-                  load_update_config_crc());
-        }
-    }
     while (1)
     {
         LOG_D("<thread:%s> running", parameter);
         HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-        if (load_verify_config())
-        {
-            if ((load_read_config_which() == LOAD_APP_USER) ||
-                (load_read_config_which() == LOAD_APP_OEM))
-            {
-                LOG_F("reset by software");
-                rt_thread_mdelay(500);
-                NVIC_SystemReset();
-            }
-        }
+        detect_app();
         rt_thread_mdelay(500);
     }
 }

@@ -56,10 +56,12 @@ typedef struct load_config_t {
 typedef void (*void_fn_void_t)(void);
 
 /**
- * @brief 读取如何启动。
- * @return uint8_t 从哪个程序启动。
+ * @brief 读取启动配置。
+ * @param which 指向读取变量的指针。
+ * @return true 读取成功。
+ * @return false 读取失败。
  */
-uint8_t load_read_config_which(void);
+bool load_read_config_which(load_which_t *which);
 
 /**
  * @brief 读取启动配置的校验值。
