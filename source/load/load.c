@@ -2,22 +2,15 @@
 #include <launch.h>
 #include <load/load.h>
 #include <main.h>
+#include <mcu.h>
 
 SHARE static load_config_t load_config;
 
-bool load_read_config_which(load_which_t *which)
+uint16_t load_update_config_crc(void)
 {
-    if (!which)
-    {
-        return false;
-    }
-
-    if (load_verify_config())
-    {
-        *which = load_config.info.which;
-    }
-
-    return true;
+    load_config.crc =
+        algo_crc16((uint8_t *)&load_config, sizeof(load_config_info_t));
+    return load_config.crc;
 }
 
 uint16_t load_read_config_crc(void)
@@ -25,17 +18,15 @@ uint16_t load_read_config_crc(void)
     return load_config.crc;
 }
 
-void load_write_config_which(load_which_t which)
+void load_set_error(load_error_t error)
 {
-    load_config.info.which = which;
+    load_config.info.error = error;
     load_update_config_crc(); //!< 更新校验值
 }
 
-uint16_t load_update_config_crc(void)
+load_error_t load_get_error(void)
 {
-    load_config.crc =
-        algo_crc16((uint8_t *)&load_config, sizeof(load_config_info_t));
-    return load_config.crc;
+    return load_config.info.error;
 }
 
 bool load_verify_config(void)
@@ -53,15 +44,25 @@ bool load_verify_config(void)
     }
 }
 
-void load_set_error(load_error_t error)
+void load_write_config_which(load_which_t which)
 {
-    load_config.info.error = error;
+    load_config.info.which = which;
     load_update_config_crc(); //!< 更新校验值
 }
 
-load_error_t load_get_error(void)
+bool load_read_config_which(load_which_t *which)
 {
-    return load_config.info.error;
+    if (!which)
+    {
+        return false;
+    }
+
+    if (load_verify_config())
+    {
+        *which = load_config.info.which;
+    }
+
+    return true;
 }
 
 void load_app(void)

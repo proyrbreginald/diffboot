@@ -39,7 +39,7 @@ void detect_app(void)
         break;
     default:
         // 无效参数时不加载app程序
-        LOG_I("LOAD_NULL");
+        LOG_I("LOAD_INVALID");
         return;
     }
     LOG_F("reset by software");

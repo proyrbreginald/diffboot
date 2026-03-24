@@ -247,3 +247,47 @@ static int ymodem_env_init(void)
     return 0;
 }
 RUN_ENV_EXPORT(ymodem_env_init);
+
+/**
+ * @brief ymodem线程。
+ * @param parameter 线程名称参数。
+ */
+static void ymodem_thread_entry(void *parameter)
+{
+    while (1)
+    {
+        // 实际应用中，可在此处判断是否进入下载模式
+        ymodem_receive_loop();
+    }
+}
+
+/**
+ * @brief 创建ymodem线程。
+ */
+static int ymodem_thread_init(void)
+{
+    const char *const name = "ymodem";
+    rt_err_t result = RT_EOK;
+    rt_thread_t tid = rt_thread_create(name, ymodem_thread_entry, (void *)name,
+                                       1024 * 2, 2, 0);
+    if (tid != NULL)
+    {
+        LOG_I("<thread:%s> create success", name);
+        result = rt_thread_startup(tid);
+        if (result == RT_EOK)
+        {
+            LOG_I("<thread:%s> startup success", name);
+        }
+        else
+        {
+            LOG_I("<thread:%s> startup fail with %d", name, result);
+        }
+    }
+    else
+    {
+        result = RT_ENOMEM;
+        LOG_I("<thread:%s> create fail", name);
+    }
+    return result;
+}
+RUN_APP_EXPORT(ymodem_thread_init);

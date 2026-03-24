@@ -1,3 +1,4 @@
+#include <algo/algo.h>
 #include <main.h>
 #include <rthw.h>
 #include <rtthread.h>
@@ -9,6 +10,15 @@
 #define DBG_TAG __FILE_NAME__
 #define DBG_LVL DBG_VERBOSE
 #include <rtdebug.h>
+
+/* 控制字符 */
+#define SOH (0x01)   /* 128字节数据包头 */
+#define STX (0x02)   /* 1024字节数据包头 */
+#define EOT (0x04)   /* 结束传输 */
+#define ACK (0x06)   /* 响应 */
+#define NAK (0x15)   /* 重传 */
+#define CAN (0x18)   /* 取消 */
+#define CRC_C (0x43) /* 'C' 字符 */
 
 #define UART_RX_BUF_SIZE (1024 * 2)
 #define YMODEM_RB_SIZE (1024 * 4)
@@ -23,29 +33,6 @@ static ymodem_ops_t *ymodem_cb = NULL;
 void ymodem_set_ops(ymodem_ops_t *const ops)
 {
     ymodem_cb = ops;
-}
-
-/**
- * @brief CRC16-CCITT软件实现。
- * @param buf 原始数据。
- * @param len 数据长度。
- * @return uint16_t 计算结果。
- */
-ITCM static uint16_t crc16_ccitt(const uint8_t *buf, uint32_t len)
-{
-    uint16_t crc = 0;
-    while (len--)
-    {
-        crc ^= (uint16_t)*buf++ << 8;
-        for (int i = 0; i < 8; i++)
-        {
-            if (crc & 0x8000)
-                crc = (crc << 1) ^ 0x1021;
-            else
-                crc <<= 1;
-        }
-    }
-    return crc;
 }
 
 /**
@@ -114,7 +101,7 @@ static size_t rb_read_wait(uint8_t *dest, size_t len, uint32_t timeout_ms)
 /**
  * @brief ymodem协议主循环。
  */
-static void ymodem_receive_loop(void)
+void ymodem_receive_loop(void)
 {
     uint8_t *pkt = rt_malloc(1024 + 12);
     if (!pkt)
@@ -210,7 +197,7 @@ static void ymodem_receive_loop(void)
                         if (pkt[1] + pkt[2] == 0xFF)
                         {
                             // 校验CRC
-                            uint16_t c_crc = crc16_ccitt(&pkt[3], block_len);
+                            uint16_t c_crc = algo_crc16(&pkt[3], block_len);
                             uint16_t r_crc =
                                 (uint16_t)(pkt[3 + block_len] << 8) |
                                 pkt[3 + block_len + 1];
@@ -266,50 +253,6 @@ exit_session:
 
     rt_free(pkt);
 }
-
-/**
- * @brief ymodem线程。
- * @param parameter 线程名称参数。
- */
-static void ymodem_thread_entry(void *parameter)
-{
-    while (1)
-    {
-        // 实际应用中，可在此处判断是否进入下载模式
-        ymodem_receive_loop();
-    }
-}
-
-/**
- * @brief 创建ymodem线程。
- */
-static int ymodem_thread_init(void)
-{
-    const char *const name = "ymodem";
-    rt_err_t result = RT_EOK;
-    rt_thread_t tid = rt_thread_create(name, ymodem_thread_entry, (void *)name,
-                                       1024 * 2, 2, 0);
-    if (tid != NULL)
-    {
-        LOG_I("<thread:%s> create success", name);
-        result = rt_thread_startup(tid);
-        if (result == RT_EOK)
-        {
-            LOG_I("<thread:%s> startup success", name);
-        }
-        else
-        {
-            LOG_I("<thread:%s> startup fail with %d", name, result);
-        }
-    }
-    else
-    {
-        result = RT_ENOMEM;
-        LOG_I("<thread:%s> create fail", name);
-    }
-    return result;
-}
-RUN_APP_EXPORT(ymodem_thread_init);
 
 /**
  * @brief 初始化ymodem。
