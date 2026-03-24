@@ -9,7 +9,6 @@ srcDirs:
   - libs/cubemx/Core/Src
   - libs/libc/source
   - libs/libstm32h743/hal/source
-  - libs/ringbuffer/source
   - libs/rtthread
   - libs/ymodem/bsp/source
   - libs/ymodem/source
@@ -70,7 +69,7 @@ targets:
           beforeBuildTasks:
             - name: build link script
               abortAfterFailed: false
-              command: ${CompilerPrefix}gcc.exe -E -P -x c -DBUILD_LOADER ${workspaceFolder}/bsp/include/mcu_port.ld -o ${OutDir}/boot.ld
+              command: ${CompilerPrefix}gcc.exe -E -P -x c -DBUILD_LOADER ${workspaceFolder}/bsp/include/mcu_port.ld -o ${OutDir}/diffboot.ld
               disable: false
               stopBuildAfterFailed: true
           c/cpp-compiler:
@@ -98,7 +97,7 @@ targets:
             LIB_FLAGS: -lgcc
             output-format: elf
             remove-unused-input-sections: true
-        scatterFilePath: ${OutDir}\boot.ld
+        scatterFilePath: ${OutDir}/diffboot.ld
         storageLayout:
           RAM: []
           ROM: []

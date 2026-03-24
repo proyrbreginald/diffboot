@@ -14,16 +14,6 @@
 #include <stdbool.h>
 
 /**
- * @brief 定义启动选项。
- */
-typedef enum load_which_t {
-    LOAD_BOOT     = 0x00, //!< 从boot启动
-    LOAD_APP_USER = 0x01, //!< 从user启动
-    LOAD_APP_OEM  = 0x02, //!< 从oem启动
-    LOAD_INVALID  = 0xff, //!< 无效参数
-} load_which_t;
-
-/**
  * @brief 定义错误选项。
  */
 typedef enum load_error_t {
@@ -34,10 +24,29 @@ typedef enum load_error_t {
 } load_error_t;
 
 /**
+ * @brief 定义复位选项。
+ */
+typedef enum load_reset_t {
+    LOAD_RESET         = 0x00, //!< 执行复位
+    LOAD_RESET_INVALID = 0xff, //!< 无效参数
+} load_reset_t;
+
+/**
+ * @brief 定义启动选项。
+ */
+typedef enum load_which_t {
+    LOAD_APP_BOOT    = 0x00, //!< 从boot启动
+    LOAD_APP_USER    = 0x01, //!< 从user启动
+    LOAD_APP_OEM     = 0x02, //!< 从oem启动
+    LOAD_APP_INVALID = 0xff, //!< 无效参数
+} load_which_t;
+
+/**
  * @brief 定义如何启动程序。
  */
 typedef struct load_config_info_t {
     volatile load_error_t error; //!< 错误信息
+    volatile load_reset_t reset; //!< 是否需要执行复位
     volatile load_which_t which; //!< 从哪个程序启动
 } load_config_info_t;
 
@@ -77,6 +86,22 @@ extern void load_set_error(load_error_t error);
  * @return load_error_t 当前错误代码。
  */
 extern load_error_t load_get_error(void);
+
+/**
+ * @brief 设置复位需求。
+ */
+extern void load_set_reset(void);
+
+/**
+ * @brief 清除复位需求。
+ */
+extern void load_clear_reset(void);
+
+/**
+ * @brief 返回复位需求。
+ * @return load_reset_t 是否需要复位。
+ */
+extern load_reset_t load_get_reset(void);
 
 /**
  * @brief 进行数据校验，检查数据有效性。

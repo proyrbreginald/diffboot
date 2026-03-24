@@ -116,7 +116,7 @@ SECTIONS
     {
         _axi_ram_init_start = .;        /* 起始地址 */
         _axi_ram_init_end = .;          /* 结束地址 */
-    } > AXIRAM AT > LOADER
+    } > AXIRAM AT > CODE_PARTITION
     _axi_ram_section_addr = LOADADDR(.axi_ram_init);
 
     /* AXIRAM未初始化数据段 */
@@ -132,7 +132,7 @@ SECTIONS
         _ahb_ram_init_start = .;        /* 起始地址 */
         *(.share_init)                  /* 已初始化数据 */
         _ahb_ram_init_end = .;          /* 结束地址 */
-    } > AHBRAM AT > LOADER
+    } > AHBRAM AT > CODE_PARTITION
     _ahb_ram_section_addr = LOADADDR(.ahb_ram_init);
 
     /* AHBRAM未初始化数据段 */
@@ -149,7 +149,7 @@ SECTIONS
         _share_ram_start = .;           /* 起始地址 */
         *(.share)                       /* 程序之间共享的数据 */
         _share_ram_end = .;             /* 结束地址 */
-    } > AHBRAM1 AT > LOADER
+    } > AHBRAM1 AT > CODE_PARTITION
     _share_ram_section_addr = LOADADDR(.share_ram);
 
     /* BKPRAM已初始化数据段 */

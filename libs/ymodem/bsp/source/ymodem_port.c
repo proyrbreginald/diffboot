@@ -11,14 +11,6 @@
 #define DBG_LVL DBG_VERBOSE
 #include <rtdebug.h>
 
-typedef enum
-{
-    IAP_USER,
-    IAP_OEM,
-} iap_zone_t;
-
-static iap_zone_t iap_zone = IAP_USER;
-
 /**
  * @brief ymodem接收到文件头时执行的回调。
  * @param name 接收到的文件名字符串。
@@ -38,14 +30,14 @@ ITCM static int ymodem_on_begin(const char *name, uint32_t size)
         flash_erase_configuration.Banks = FLASH_BANK_1;
         flash_erase_configuration.Sector =
             (USER_START - MCU_FLASH_START) / MCU_FLASH_SECTOR_SIZE;
-        iap_zone = IAP_USER;
+        load_write_config_which(LOAD_APP_USER);
     }
     else if (strcmp(name, "oem.bin") == 0)
     {
         flash_erase_configuration.Banks = FLASH_BANK_2;
         flash_erase_configuration.Sector =
             OEM_START / MCU_FLASH_SECTOR_SIZE - 8;
-        iap_zone = IAP_OEM;
+        load_write_config_which(LOAD_APP_OEM);
     }
     else
     {
@@ -110,8 +102,16 @@ ITCM static int ymodem_on_data(const uint8_t *data, uint32_t len,
 {
     int result = 0;
 
+    load_which_t which;
+    if (!load_read_config_which(&which))
+    {
+        result = load_get_error();
+        LOG_E("read load which fail with 0x%d", result);
+        goto exit;
+    }
+
     const uint32_t addr =
-        ((iap_zone == IAP_USER) ? USER_START : OEM_START) + offset;
+        ((which == LOAD_APP_USER) ? USER_START : OEM_START) + offset;
     // 检查地址是否32字节对齐
     if ((addr & 31) != 0)
     {
@@ -132,7 +132,7 @@ ITCM static int ymodem_on_data(const uint8_t *data, uint32_t len,
     }
 
     // 清除ECC标志
-    __HAL_FLASH_CLEAR_FLAG_BANK1((iap_zone == IAP_USER)
+    __HAL_FLASH_CLEAR_FLAG_BANK1((which == LOAD_APP_USER)
                                      ? FLASH_FLAG_ALL_ERRORS_BANK1
                                      : FLASH_FLAG_ALL_ERRORS_BANK2);
 
@@ -205,8 +205,16 @@ ITCM static void ymodem_on_end(int status)
     {
         LOG_I("download success!");
 
+        load_which_t which;
+        if (!load_read_config_which(&which))
+        {
+            LOG_E("read which fail with %d", load_get_error());
+            return;
+        }
+
         uint8_t buffer[8] = {0};
-        const uint32_t addr = ((iap_zone == IAP_USER) ? USER_START : OEM_START);
+        const uint32_t addr =
+            ((which == LOAD_APP_USER) ? USER_START : OEM_START);
         memcpy(buffer, (void *)addr, sizeof(buffer));
 
         uint32_t stack = (uint32_t)buffer[3] << (3 * 8);
@@ -219,13 +227,13 @@ ITCM static void ymodem_on_end(int status)
         reset |= (uint32_t)buffer[5] << (1 * 8);
         reset |= (uint32_t)buffer[4] << (0 * 8);
 
-        // 设置加载app标志位
-        load_write_config_which(LOAD_APP_USER);
         LOG_I("stack: 0x%08x, reset: 0x%08x", stack, reset);
+        load_set_reset();
     }
     else
     {
         LOG_E("download failed, error code: %d", status);
+        load_write_config_which(LOAD_APP_INVALID); //!< 清除启动参数
     }
 }
 

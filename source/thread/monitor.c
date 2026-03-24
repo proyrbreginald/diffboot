@@ -2,7 +2,7 @@
 
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__
-#define DBG_LVL DBG_WARN
+#define DBG_LVL DBG_DEBUG
 #include <rtdebug.h>
 
 /**
@@ -35,7 +35,7 @@ static void monitor_thread_entry(void *parameter)
         if (++cnt % 1 == 0)
         {
             /* 占用率 = 100 - (睡眠占比) */
-            LOG_I("cpu usage per s: %.2f%%",
+            LOG_D("cpu usage per s: %.2f%%",
                   100.0f - ((float)sleep_cnt / 1000000) * 100.0f);
             cnt = 0;
         }

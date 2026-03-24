@@ -7,11 +7,16 @@
 
 // 配置调试日志
 #define DBG_TAG __FILE_NAME__
-#define DBG_LVL DBG_WARN
+#define DBG_LVL DBG_DEBUG
 #include <rtdebug.h>
 
-void detect_app(void)
+void detect_reset(void)
 {
+    if (load_get_reset() != LOAD_RESET)
+    {
+        return;
+    }
+
     load_which_t which;
     if (!load_read_config_which(&which))
     {
@@ -24,22 +29,18 @@ void detect_app(void)
     // 校验跳转标志位
     switch (which)
     {
-    case LOAD_BOOT:
-        LOG_I("LOAD_BOOT");
-        return;
     case LOAD_APP_USER:
         // 赋值user程序分区的地址作为app程序地址
         app_bin_addr = USER_START;
-        LOG_I("LOAD_APP_USER");
+        LOG_I("detect user app");
         break;
     case LOAD_APP_OEM:
         // 赋值oem程序分区的地址作为app程序地址
         app_bin_addr = OEM_START;
-        LOG_I("LOAD_APP_OEM");
+        LOG_I("detect oem app");
         break;
     default:
         // 无效参数时不加载app程序
-        LOG_I("LOAD_INVALID");
         return;
     }
     LOG_F("reset by software");
@@ -65,11 +66,20 @@ void detect_app(void)
  */
 static void boot_thread_entry(void *parameter)
 {
+#if defined(BUILD_LOADER)
+    LOG_D("launch from boot");
+#elif defined(BUILD_USER)
+    LOG_D("launch from user");
+#elif defined(BUILD_OEM)
+    LOG_D("launch from oem");
+#else
+    LOG_F("lost BUILD_XXX define");
+#endif
     while (1)
     {
         LOG_D("<thread:%s> running", parameter);
         HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
-        detect_app();
+        detect_reset();
         rt_thread_mdelay(500);
     }
 }
