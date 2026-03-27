@@ -19,5 +19,5 @@
 ## 三、 使用指南
 
 ```c
-detools create_patch --compression crle old_bin new_bin patch
+detools create_patch --compression crle old_bin new_bin old_patch
 ```
