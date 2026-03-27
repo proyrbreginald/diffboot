@@ -15,3 +15,9 @@
 1. 在于将boot与app的ram与flash分区布局进行了统一，从而避免出现app链接地址与烧录地址不匹配的情况；
 2. 在于boot与app均共用通过一套库，包括深度优化过的实时操作系统、ymodem协议栈，从而实现boot与app均可无感接收、烧录并验证新固件；
 3. 在于支持接收新固件的差分包，在boot端进行还原操作，从而节省固件传输大小。
+
+## 三、 使用指南
+
+```c
+detools create_patch --compression crle old_bin new_bin patch
+```

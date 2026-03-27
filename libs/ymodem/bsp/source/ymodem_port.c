@@ -36,8 +36,24 @@ ITCM static int ymodem_on_begin(const char *name, uint32_t size)
     {
         flash_erase_configuration.Banks = FLASH_BANK_2;
         flash_erase_configuration.Sector =
-            OEM_START / MCU_FLASH_SECTOR_SIZE - 8;
+            (OEM_START - MCU_FLASH_START) / MCU_FLASH_SECTOR_SIZE - 8;
         load_write_config_which(LOAD_APP_OEM);
+    }
+    else if (strcmp(name, "user.patch") == 0)
+    {
+        flash_erase_configuration.Banks = FLASH_BANK_2;
+        flash_erase_configuration.Sector =
+            (PATCH_START - MCU_FLASH_START) / MCU_FLASH_SECTOR_SIZE - 8;
+        load_set_patch(LOAD_PATCH_USER);
+        load_set_patch_size(size);
+    }
+    else if (strcmp(name, "oem.patch") == 0)
+    {
+        flash_erase_configuration.Banks = FLASH_BANK_2;
+        flash_erase_configuration.Sector =
+            (PATCH_START - MCU_FLASH_START) / MCU_FLASH_SECTOR_SIZE - 8;
+        load_set_patch(LOAD_PATCH_OEM);
+        load_set_patch_size(size);
     }
     else
     {
@@ -60,10 +76,14 @@ ITCM static int ymodem_on_begin(const char *name, uint32_t size)
     }
 
     // 清除ECC标志
-    __HAL_FLASH_CLEAR_FLAG_BANK1(
-        (flash_erase_configuration.Banks == FLASH_BANK_1)
-            ? FLASH_FLAG_ALL_ERRORS_BANK1
-            : FLASH_FLAG_ALL_ERRORS_BANK2);
+    if (flash_erase_configuration.Banks == FLASH_BANK_1)
+    {
+        __HAL_FLASH_CLEAR_FLAG_BANK1(FLASH_FLAG_ALL_ERRORS_BANK1);
+    }
+    else
+    {
+        __HAL_FLASH_CLEAR_FLAG_BANK2(FLASH_FLAG_ALL_ERRORS_BANK2);
+    }
 
     // 执行擦除
     uint32_t sector_error;
@@ -110,8 +130,31 @@ ITCM static int ymodem_on_data(const uint8_t *data, uint32_t len,
         goto exit;
     }
 
-    const uint32_t addr =
-        ((which == LOAD_APP_USER) ? USER_START : OEM_START) + offset;
+    uint32_t addr;
+
+    switch (which)
+    {
+    case LOAD_APP_USER:
+        addr = USER_START + offset;
+        break;
+    case LOAD_APP_OEM:
+        addr = OEM_START + offset;
+        break;
+    default:
+        const load_patch_t patch = load_get_patch();
+        switch (patch)
+        {
+        case LOAD_PATCH_USER:
+        case LOAD_PATCH_OEM:
+            addr = PATCH_START + offset;
+            break;
+        default:
+            LOG_E("load patch error with %d", patch);
+            goto exit;
+        }
+        break;
+    }
+
     // 检查地址是否32字节对齐
     if ((addr & 31) != 0)
     {
@@ -132,9 +175,28 @@ ITCM static int ymodem_on_data(const uint8_t *data, uint32_t len,
     }
 
     // 清除ECC标志
-    __HAL_FLASH_CLEAR_FLAG_BANK1((which == LOAD_APP_USER)
-                                     ? FLASH_FLAG_ALL_ERRORS_BANK1
-                                     : FLASH_FLAG_ALL_ERRORS_BANK2);
+    switch (which)
+    {
+    case LOAD_APP_USER:
+        __HAL_FLASH_CLEAR_FLAG_BANK1(FLASH_FLAG_ALL_ERRORS_BANK1);
+        break;
+    case LOAD_APP_OEM:
+        __HAL_FLASH_CLEAR_FLAG_BANK2(FLASH_FLAG_ALL_ERRORS_BANK2);
+        break;
+    default:
+        const load_patch_t patch = load_get_patch();
+        switch (patch)
+        {
+        case LOAD_PATCH_USER:
+        case LOAD_PATCH_OEM:
+            __HAL_FLASH_CLEAR_FLAG_BANK2(FLASH_FLAG_ALL_ERRORS_BANK2);
+            break;
+        default:
+            LOG_E("load patch(%d) with error(%d)", patch, load_get_error());
+            goto exit;
+        }
+        break;
+    }
 
     uint32_t bytes_processed = 0;
     static uint8_t buffer[32] __attribute__((aligned(32)));
@@ -212,23 +274,44 @@ ITCM static void ymodem_on_end(int status)
             return;
         }
 
-        uint8_t buffer[8] = {0};
-        const uint32_t addr =
-            ((which == LOAD_APP_USER) ? USER_START : OEM_START);
-        memcpy(buffer, (void *)addr, sizeof(buffer));
+        switch (which)
+        {
+        case LOAD_APP_USER:
+        case LOAD_APP_OEM:
+            uint8_t buffer[8] = {0};
+            const uint32_t addr =
+                ((which == LOAD_APP_USER) ? USER_START : OEM_START);
+            memcpy(buffer, (void *)addr, sizeof(buffer));
 
-        uint32_t stack = (uint32_t)buffer[3] << (3 * 8);
-        stack |= (uint32_t)buffer[2] << (2 * 8);
-        stack |= (uint32_t)buffer[1] << (1 * 8);
-        stack |= (uint32_t)buffer[0] << (0 * 8);
+            uint32_t stack = (uint32_t)buffer[3] << (3 * 8);
+            stack |= (uint32_t)buffer[2] << (2 * 8);
+            stack |= (uint32_t)buffer[1] << (1 * 8);
+            stack |= (uint32_t)buffer[0] << (0 * 8);
 
-        uint32_t reset = (uint32_t)buffer[7] << (3 * 8);
-        reset |= (uint32_t)buffer[6] << (2 * 8);
-        reset |= (uint32_t)buffer[5] << (1 * 8);
-        reset |= (uint32_t)buffer[4] << (0 * 8);
+            uint32_t reset = (uint32_t)buffer[7] << (3 * 8);
+            reset |= (uint32_t)buffer[6] << (2 * 8);
+            reset |= (uint32_t)buffer[5] << (1 * 8);
+            reset |= (uint32_t)buffer[4] << (0 * 8);
 
-        LOG_I("stack: 0x%08x, reset: 0x%08x", stack, reset);
-        load_set_reset();
+            LOG_I("stack: 0x%08x, reset: 0x%08x", stack, reset);
+            load_set_reset();
+            break;
+        default:
+            const load_patch_t patch = load_get_patch();
+            switch (patch)
+            {
+            case LOAD_PATCH_USER:
+                load_set_apply(LOAD_APPLY_OEM);
+                break;
+            case LOAD_PATCH_OEM:
+                load_set_apply(LOAD_APPLY_USER);
+                break;
+            default:
+                LOG_E("load patch error with %d", patch);
+                return;
+            }
+            break;
+        }
     }
     else
     {

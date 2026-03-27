@@ -6,6 +6,21 @@
 
 SHARE static load_config_t load_config;
 
+bool load_verify_config(void)
+{
+    const uint16_t c_crc =
+        algo_crc16((uint8_t *)&load_config, sizeof(load_config_info_t));
+    if (c_crc != load_config.crc)
+    {
+        load_set_error(LOAD_ERROR_VERIFY);
+        return false;
+    }
+    else
+    {
+        return true;
+    }
+}
+
 uint16_t load_update_config_crc(void)
 {
     load_config.crc =
@@ -23,6 +38,15 @@ void load_set_error(load_error_t error)
     if (load_config.info.error != error)
     {
         load_config.info.error = error;
+        load_update_config_crc(); //!< 更新校验值
+    }
+}
+
+void load_clear_error(void)
+{
+    if (load_config.info.error != LOAD_ERROR_INVALID)
+    {
+        load_config.info.error = LOAD_ERROR_INVALID;
         load_update_config_crc(); //!< 更新校验值
     }
 }
@@ -55,21 +79,6 @@ load_reset_t load_get_reset(void)
     return load_config.info.reset;
 }
 
-bool load_verify_config(void)
-{
-    const uint16_t c_crc =
-        algo_crc16((uint8_t *)&load_config, sizeof(load_config_info_t));
-    if (c_crc != load_config.crc)
-    {
-        load_set_error(LOAD_ERROR_VERIFY);
-        return false;
-    }
-    else
-    {
-        return true;
-    }
-}
-
 void load_write_config_which(load_which_t which)
 {
     if (load_config.info.which != which)
@@ -94,11 +103,70 @@ bool load_read_config_which(load_which_t *which)
     return true;
 }
 
+void load_set_apply(load_apply_t apply)
+{
+    if (load_config.info.apply != apply)
+    {
+        load_config.info.apply = apply;
+        load_update_config_crc(); //!< 更新校验值
+    }
+}
+
+void load_clear_apply(void)
+{
+    if (load_config.info.apply != LOAD_APPLY_INVALID)
+    {
+        load_config.info.apply = LOAD_APPLY_INVALID;
+        load_update_config_crc(); //!< 更新校验值
+    }
+}
+
+load_apply_t load_get_apply(void)
+{
+    return load_config.info.apply;
+}
+
+void load_set_patch(load_patch_t patch)
+{
+    if (load_config.info.patch != patch)
+    {
+        load_config.info.patch = patch;
+        load_update_config_crc(); //!< 更新校验值
+    }
+}
+
+void load_clear_patch(void)
+{
+    if (load_config.info.patch != LOAD_PATCH_INVALID)
+    {
+        load_config.info.patch = LOAD_PATCH_INVALID;
+        load_update_config_crc(); //!< 更新校验值
+    }
+}
+
+load_patch_t load_get_patch(void)
+{
+    return load_config.info.patch;
+}
+
+void load_set_patch_size(uint32_t patch_size)
+{
+    if (load_config.info.patch_size != patch_size)
+    {
+        load_config.info.patch_size = patch_size;
+        load_update_config_crc(); //!< 更新校验值
+    }
+}
+
+uint32_t load_get_patch_size(void)
+{
+    return load_config.info.patch_size;
+}
+
 void load_app(void)
 {
-
-    load_set_error(LOAD_ERROR_NONE); //!< 清除复位前设置的错误码
-    load_clear_reset();              //!< 清除复位前设置的复位需求
+    load_clear_error(); //!< 清除复位前设置的错误码
+    load_clear_reset(); //!< 清除复位前设置的复位需求
 
     uint32_t app_bin_addr; //!< 待启动的app程序地址
     load_which_t which;
@@ -108,7 +176,7 @@ void load_app(void)
     }
     switch (which) //!< 读取应该启动哪个程序
     {
-    case LOAD_APP_BOOT:
+    case LOAD_APP_LOADER:
         return; //!< 从boot启动
     case LOAD_APP_USER:
         app_bin_addr = USER_START; //!< 从用户程序启动

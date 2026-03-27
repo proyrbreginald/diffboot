@@ -7,6 +7,8 @@ srcDirs:
   - bsp/source
   - libs/arch/arm/cm7
   - libs/cubemx/Core/Src
+  - libs/detools/bsp/source
+  - libs/detools/source
   - libs/libc/source
   - libs/libstm32h743/hal/source
   - libs/rtthread
@@ -34,6 +36,8 @@ targets:
         - bsp/include
         - include
         - libs/cubemx/Core/Inc
+        - libs/detools/bsp/include
+        - libs/detools/include
         - libs/libc/include
         - libs/libstm32h743/cmsis/device/st/stm32h7/include
         - libs/libstm32h743/cmsis/include

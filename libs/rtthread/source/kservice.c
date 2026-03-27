@@ -151,7 +151,18 @@ RTM_EXPORT(_rt_errno);
  */
 void rt_show_version(void)
 {
-    rt_kprintf(" \\ | /  Thread Operating System\n");
+    rt_kprintf(" \\ | /  Thread Operating System of %s\n",
+#if defined(BUILD_LOADER)
+               "LOADER"
+#elif defined(BUILD_USER)
+               "USER"
+#elif defined(BUILD_OEM)
+               "OEM"
+#else
+/* 无有效参数时报错 */
+#error "BUILD_LOADER, BUILD_USER or BUILD_OEM must be defined"
+#endif
+    );
     rt_kprintf("- R T - %d.%d.%d build %s %s\n", RT_VERSION, RT_SUBVERSION,
                RT_REVISION, __DATE__, __TIME__);
     rt_kprintf(" / | \\  2006-2022 Copyright by RT-Thread team\n");

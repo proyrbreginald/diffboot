@@ -97,9 +97,9 @@
  */
 #define dbg_log_line(lvl, color_fg, color_bg, fmt, ...)                        \
     do {                                                                       \
-        rt_kprintf(_DBG_LOG_HDR(color_fg, color_bg) "[" lvl "/" DBG_TAG        \
+        rt_kprintf(_DBG_LOG_HDR(color_fg, color_bg) "[" lvl "/" DBG_TAG ":%d"  \
                                                     "] " fmt _DBG_LOG_X_END,   \
-                   ##__VA_ARGS__);                                             \
+                   __LINE__, ##__VA_ARGS__);                                   \
     } while (0)
 
 /**

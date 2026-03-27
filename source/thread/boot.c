@@ -1,3 +1,4 @@
+#include <detools_port.h>
 #include <load/load.h>
 #include <main.h>
 #include <rthw.h>
@@ -9,6 +10,161 @@
 #define DBG_TAG __FILE_NAME__
 #define DBG_LVL DBG_DEBUG
 #include <rtdebug.h>
+
+void erase_user(void)
+{
+    int result = 0;
+    FLASH_EraseInitTypeDef flash_erase_configuration = {
+        .TypeErase = FLASH_TYPEERASE_SECTORS,
+        .Banks = FLASH_BANK_1,
+        .Sector = (USER_START - MCU_FLASH_START) / MCU_FLASH_SECTOR_SIZE,
+        .NbSectors = USER_SECTOR_COUNT,
+        .VoltageRange = FLASH_VOLTAGE_RANGE_3,
+    };
+
+    LOG_D("flash erase sector index: %u, number: %u",
+          flash_erase_configuration.Sector,
+          flash_erase_configuration.NbSectors);
+
+    // 在擦写前关闭全局中断
+    __disable_irq();
+
+    // 解锁Flash控制寄存器
+    result = HAL_FLASH_Unlock();
+    if (0 != result)
+    {
+        LOG_E("flash unlock fail");
+        return;
+    }
+
+    // 清除ECC标志
+    __HAL_FLASH_CLEAR_FLAG_BANK1(FLASH_FLAG_ALL_ERRORS_BANK1);
+
+    // 执行擦除
+    uint32_t sector_error;
+    result = HAL_FLASHEx_Erase(&flash_erase_configuration, &sector_error);
+    if (0 != result)
+    {
+        LOG_E("flash erase fail with %u", sector_error);
+        return;
+    }
+
+    // 上锁Flash控制寄存器
+    result = HAL_FLASH_Lock();
+    if (0 != result)
+    {
+        LOG_E("flash lock fail");
+    }
+
+    // 使能全局中断
+    __enable_irq();
+
+    LOG_E("flash user success");
+}
+
+void erase_oem(void)
+{
+    int result = 0;
+    FLASH_EraseInitTypeDef flash_erase_configuration = {
+        .TypeErase = FLASH_TYPEERASE_SECTORS,
+        .Banks = FLASH_BANK_2,
+        .Sector = (OEM_START - MCU_FLASH_START) / MCU_FLASH_SECTOR_SIZE - 8,
+        .NbSectors = OEM_SECTOR_COUNT,
+        .VoltageRange = FLASH_VOLTAGE_RANGE_3,
+    };
+
+    LOG_D("flash erase sector index: %u, number: %u",
+          flash_erase_configuration.Sector,
+          flash_erase_configuration.NbSectors);
+
+    // 在擦写前关闭全局中断
+    __disable_irq();
+
+    // 解锁Flash控制寄存器
+    result = HAL_FLASH_Unlock();
+    if (0 != result)
+    {
+        LOG_E("flash unlock fail");
+        return;
+    }
+
+    // 清除ECC标志
+    __HAL_FLASH_CLEAR_FLAG_BANK2(FLASH_FLAG_ALL_ERRORS_BANK2);
+
+    // 执行擦除
+    uint32_t sector_error;
+    result = HAL_FLASHEx_Erase(&flash_erase_configuration, &sector_error);
+    if (0 != result)
+    {
+        LOG_E("flash erase fail with %u", sector_error);
+        return;
+    }
+
+    // 上锁Flash控制寄存器
+    result = HAL_FLASH_Lock();
+    if (0 != result)
+    {
+        LOG_E("flash lock fail");
+    }
+
+    // 使能全局中断
+    __enable_irq();
+
+    LOG_E("flash oem success");
+}
+
+void detect_apply(void)
+{
+    uint32_t old_app_addr;
+    uint32_t patch_addr;
+    uint32_t patch_size;
+    uint32_t new_app_addr;
+    const load_apply_t apply = load_get_apply();
+    switch (apply)
+    {
+    case LOAD_APPLY_USER:
+        LOG_I("LOAD_APPLY_OEM erase");
+        old_app_addr = OEM_START;
+        patch_addr = PATCH_START;
+        patch_size = load_get_patch_size();
+        new_app_addr = USER_START;
+        erase_user();
+        break;
+    case LOAD_APPLY_OEM:
+        LOG_I("LOAD_APPLY_OEM erase");
+        old_app_addr = USER_START;
+        patch_addr = PATCH_START;
+        patch_size = load_get_patch_size();
+        new_app_addr = OEM_START;
+        erase_oem();
+        break;
+    default:
+        LOG_I("LOAD_APPLY_OEM erase");
+        return;
+    }
+
+    const int result =
+        detools_apply_patch(old_app_addr, patch_addr, patch_size, new_app_addr);
+    if (result == DETOOLS_OK)
+    {
+        switch (apply)
+        {
+        case LOAD_APPLY_USER:
+            load_write_config_which(LOAD_APP_USER);
+            LOG_I("LOAD_APPLY_USER apply");
+            break;
+        case LOAD_APPLY_OEM:
+            load_write_config_which(LOAD_APP_OEM);
+            LOG_I("LOAD_APPLY_OEM apply");
+            break;
+        default:
+            LOG_I("LOAD_APPLY_INVALID apply");
+            return;
+        }
+        load_clear_apply();
+        load_set_reset();
+    }
+}
 
 void detect_reset(void)
 {
@@ -79,6 +235,7 @@ static void boot_thread_entry(void *parameter)
     {
         LOG_D("<thread:%s> running", parameter);
         HAL_GPIO_TogglePin(LED_GREEN_GPIO_Port, LED_GREEN_Pin);
+        detect_apply();
         detect_reset();
         rt_thread_mdelay(500);
     }
