@@ -11,14 +11,14 @@
 #define DBG_LVL DBG_DEBUG
 #include <rtdebug.h>
 
-void erase_user(void)
+void erase_user(uint32_t patch_size)
 {
     int result = 0;
     FLASH_EraseInitTypeDef flash_erase_configuration = {
         .TypeErase = FLASH_TYPEERASE_SECTORS,
         .Banks = FLASH_BANK_1,
         .Sector = (USER_START - MCU_FLASH_START) / MCU_FLASH_SECTOR_SIZE,
-        .NbSectors = USER_SECTOR_COUNT,
+        .NbSectors = (1 + patch_size / MCU_FLASH_SECTOR_SIZE),
         .VoltageRange = FLASH_VOLTAGE_RANGE_3,
     };
 
@@ -62,14 +62,14 @@ void erase_user(void)
     LOG_E("flash user success");
 }
 
-void erase_oem(void)
+void erase_oem(uint32_t patch_size)
 {
     int result = 0;
     FLASH_EraseInitTypeDef flash_erase_configuration = {
         .TypeErase = FLASH_TYPEERASE_SECTORS,
         .Banks = FLASH_BANK_2,
         .Sector = (OEM_START - MCU_FLASH_START) / MCU_FLASH_SECTOR_SIZE - 8,
-        .NbSectors = OEM_SECTOR_COUNT,
+        .NbSectors = (1 + patch_size / MCU_FLASH_SECTOR_SIZE),
         .VoltageRange = FLASH_VOLTAGE_RANGE_3,
     };
 
@@ -110,7 +110,7 @@ void erase_oem(void)
     // 使能全局中断
     __enable_irq();
 
-    LOG_E("flash oem success");
+    LOG_I("flash oem success");
 }
 
 void detect_apply(void)
@@ -128,7 +128,7 @@ void detect_apply(void)
         patch_addr = PATCH_START;
         patch_size = load_get_patch_size();
         new_app_addr = USER_START;
-        erase_user();
+        erase_user(patch_size);
         break;
     case LOAD_APPLY_OEM:
         LOG_I("LOAD_APPLY_OEM erase");
@@ -136,10 +136,10 @@ void detect_apply(void)
         patch_addr = PATCH_START;
         patch_size = load_get_patch_size();
         new_app_addr = OEM_START;
-        erase_oem();
+        erase_oem(patch_size);
         break;
     default:
-        LOG_I("LOAD_APPLY_OEM erase");
+        LOG_I("LOAD_APPLY_INVALID");
         return;
     }
 
@@ -203,9 +203,9 @@ void detect_reset(void)
 
     // 获取app的栈指针和复位处理函数
     // app程序的第一个4字节是栈地址，第二个是复位处理函数地址
-    const uint32_t new_msp = *(volatile uint32_t *)app_bin_addr;
+    const uint32_t new_msp = *((volatile uint32_t *)app_bin_addr);
     const void_fn_void_t new_reset_handler =
-        (void_fn_void_t)(*(volatile uint32_t *)(app_bin_addr + 4));
+        (void_fn_void_t)(*((volatile uint32_t *)(app_bin_addr + 4)));
     LOG_I("VTOR: 0x%08x, new_msp: 0x%08x, new_reset_handler: 0x%08x",
           app_bin_addr, new_msp, new_reset_handler);
     UNUSE_VAR(new_msp);

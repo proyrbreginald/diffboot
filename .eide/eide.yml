@@ -55,6 +55,8 @@ targets:
       - libs/libstm32h743/hal/source/stm32h7xx_hal_timebase_tim_template.c
       - libs/cubemx/Core/Src/sysmem.c
       - libs/cubemx/Core/Src/syscalls.c
+    settings:
+      debugger: cortex-debug
     toolchain: GCC
     toolchainConfigMap:
       GCC:
