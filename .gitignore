@@ -1,3 +1,1 @@
-/.vscode/launch.json
-/build
-/docs
+Nothing to output - the change list contains only a source/config file (README.md) and no build artifacts, dependencies, or temp files that need to be ignored.
