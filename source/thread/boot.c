@@ -11,7 +11,7 @@
 #define DBG_LVL DBG_DEBUG
 #include <rtdebug.h>
 
-void erase_user(uint32_t patch_size)
+ITCM void erase_user(uint32_t patch_size)
 {
     int result = 0;
     FLASH_EraseInitTypeDef flash_erase_configuration = {
@@ -62,7 +62,7 @@ void erase_user(uint32_t patch_size)
     LOG_E("flash user success");
 }
 
-void erase_oem(uint32_t patch_size)
+ITCM void erase_oem(uint32_t patch_size)
 {
     int result = 0;
     FLASH_EraseInitTypeDef flash_erase_configuration = {
@@ -113,7 +113,7 @@ void erase_oem(uint32_t patch_size)
     LOG_I("flash oem success");
 }
 
-void detect_apply(void)
+ITCM void detect_apply(void)
 {
     uint32_t old_app_addr;
     uint32_t patch_addr;
@@ -166,7 +166,7 @@ void detect_apply(void)
     }
 }
 
-void detect_reset(void)
+ITCM void detect_reset(void)
 {
     if (load_get_reset() != LOAD_RESET)
     {
@@ -220,7 +220,7 @@ void detect_reset(void)
  * @brief bootloader线程。
  * @param parameter 线程名称字符串。
  */
-static void boot_thread_entry(void *parameter)
+ITCM static void boot_thread_entry(void *parameter)
 {
 #if defined(BUILD_LOADER)
     LOG_D("launch from boot");

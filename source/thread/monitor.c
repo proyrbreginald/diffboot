@@ -9,7 +9,7 @@
  * @brief 监视器线程。
  * @param parameter 线程名称字符串。
  */
-static void monitor_thread_entry(void *parameter)
+ITCM static void monitor_thread_entry(void *parameter)
 {
     // 将毫秒转换为系统的Tick数
     const rt_tick_t period_tick = rt_tick_from_millisecond(1000);

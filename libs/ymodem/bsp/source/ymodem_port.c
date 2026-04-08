@@ -343,7 +343,7 @@ RUN_ENV_EXPORT(ymodem_env_init);
  * @brief ymodem线程。
  * @param parameter 线程名称参数。
  */
-static void ymodem_thread_entry(void *parameter)
+ITCM static void ymodem_thread_entry(void *parameter)
 {
     while (1)
     {

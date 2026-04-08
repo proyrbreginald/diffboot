@@ -16,7 +16,7 @@ extern int bsp_flash_erase_sector_by_addr(uint32_t addr);
 /* ====================================================================
  * 1. 回调函数：读取旧固件 (From Read)
  * ==================================================================== */
-static int cb_from_read(void *arg_p, uint8_t *buf_p, size_t size)
+ITCM static int cb_from_read(void *arg_p, uint8_t *buf_p, size_t size)
 {
     detools_ctx_t *ctx = (detools_ctx_t *)arg_p;
 
@@ -31,7 +31,7 @@ static int cb_from_read(void *arg_p, uint8_t *buf_p, size_t size)
 /* ====================================================================
  * 2. 回调函数：移动旧固件读取指针 (From Seek)
  * ==================================================================== */
-static int cb_from_seek(void *arg_p, int offset)
+ITCM static int cb_from_seek(void *arg_p, int offset)
 {
     detools_ctx_t *ctx = (detools_ctx_t *)arg_p;
 
@@ -43,7 +43,7 @@ static int cb_from_seek(void *arg_p, int offset)
 /* ====================================================================
  * 3. 回调函数：读取差分包 (Patch Read)
  * ==================================================================== */
-static int cb_patch_read(void *arg_p, uint8_t *buf_p, size_t size)
+ITCM static int cb_patch_read(void *arg_p, uint8_t *buf_p, size_t size)
 {
     detools_ctx_t *ctx = (detools_ctx_t *)arg_p;
 
@@ -57,7 +57,7 @@ static int cb_patch_read(void *arg_p, uint8_t *buf_p, size_t size)
 /* ====================================================================
  * 写入生成的新固件 (To Write) - 带 32 字节缓存的 Flash 写入
  * ==================================================================== */
-static int cb_to_write(void *arg_p, const uint8_t *buf_p, size_t size)
+ITCM static int cb_to_write(void *arg_p, const uint8_t *buf_p, size_t size)
 {
     detools_ctx_t *ctx = (detools_ctx_t *)arg_p;
     uint32_t bytes_processed = 0;
@@ -122,7 +122,7 @@ static int cb_to_write(void *arg_p, const uint8_t *buf_p, size_t size)
 /* ====================================================================
  * 5. 顶层暴露接口
  * ==================================================================== */
-int detools_apply_patch(uint32_t old_app_addr, uint32_t patch_addr,
+ITCM int detools_apply_patch(uint32_t old_app_addr, uint32_t patch_addr,
                         uint32_t patch_size, uint32_t new_app_addr)
 {
     detools_ctx_t ctx;
